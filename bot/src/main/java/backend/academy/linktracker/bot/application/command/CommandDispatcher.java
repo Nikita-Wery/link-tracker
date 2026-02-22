@@ -17,6 +17,10 @@ public class CommandDispatcher {
 
     private Map<String, Command> commands = new HashMap<>();
 
+    public CommandDispatcher(List<Command> commands) {
+        commands.stream().forEach(command -> this.commands.put(command.getCommandName(), command));
+    }
+
     public void register(String commandName, Command command) {
         this.commands.put(commandName, command);
     }
@@ -35,6 +39,7 @@ public class CommandDispatcher {
         if (update.message() == null || update.message().text() == null) {
             return;
         }
+
         String text = update.message().text().split(" ")[0];
         Command command = commands.getOrDefault(text, commands.get("/unknown"));
         command.handle(update);
