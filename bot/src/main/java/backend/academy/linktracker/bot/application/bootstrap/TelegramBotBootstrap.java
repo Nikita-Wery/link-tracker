@@ -11,10 +11,7 @@ public class TelegramBotBootstrap implements ApplicationRunner {
     private final TelegramPollingUpdateListener listener;
     private final TelegramCommandRegistrar commandRegistrar;
 
-    public TelegramBotBootstrap(
-            TelegramPollingUpdateListener listener,
-            TelegramCommandRegistrar commandRegistrar
-    ) {
+    public TelegramBotBootstrap(TelegramPollingUpdateListener listener, TelegramCommandRegistrar commandRegistrar) {
         this.listener = listener;
         this.commandRegistrar = commandRegistrar;
     }

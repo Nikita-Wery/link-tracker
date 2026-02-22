@@ -22,4 +22,3 @@ public interface Command<T> {
         commandDispatcher.register(getCommandName(), this);
     }
 }
-

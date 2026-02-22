@@ -1,7 +1,7 @@
 package backend.academy.linktracker.bot.application.command.impl;
 
-import backend.academy.linktracker.bot.application.command.AbstractCommand;
 import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
+import backend.academy.linktracker.bot.application.command.AbstractCommand;
 import com.pengrad.telegrambot.model.Update;
 
 public class UnknownCommand extends AbstractCommand<Update> {
@@ -17,9 +17,6 @@ public class UnknownCommand extends AbstractCommand<Update> {
     public void handle(Update data) {
         Long chatId = data.message().chat().id();
 
-        telegramMessageSender.sendMessage(
-                chatId,
-                getCommandDescription()
-        );
+        telegramMessageSender.sendMessage(chatId, getCommandDescription());
     }
 }
