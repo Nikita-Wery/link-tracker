@@ -17,12 +17,16 @@ public class CommandDispatcher {
 
     private Map<String, Command> commands = new HashMap<>();
 
-    public CommandDispatcher(List<Command> commands) {
-        commands.stream().forEach(command -> this.commands.put(command.getCommandName(), command));
-    }
+    private Command unknownCommand;
 
-    public void register(String commandName, Command command) {
-        this.commands.put(commandName, command);
+    public CommandDispatcher(List<Command> commands) {
+        commands.stream().forEach(command -> {
+            if (!command.getCommandName().equals("/unknown")) {
+                this.commands.put(command.getCommandName(), command);
+            } else {
+                unknownCommand = command;
+            }
+        });
     }
 
     @PostConstruct
@@ -41,7 +45,8 @@ public class CommandDispatcher {
         }
 
         String text = update.message().text().split(" ")[0];
-        Command command = commands.getOrDefault(text, commands.get("/unknown"));
+
+        Command command = commands.getOrDefault(text, unknownCommand);
         command.handle(update);
     }
 }

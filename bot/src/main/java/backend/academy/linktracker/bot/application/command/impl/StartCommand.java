@@ -11,7 +11,7 @@ public class StartCommand extends AbstractCommand<Update> {
     private final TelegramMessageSender telegramMessageSender;
 
     public StartCommand(TelegramMessageSender telegramMessageSender) {
-        super("/start", "Бот запускается");
+        super("/start", "Готовы пообщаться?)");
         this.telegramMessageSender = telegramMessageSender;
     }
 
