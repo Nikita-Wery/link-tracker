@@ -21,12 +21,16 @@ public class TelegramPollingUpdateListener {
     }
 
     public void start() {
-        telegramBot.setUpdatesListener(updates -> {
-            log.info("Received {} updates", updates.size());
+        telegramBot.setUpdatesListener(
+                updates -> {
+                    log.info("Received {} updates", updates.size());
 
-            updates.forEach(commandDispatcher::dispatch);
+                    updates.forEach(commandDispatcher::dispatch);
 
-            return UpdatesListener.CONFIRMED_UPDATES_ALL;
-        });
+                    return UpdatesListener.CONFIRMED_UPDATES_ALL;
+                },
+                e -> {
+                    log.error(e.getMessage());
+                });
     }
 }
