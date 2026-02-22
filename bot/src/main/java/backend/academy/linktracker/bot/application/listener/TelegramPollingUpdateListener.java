@@ -24,7 +24,6 @@ public class TelegramPollingUpdateListener {
     @PostConstruct
     public void start() {
         telegramBot.setUpdatesListener(updates -> {
-
             log.info("Received {} updates", updates.size());
 
             updates.forEach(commandDispatcher::dispatch);
