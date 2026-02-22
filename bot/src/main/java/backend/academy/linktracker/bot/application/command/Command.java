@@ -1,7 +1,5 @@
 package backend.academy.linktracker.bot.application.command;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 /**
  * Абстракция команды, используется паттерн "Command"
  *
@@ -17,8 +15,8 @@ public interface Command<T> {
 
     String getCommandName();
 
-    @Autowired
-    default void registerMySelf(CommandDispatcher commandDispatcher) {
-        commandDispatcher.register(getCommandName(), this);
-    }
+    //    @Autowired
+    //    default void registerMySelf(CommandDispatcher commandDispatcher) {
+    //        commandDispatcher.register(getCommandName(), this);
+    //    }
 }

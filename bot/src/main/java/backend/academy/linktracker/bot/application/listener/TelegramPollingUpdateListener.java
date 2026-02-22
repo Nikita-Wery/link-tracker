@@ -3,7 +3,6 @@ package backend.academy.linktracker.bot.application.listener;
 import backend.academy.linktracker.bot.application.command.CommandDispatcher;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
-import jakarta.annotation.PostConstruct;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,6 @@ public class TelegramPollingUpdateListener {
         this.commandDispatcher = commandDispatcher;
     }
 
-    @PostConstruct
     public void start() {
         telegramBot.setUpdatesListener(updates -> {
             log.info("Received {} updates", updates.size());
