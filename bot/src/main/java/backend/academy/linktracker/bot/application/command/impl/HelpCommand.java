@@ -16,8 +16,9 @@ public class HelpCommand extends AbstractCommand<Update> {
     private final List<Command> commands;
 
     public HelpCommand(TelegramMessageSender telegramMessageSender, List<Command> commands) {
-
         super("/help", "Список доступных команд");
+        // необходимо из-за циклической зависимости
+        commands.add(this);
         this.telegramMessageSender = telegramMessageSender;
         this.commands = commands;
     }
