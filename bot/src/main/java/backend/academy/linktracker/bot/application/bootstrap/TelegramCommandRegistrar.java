@@ -19,7 +19,6 @@ public class TelegramCommandRegistrar {
     }
 
     public void registerCommands() {
-
         List<BotCommand> botCommands = commands.stream()
                 .filter(cmd -> !cmd.getCommandName().equals("/unknown"))
                 .map(cmd -> new BotCommand(cmd.getCommandName(), cmd.getCommandDescription()))
