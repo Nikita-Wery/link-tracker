@@ -5,6 +5,7 @@ import static backend.academy.linktracker.bot.configuration.constants.LoggerCons
 import static net.logstash.logback.argument.StructuredArguments.value;
 
 import backend.academy.linktracker.bot.application.command.Command;
+import com.pengrad.telegrambot.model.Update;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -38,14 +39,14 @@ public class LogstashLoggerConfig {
 
     @After("backend.academy.linktracker.bot.logging.aspect.SystemArchitecture.commandHandleMethod()"
             + " && target(command)")
-    public void addCommandName(JoinPoint joinPoint, Command command) {
+    public void addCommandName(JoinPoint joinPoint, Command<Update> command) {
         MDC.put(STRUCTURED_ARGUMENTS_KEY_COMMAND_NAME, command.getCommandName());
     }
 
     @Before("backend.academy.linktracker.bot.logging.aspect.SystemArchitecture.sendTelegramMessageMethod()"
             + " && args(chatId, message)")
-    public void addChatId(JoinPoint joinPoint, Long chatId, String message) {
-        MDC.put(STRUCTURED_ARGUMENTS_KEY_CHAT_ID, String.valueOf(chatId));
+    public void addChatId(JoinPoint joinPoint, String chatId, String message) {
+        MDC.put(STRUCTURED_ARGUMENTS_KEY_CHAT_ID, chatId);
     }
 
     @After("backend.academy.linktracker.bot.logging.aspect.SystemArchitecture.sendTelegramMessageMethod()")

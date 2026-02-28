@@ -22,11 +22,11 @@ public class CommandDispatcher implements UpdateDispatcher {
 
     private final Logger log = LogManager.getLogger(CommandDispatcher.class);
 
-    private Map<String, Command> commands = new HashMap<>();
+    private Map<String, Command<Update>> commands = new HashMap<>();
 
-    private Command unknownCommand;
+    private Command<Update> unknownCommand;
 
-    public CommandDispatcher(List<Command> commands) {
+    public CommandDispatcher(List<Command<Update>> commands) {
         commands.stream().forEach(command -> {
             if (!command.getCommandName().equals("/unknown")) {
                 this.commands.put(command.getCommandName(), command);
@@ -42,7 +42,7 @@ public class CommandDispatcher implements UpdateDispatcher {
         commands.keySet().forEach(cmd -> log.info(" - {}", cmd));
     }
 
-    public List<Command> getListOfCommands() {
+    public List<Command<Update>> getListOfCommands() {
         return new ArrayList<>(commands.values());
     }
 
@@ -58,7 +58,7 @@ public class CommandDispatcher implements UpdateDispatcher {
 
         String text = update.message().text().split(" ")[0];
 
-        Command command = commands.getOrDefault(text, unknownCommand);
+        Command<Update> command = commands.getOrDefault(text, unknownCommand);
         command.handle(update);
     }
 

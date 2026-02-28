@@ -38,7 +38,7 @@ public class SystemArchitecture {
     @Pointcut("execution(* backend..Command.handle(..))")
     public void commandHandleMethod() {}
 
-    @Pointcut("execution(* backend..TelegramMessageSender.sendMessage(Long, String))")
+    @Pointcut("execution(* backend..TelegramMessageSender.sendMessage(String, String))")
     public void sendTelegramMessageMethod() {}
 
     @Pointcut("dispatchMethod() || methodLoggingMethods()")

@@ -3,6 +3,7 @@ package backend.academy.linktracker.bot.application.bootstrap;
 import backend.academy.linktracker.bot.application.command.Command;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.BotCommand;
+import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SetMyCommands;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -16,9 +17,9 @@ import org.springframework.stereotype.Component;
 public class TelegramCommandRegistrar {
 
     private final TelegramBot telegramBot;
-    private final List<Command> commands;
+    private final List<Command<Update>> commands;
 
-    public TelegramCommandRegistrar(TelegramBot telegramBot, List<Command> commands) {
+    public TelegramCommandRegistrar(TelegramBot telegramBot, List<Command<Update>> commands) {
         this.telegramBot = telegramBot;
         this.commands = commands;
     }
