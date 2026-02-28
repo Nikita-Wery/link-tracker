@@ -6,9 +6,9 @@ import static net.logstash.logback.argument.StructuredArguments.value;
 
 import backend.academy.linktracker.bot.application.command.Command;
 import com.pengrad.telegrambot.model.Update;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
 import java.util.UUID;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -51,13 +51,10 @@ public class LogstashLoggerConfig {
     }
 
     @SuppressFBWarnings(
-        value = "SLF4J_PLACE_HOLDER_MISMATCH",
-        justification = "Используем StructuredArguments для JSON, placeholders не нужны"
-    )
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     @After("backend.academy.linktracker.bot.logging.aspect.SystemArchitecture.sendTelegramMessageMethod()")
     public void afterSendTelegramMethod() {
-        log.info(AFTER_METHOD,
-            value(STRUCTURED_ARGUMENTS_KEY_SERVICE, "bot-service"),
-            value("event", "call command"));
+        log.info(AFTER_METHOD, value(STRUCTURED_ARGUMENTS_KEY_SERVICE, "bot-service"), value("event", "call command"));
     }
 }
