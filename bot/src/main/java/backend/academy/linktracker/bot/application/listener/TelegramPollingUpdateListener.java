@@ -34,7 +34,7 @@ public class TelegramPollingUpdateListener {
                     return UpdatesListener.CONFIRMED_UPDATES_ALL;
                 },
                 e -> {
-                    log.error("Exception - {}", e);
+                    log.error("Exception: ", e);
                 });
     }
 }
