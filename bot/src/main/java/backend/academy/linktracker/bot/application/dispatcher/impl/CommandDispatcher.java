@@ -1,20 +1,24 @@
-package backend.academy.linktracker.bot.application.command;
+package backend.academy.linktracker.bot.application.dispatcher.impl;
 
-import com.pengrad.telegrambot.model.Message;
+import backend.academy.linktracker.bot.application.command.Command;
+import backend.academy.linktracker.bot.application.dispatcher.UpdateDispatcher;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.model.User;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+/**
+ * Обработка события - команда
+ *
+ * @author Luzin Nikita
+ */
 @Component
-public class CommandDispatcher {
+public class CommandDispatcher implements UpdateDispatcher {
 
     private final Logger log = LogManager.getLogger(CommandDispatcher.class);
 
@@ -42,21 +46,34 @@ public class CommandDispatcher {
         return new ArrayList<>(commands.values());
     }
 
+    /**
+     * Обработать команду от пользователя
+     *
+     * @param update содержит необходимую информацию для обработки
+     */
     public void dispatch(Update update) {
         if (update.message() == null || update.message().text() == null) {
             return;
         }
 
-        String language = Optional.ofNullable(update.message())
-                .map(Message::from)
-                .map(User::languageCode)
-                .orElse("unknown");
-
-        log.info("LANGUAGE: {}", language);
-
         String text = update.message().text().split(" ")[0];
 
         Command command = commands.getOrDefault(text, unknownCommand);
         command.handle(update);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param update информация о событии
+     * @return поддержка обработки
+     */
+    @Override
+    public boolean supports(Update update) {
+        if (update.message() != null
+                || update.message().text() != null && update.message().text().startsWith("/")) {
+
+            return true;
+        } else return false;
     }
 }

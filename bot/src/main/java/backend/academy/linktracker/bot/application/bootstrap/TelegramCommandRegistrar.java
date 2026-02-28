@@ -7,6 +7,11 @@ import com.pengrad.telegrambot.request.SetMyCommands;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
+/**
+ * Регистратор комманд
+ *
+ * @author Luzin Nikita
+ */
 @Component
 public class TelegramCommandRegistrar {
 
@@ -18,6 +23,10 @@ public class TelegramCommandRegistrar {
         this.commands = commands;
     }
 
+    /**
+     * Регестрирует доступные команды в telegram боте
+     * используется TelegramAPT
+     */
     public void registerCommands() {
         List<BotCommand> botCommands = commands.stream()
                 .filter(cmd -> !cmd.getCommandName().equals("/unknown"))

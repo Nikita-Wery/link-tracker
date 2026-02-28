@@ -5,6 +5,11 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+/**
+ * Стартер приложения
+ *
+ * @author Luzin Nikita
+ */
 @Component
 public class TelegramBotBootstrap implements ApplicationRunner {
 

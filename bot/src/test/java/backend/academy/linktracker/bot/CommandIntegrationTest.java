@@ -5,8 +5,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import backend.academy.linktracker.bot.application.command.CommandDispatcher;
-import backend.academy.linktracker.bot.configuration.TelegramTestConfiguration;
+import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispatcher;
+import backend.academy.linktracker.bot.configuration.telgramconfiguration.TelegramTestConfiguration;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
