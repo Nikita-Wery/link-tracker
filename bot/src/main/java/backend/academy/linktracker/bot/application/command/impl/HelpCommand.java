@@ -18,9 +18,9 @@ import org.springframework.stereotype.Component;
 public class HelpCommand extends AbstractCommand<Update> {
 
     private final TelegramMessageSender telegramMessageSender;
-    private final List<Command> commands;
+    private final List<Command<Update>> commands;
 
-    public HelpCommand(TelegramMessageSender telegramMessageSender, List<Command> commands) {
+    public HelpCommand(TelegramMessageSender telegramMessageSender, List<Command<Update>> commands) {
         super("/help", "Список доступных команд");
         // необходимо из-за циклической зависимости
         commands.add(this);
@@ -36,7 +36,7 @@ public class HelpCommand extends AbstractCommand<Update> {
      */
     @Override
     public void handle(Update data) {
-        Long chatId = data.message().chat().id();
+        String chatId = String.valueOf(data.message().chat().id());
 
         String helpMessage = commands.stream()
                 .filter(command -> !command.getCommandName().equals("/unknown"))

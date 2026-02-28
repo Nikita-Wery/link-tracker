@@ -30,7 +30,7 @@ public class UnknownCommand extends AbstractCommand<Update> {
      */
     @Override
     public void handle(Update data) {
-        Long chatId = data.message().chat().id();
+        String chatId = String.valueOf(data.message().chat().id());
 
         telegramMessageSender.sendMessage(chatId, getCommandDescription());
     }
