@@ -23,8 +23,9 @@ public class PengradTelegramMessageSender implements TelegramMessageSender {
         this.telegramBot = telegramBot;
     }
 
-    @SuppressFBWarnings(value = "DM_DEPRECATED",
-        justification = "Сам тг использует в API - Long, у pengrad с этим же какие-то проблемы...")
+    @SuppressFBWarnings(
+            value = "DM_DEPRECATED",
+            justification = "Сам тг использует в API - Long, у pengrad с этим же какие-то проблемы...")
     @Override
     public void sendMessage(Long chatId, String message) {
         telegramBot.execute(new SendMessage(chatId, message));

@@ -24,41 +24,29 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "app.logger.console", value = "enabled", havingValue = "true", matchIfMissing = true)
 public class ConsoleLoggerConfig {
 
-    private static final String BEFORE_METHOD_MESSAGE_PATTERN =
-            "{} method [{}] call args [{}]";
+    private static final String BEFORE_METHOD_MESSAGE_PATTERN = "{} method [{}] call args [{}]";
 
-    private static final String AFTER_METHOD_MESSAGE_PATTERN =
-            "{} method [{}] result: [{}]";
+    private static final String AFTER_METHOD_MESSAGE_PATTERN = "{} method [{}] result: [{}]";
 
-    private static final String AFTER_THROWING_MESSAGE_PATTERN =
-            "{} method [{}] throw exception";
+    private static final String AFTER_THROWING_MESSAGE_PATTERN = "{} method [{}] throw exception";
 
     @Before(value = "backend.academy.linktracker.bot.logging.aspect.SystemArchitecture.allMethods()")
     public void beforeLogControllers(JoinPoint joinPoint) {
-        log.info(BEFORE_METHOD_MESSAGE_PATTERN,
-            BEFORE.getLogPrefix(),
-            joinPoint.getSignature(),
-            joinPoint.getArgs());
+        log.info(BEFORE_METHOD_MESSAGE_PATTERN, BEFORE.getLogPrefix(), joinPoint.getSignature(), joinPoint.getArgs());
     }
 
     @AfterReturning(
             value = "backend.academy.linktracker.bot.logging.aspect.SystemArchitecture.allMethods()",
             returning = "result")
     public void afterReturningLogController(JoinPoint joinPoint, Object result) {
-        log.info(AFTER_METHOD_MESSAGE_PATTERN,
-            AFTER_RETURNING.getLogPrefix(),
-            joinPoint.getSignature(),
-            result);
+        log.info(AFTER_METHOD_MESSAGE_PATTERN, AFTER_RETURNING.getLogPrefix(), joinPoint.getSignature(), result);
     }
 
     @AfterThrowing(
             value = "backend.academy.linktracker.bot.logging.aspect.SystemArchitecture.allMethods()",
             throwing = "exception")
     public void afterLogControllers(JoinPoint joinPoint, Throwable exception) {
-        log.error(AFTER_THROWING_MESSAGE_PATTERN,
-            AFTER_THROWING.getLogPrefix(),
-            joinPoint.getSignature(),
-            exception);
+        log.error(AFTER_THROWING_MESSAGE_PATTERN, AFTER_THROWING.getLogPrefix(), joinPoint.getSignature(), exception);
     }
 
     public enum LogPrefix {
