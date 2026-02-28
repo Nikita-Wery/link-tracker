@@ -12,7 +12,7 @@ app:
     update-listener-sleep: 1s
     debug: false
   logger:
-    path: logs
+    path: ./logs
     console:
       enabled: true
     file:
