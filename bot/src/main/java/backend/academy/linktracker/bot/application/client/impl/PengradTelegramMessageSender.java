@@ -6,6 +6,12 @@ import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * Реализует отправку сообщений используя
+ * <a href="https://github.com/pengrad/java-telegram-bot-api">Pengrad</a>
+ *
+ * @author Luzin Nikita
+ */
 @Component
 public class PengradTelegramMessageSender implements TelegramMessageSender {
 

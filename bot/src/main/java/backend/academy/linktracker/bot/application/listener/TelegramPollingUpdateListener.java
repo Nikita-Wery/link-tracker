@@ -1,31 +1,35 @@
 package backend.academy.linktracker.bot.application.listener;
 
-import backend.academy.linktracker.bot.application.command.CommandDispatcher;
+import backend.academy.linktracker.bot.application.UpdateRouter;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+/**
+ * Реализация слушателя событий telegramAPI
+ * через LongPolling
+ *
+ * !НЕ ПОДДЕРЖИВАЕТ WebHook
+ *
+ * @author Luzin Nikita
+ */
+@Slf4j
 @Component
 public class TelegramPollingUpdateListener {
 
-    private final Logger log = LogManager.getLogger(TelegramPollingUpdateListener.class);
-
     private final TelegramBot telegramBot;
-    private final CommandDispatcher commandDispatcher;
+    private final UpdateRouter updateRouter;
 
-    public TelegramPollingUpdateListener(TelegramBot telegramBot, CommandDispatcher commandDispatcher) {
+    public TelegramPollingUpdateListener(TelegramBot telegramBot, UpdateRouter updateRouter) {
         this.telegramBot = telegramBot;
-        this.commandDispatcher = commandDispatcher;
+        this.updateRouter = updateRouter;
     }
 
     public void start() {
         telegramBot.setUpdatesListener(
                 updates -> {
-                    log.info("Received {} updates", updates.size());
-
-                    updates.forEach(commandDispatcher::dispatch);
+                    updates.forEach(updateRouter::route);
 
                     return UpdatesListener.CONFIRMED_UPDATES_ALL;
                 },

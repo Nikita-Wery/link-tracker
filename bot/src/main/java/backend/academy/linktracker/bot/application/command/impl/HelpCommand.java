@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
+/**
+ * Команда бота {@code /help}
+ *
+ * @author Luzin Nikita
+ */
 @Component
 public class HelpCommand extends AbstractCommand<Update> {
 
@@ -23,6 +28,12 @@ public class HelpCommand extends AbstractCommand<Update> {
         this.commands = commands;
     }
 
+    /**
+     * Посылает список всех доступных команд
+     * с пояснением к каждой
+     *
+     * @param data данные, необходимые для отправки сообщения
+     */
     @Override
     public void handle(Update data) {
         Long chatId = data.message().chat().id();

@@ -11,3 +11,13 @@ app:
     token: ${TELEGRAM_TOKEN} # Use env variable. DO NOT KEEP TOKEN HERE
     update-listener-sleep: 1s
     debug: false
+  logger:
+    path: logs
+    console:
+      enabled: true
+    file:
+      enabled: true
+
+
+
+
