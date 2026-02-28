@@ -18,8 +18,9 @@
     </condition>
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>${LOG_PATH}/log-${bySecond}.txt</file>
-        <includeContext>false</includeContext>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeContext>false</includeContext>
+        </encoder>
     </appender>
 
     <condition class="ch.qos.logback.core.boolex.ExpressionPropertyCondition">
