@@ -27,6 +27,8 @@ public interface LoggerConstant {
 
     String STRUCTURED_ARGUMENTS_KEY_COMMAND_NAME = "commandName";
 
+    String STRUCTURED_ARGUMENTS_KEY_EVENT = "event";
+
     String STRUCTURED_ARGUMENTS_KEY_CHAT_ID = "chatId";
 
     interface Step {

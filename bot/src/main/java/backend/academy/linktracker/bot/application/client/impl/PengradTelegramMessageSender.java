@@ -3,6 +3,7 @@ package backend.academy.linktracker.bot.application.client.impl;
 import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +23,10 @@ public class PengradTelegramMessageSender implements TelegramMessageSender {
         this.telegramBot = telegramBot;
     }
 
+    @SuppressFBWarnings(value = "DM_DEPRECATED",
+        justification = "Сам тг использует в API - Long, у pengrad с этим же какие-то проблемы...")
     @Override
-    public void sendMessage(String chatId, String message) {
+    public void sendMessage(Long chatId, String message) {
         telegramBot.execute(new SendMessage(chatId, message));
     }
 }

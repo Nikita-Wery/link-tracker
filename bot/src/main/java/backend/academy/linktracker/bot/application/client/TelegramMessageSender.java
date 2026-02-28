@@ -11,5 +11,5 @@ public interface TelegramMessageSender {
      * @param chatId id чата, в который нужно отправить сообщение
      * @param message отправляемое сообщение
      */
-    void sendMessage(String chatId, String message);
+    void sendMessage(Long chatId, String message);
 }

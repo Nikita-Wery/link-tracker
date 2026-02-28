@@ -27,7 +27,7 @@ public class StartCommand extends AbstractCommand<Update> {
      */
     @Override
     public void handle(Update data) {
-        String chatId = String.valueOf(data.message().chat().id());
+        Long chatId = data.message().chat().id();
 
         telegramMessageSender.sendMessage(chatId, getCommandDescription());
     }
