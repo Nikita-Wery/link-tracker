@@ -36,7 +36,7 @@ public class HelpCommand extends AbstractCommand<Update> {
      */
     @Override
     public void handle(Update data) {
-        String chatId = String.valueOf(data.message().chat().id());
+        Long chatId = data.message().chat().id();
 
         String helpMessage = commands.stream()
                 .filter(command -> !command.getCommandName().equals("/unknown"))

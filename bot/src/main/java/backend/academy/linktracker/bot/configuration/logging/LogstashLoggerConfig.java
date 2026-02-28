@@ -8,6 +8,7 @@ import backend.academy.linktracker.bot.application.command.Command;
 import com.pengrad.telegrambot.model.Update;
 import java.util.Optional;
 import java.util.UUID;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -45,12 +46,18 @@ public class LogstashLoggerConfig {
 
     @Before("backend.academy.linktracker.bot.logging.aspect.SystemArchitecture.sendTelegramMessageMethod()"
             + " && args(chatId, message)")
-    public void addChatId(JoinPoint joinPoint, String chatId, String message) {
-        MDC.put(STRUCTURED_ARGUMENTS_KEY_CHAT_ID, chatId);
+    public void addChatId(JoinPoint joinPoint, Long chatId, String message) {
+        MDC.put(STRUCTURED_ARGUMENTS_KEY_CHAT_ID, String.valueOf(chatId));
     }
 
+    @SuppressFBWarnings(
+        value = "SLF4J_PLACE_HOLDER_MISMATCH",
+        justification = "Используем StructuredArguments для JSON, placeholders не нужны"
+    )
     @After("backend.academy.linktracker.bot.logging.aspect.SystemArchitecture.sendTelegramMessageMethod()")
     public void afterSendTelegramMethod() {
-        log.info(AFTER_METHOD, value(STRUCTURED_ARGUMENTS_KEY_SERVICE, "bot-service"), value("event", "call comand"));
+        log.info(AFTER_METHOD,
+            value(STRUCTURED_ARGUMENTS_KEY_SERVICE, "bot-service"),
+            value("event", "call command"));
     }
 }
