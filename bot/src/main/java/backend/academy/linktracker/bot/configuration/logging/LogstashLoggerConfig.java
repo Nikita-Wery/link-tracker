@@ -3,7 +3,6 @@ package backend.academy.linktracker.bot.configuration.logging;
 import static backend.academy.linktracker.bot.configuration.constants.LoggerConstant.*;
 import static backend.academy.linktracker.bot.configuration.constants.LoggerConstant.Step.AFTER_METHOD;
 import static net.logstash.logback.argument.StructuredArguments.kv;
-import static net.logstash.logback.argument.StructuredArguments.value;
 
 import backend.academy.linktracker.bot.application.command.Command;
 import com.pengrad.telegrambot.model.Update;
