@@ -31,6 +31,8 @@ public interface LoggerConstant {
 
     String STRUCTURED_ARGUMENTS_KEY_CHAT_ID = "chatId";
 
+    String STRUCTURED_ARGUMENTS_KEY_MESSAGE = "message";
+
     interface Step {
 
         String BEFORE_CONTROLLER = "BEFORE controller calling";
