@@ -2,6 +2,7 @@ package backend.academy.linktracker.bot.configuration.logging;
 
 import static backend.academy.linktracker.bot.configuration.constants.LoggerConstant.*;
 import static backend.academy.linktracker.bot.configuration.constants.LoggerConstant.Step.AFTER_METHOD;
+import static net.logstash.logback.argument.StructuredArguments.kv;
 import static net.logstash.logback.argument.StructuredArguments.value;
 
 import backend.academy.linktracker.bot.application.command.Command;
@@ -55,6 +56,9 @@ public class LogstashLoggerConfig {
             justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     @After("backend.academy.linktracker.bot.logging.aspect.SystemArchitecture.sendTelegramMessageMethod()")
     public void afterSendTelegramMethod() {
-        log.info(AFTER_METHOD, value(STRUCTURED_ARGUMENTS_KEY_SERVICE, "bot-service"), value("event", "call command"));
+        log.info(
+                AFTER_METHOD,
+                kv(STRUCTURED_ARGUMENTS_KEY_SERVICE, "bot-service"),
+                kv(STRUCTURED_ARGUMENTS_KEY_EVENT, "call command"));
     }
 }

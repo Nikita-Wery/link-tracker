@@ -1,5 +1,9 @@
 package backend.academy.linktracker.bot.application.listener;
 
+import static backend.academy.linktracker.bot.configuration.constants.LoggerConstant.STRUCTURED_ARGUMENTS_KEY_EXCEPTION;
+import static backend.academy.linktracker.bot.configuration.constants.LoggerConstant.STRUCTURED_ARGUMENTS_KEY_MESSAGE;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import backend.academy.linktracker.bot.application.UpdateRouter;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -34,6 +38,20 @@ public class TelegramPollingUpdateListener {
                     return UpdatesListener.CONFIRMED_UPDATES_ALL;
                 },
                 e -> {
+                    if (e.response() != null) {
+                        log.error(
+                                "TelegramAPI error code: {}, description: {}",
+                                kv(
+                                        STRUCTURED_ARGUMENTS_KEY_EXCEPTION,
+                                        e.response().errorCode()),
+                                kv(
+                                        STRUCTURED_ARGUMENTS_KEY_MESSAGE,
+                                        e.response().description()));
+                    } else {
+                        log.error(
+                                "Connection failed, message: {}",
+                                kv(STRUCTURED_ARGUMENTS_KEY_EXCEPTION, e.getMessage()));
+                    }
                     log.error("Exception: ", e);
                 });
     }
