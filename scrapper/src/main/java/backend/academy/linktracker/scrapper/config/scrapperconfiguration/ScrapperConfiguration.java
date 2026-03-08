@@ -3,6 +3,7 @@ package backend.academy.linktracker.scrapper.config.scrapperconfiguration;
 import backend.academy.linktracker.scrapper.client.BotClient;
 import backend.academy.linktracker.scrapper.client.GitHubClient;
 import backend.academy.linktracker.scrapper.client.StackOverflowClient;
+import backend.academy.linktracker.scrapper.client.responsehandler.APIResponseHandler;
 import backend.academy.linktracker.scrapper.client.responsehandler.BotResponseHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class ScrapperConfiguration {
 
     @Bean
-    public BotClient botClient(RestClientFactory factory, BotResponseHandler handler) {
+    public BotClient botClient(RestClientFactory factory, APIResponseHandler handler) {
 
         // TODO: убрать hardcode и подтягивать из property class
         return factory.createClient(
@@ -22,7 +23,7 @@ public class ScrapperConfiguration {
     }
 
     @Bean
-    public GitHubClient gitHubClient(RestClientFactory factory, BotResponseHandler handler) {
+    public GitHubClient gitHubClient(RestClientFactory factory, APIResponseHandler handler) {
 
         // TODO: убрать hardcode
         return factory.createClient(
