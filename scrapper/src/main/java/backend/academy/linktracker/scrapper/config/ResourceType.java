@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 public enum ResourceType {
 
     GITHUB_REPOSITORY(
-            Pattern.compile("^https://api\\.github\\.com/repos/([^/]+)/([^/]+)$")
+            Pattern.compile("^https://api\\.github\\.com/([^/]+)/([^/]+)$")
     ),
 
     // TODO: поменять паттерн возможно стоит

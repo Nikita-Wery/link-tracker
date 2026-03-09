@@ -5,7 +5,6 @@ import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.UpdateEvent;
-import backend.academy.linktracker.scrapper.dto.github.GithubRepositoryUpdateTime;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowQuestionUpdateTime;
 import backend.academy.linktracker.scrapper.source.UpdateSource;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +37,10 @@ public class StackOverflowQuestionSource implements UpdateSource {
                 stackOverflowClient.getQuestionUpdateTime(Long.getLong(dataForRequest));
 
         return new LinkUpdate(
+            link.getId(),
             link.getUrl(),
             buildDescription(update),
-            link.getTgChatId(),
+            link.getTgChatIds(),
             link.getResourceType(),
             update.lastUpdate()
         );
