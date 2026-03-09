@@ -1,15 +1,15 @@
 package backend.academy.linktracker.scrapper.dto;
 
 import backend.academy.linktracker.scrapper.config.ResourceType;
-import lombok.Getter;
 import java.net.URI;
 import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.Set;
 
 public record LinkUpdate(
+    Long id,
     URI url,
     String description,
-    List<Long> tgChatIds,
+    Set<Long> tgChatIds,
     ResourceType resourceType,
     OffsetDateTime lastUpdate
 ) implements UpdateEvent {

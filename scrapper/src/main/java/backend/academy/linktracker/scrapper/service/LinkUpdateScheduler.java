@@ -5,6 +5,7 @@ import backend.academy.linktracker.scrapper.repository.impl.InMemeoryLinkReposit
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class LinkUpdateScheduler {
@@ -22,7 +23,7 @@ public class LinkUpdateScheduler {
 
     @Scheduled(fixedDelay = 60000)
     public void checkLinks() {
-        List<Link> links = inMemeoryLinkRepository.findAll();
+        Set<Link> links = inMemeoryLinkRepository.findAll();
 
         for (Link link : links) {
             linkUpdateService.process(link);

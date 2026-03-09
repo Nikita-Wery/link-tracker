@@ -37,9 +37,10 @@ public class GithubRepositorySource implements UpdateSource {
                 gitHubClient.getRepositoryUpdateTime(dataForRequest[0], dataForRequest[1]);
 
         return new LinkUpdate(
+            link.getId(),
             link.getUrl(),
             buildDescription(update),
-            link.getTgChatId(),
+            link.getTgChatIds(),
             link.getResourceType(),
             update.updateAt()
         );

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import java.net.URI;
 import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -25,6 +25,10 @@ public class Link {
 
     private OffsetDateTime latestUpdateTime;
 
-    private List<Long> tgChatId;
+    private Set<Long> tgChatIds;
+
+    private Set<String> tags;
+
+    private Set<String> filters;
 
 }
