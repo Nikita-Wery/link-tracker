@@ -3,7 +3,7 @@ package backend.academy.linktracker.scrapper.service;
 import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.UpdateEvent;
-import backend.academy.linktracker.scrapper.source.UpdateSource;
+import backend.academy.linktracker.scrapper.service.source.UpdateSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class LinkUpdateService {
 
             publisher.publishEvent(updateEvent);
         } else {
-            log.info("Link {} has not been updated.", link.getUrl());
+            log.info("Link {} has not been updated", link.getUrl());
         }
 
     }

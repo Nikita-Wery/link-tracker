@@ -1,8 +1,10 @@
 package backend.academy.linktracker.scrapper.dto.bot;
 
-import java.net.URI;
+
+import jakarta.validation.constraints.NotBlank;
 
 public record RemoveLinkRequest(
-    URI link
+    @NotBlank
+    String link
 ) {
 }

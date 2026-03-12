@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "app.github")
+@ConfigurationProperties(prefix = "app.client.github")
 @Validated
 @Getter
 @Setter
@@ -18,4 +18,7 @@ public class GithubProperties {
 
     @NotEmpty
     private String token;
+
+    @NotEmpty
+    private String host;
 }

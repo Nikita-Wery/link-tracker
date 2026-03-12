@@ -8,7 +8,7 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "app.stackoverflow")
+@ConfigurationProperties(prefix = "app.client.stackoverflow")
 @Validated
 @Getter
 @Setter
@@ -21,4 +21,7 @@ public class StackoverflowProperties {
 
     @NotEmpty
     private String accessToken;
+
+    @NotEmpty
+    private String host;
 }

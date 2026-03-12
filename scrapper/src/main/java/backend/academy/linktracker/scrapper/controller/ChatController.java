@@ -28,7 +28,11 @@ public class ChatController {
             kv("chat_id", chatId)
         );
 
-        chatService.addChat(new Chat(chatId));
+        chatService.addChat(
+            Chat.builder()
+                .chatId(chatId)
+                .build()
+        );
     }
 
     @DeleteMapping("/{id}")

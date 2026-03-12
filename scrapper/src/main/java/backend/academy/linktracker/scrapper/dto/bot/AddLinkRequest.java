@@ -1,10 +1,11 @@
 package backend.academy.linktracker.scrapper.dto.bot;
 
-import java.net.URI;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public record AddLinkRequest(
-        URI link,
+        @NotBlank
+        String link,
         List<String> tags,
         List<String> filters
 ) {

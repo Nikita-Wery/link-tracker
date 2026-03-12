@@ -3,45 +3,68 @@ package backend.academy.linktracker.scrapper.config.scrapperconfiguration;
 import backend.academy.linktracker.scrapper.client.BotClient;
 import backend.academy.linktracker.scrapper.client.GitHubClient;
 import backend.academy.linktracker.scrapper.client.StackOverflowClient;
-import backend.academy.linktracker.scrapper.client.responsehandler.APIResponseHandler;
-import backend.academy.linktracker.scrapper.client.responsehandler.BotResponseHandler;
+import backend.academy.linktracker.scrapper.client.responsehandler.APIBadResponseHandler;
+import backend.academy.linktracker.scrapper.client.responsehandler.BotBadResponseHandler;
+import backend.academy.linktracker.scrapper.properties.BotProperties;
+import backend.academy.linktracker.scrapper.properties.GithubProperties;
+import backend.academy.linktracker.scrapper.properties.StackoverflowProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
 public class ScrapperConfiguration {
 
     @Bean
-    public BotClient botClient(RestClientFactory factory, APIResponseHandler handler) {
+    public BotClient botClient(
+        BotBadResponseHandler handler,
+        BotProperties properties) {
 
-        // TODO: убрать hardcode и подтягивать из property class
-        return factory.createClient(
-            "http://localhost:8080",
-                handler,
-                BotClient.class
-        );
+        RestClient restClient = RestClient.builder()
+            .baseUrl(properties.getHost())
+            .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
+            .build();
+
+        return restClientFactoryMethod(restClient, BotClient.class);
     }
 
     @Bean
-    public GitHubClient gitHubClient(RestClientFactory factory, APIResponseHandler handler) {
+    public GitHubClient gitHubClient(
+        APIBadResponseHandler handler,
+        GithubProperties properties) {
 
-        // TODO: убрать hardcode
-        return factory.createClient(
-            "https://api.github.com",
-            handler,
-            GitHubClient.class
-        );
+        RestClient restClient = RestClient.builder()
+            .baseUrl(properties.getHost())
+            .defaultHeader("Authorization", "Bearer" + properties.getToken())
+            .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
+            .build();
+
+        return restClientFactoryMethod(restClient, GitHubClient.class);
     }
 
     @Bean
-    public StackOverflowClient stackOverflowClient(RestClientFactory factory, BotResponseHandler handler) {
+    public StackOverflowClient stackOverflowClient(
+        APIBadResponseHandler handler,
+        StackoverflowProperties properties) {
 
-        // TODO: убрать hardcode
-        return factory.createClient(
-            "https://api.stackexchange.com",
-            handler,
-            StackOverflowClient.class
-        );
+        RestClient restClient = RestClient.builder()
+            .baseUrl(properties.getHost())
+            .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
+            .build();
+
+        return restClientFactoryMethod(restClient, StackOverflowClient.class);
+    }
+
+    private <T> T restClientFactoryMethod(RestClient restClient, Class<T> clientType) {
+        HttpServiceProxyFactory factory =
+            HttpServiceProxyFactory.builderFor(
+                RestClientAdapter.create(restClient)
+            ).build();
+
+        return factory.createClient(clientType);
     }
 
 }

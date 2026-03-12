@@ -1,16 +1,18 @@
 package backend.academy.linktracker.scrapper.controller;
 
+import backend.academy.linktracker.scrapper.domain.Chat;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.bot.AddLinkRequest;
 import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
 import backend.academy.linktracker.scrapper.dto.bot.ListLinkResponse;
 import backend.academy.linktracker.scrapper.dto.bot.RemoveLinkRequest;
-import backend.academy.linktracker.scrapper.exception.ChatNotExistException;
-import backend.academy.linktracker.scrapper.exception.LinkNotSupportedException;
-import backend.academy.linktracker.scrapper.mapper.LinkMapper;
+import backend.academy.linktracker.scrapper.exception.botexception.requestexception.ChatNotExistsException;
 import backend.academy.linktracker.scrapper.service.ChatService;
 import backend.academy.linktracker.scrapper.service.LinkService;
+import backend.academy.linktracker.scrapper.service.SubscriptionService;
+import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -28,16 +30,19 @@ public class LinkController {
 
     private final LinkService linksService;
     private final ChatService chatService;
-    private final LinkMapper linkMapper;
+    private final SubscriptionService subscriptionService;
+    private final DtoEntityMapper dtoEntityMapper;
 
     public LinkController(
             LinkService linksService,
             ChatService chatService,
-            LinkMapper linkMapper) {
+            SubscriptionService subscriptionService,
+            DtoEntityMapper dtoEntityMapper) {
 
         this.linksService = linksService;
         this.chatService = chatService;
-        this.linkMapper = linkMapper;
+        this.subscriptionService = subscriptionService;
+        this.dtoEntityMapper = dtoEntityMapper;
     }
 
     @GetMapping
@@ -46,8 +51,9 @@ public class LinkController {
     ) {
         List<LinkResponse> linkResponses =
             chatService.getChatById(chatId).map(chat
-                    -> chat.getTrackedLinks().stream().map(linkMapper::linkToLinkResponse).toList())
-                .orElseThrow(() -> new ChatNotExistException("Chat not found"));
+                    -> chat.getTrackedLinks().stream().map(
+                        chatLink -> dtoEntityMapper.linkToLinkResponse(chatLink.getLink())).toList())
+                .orElseThrow(() -> new ChatNotExistsException("Chat not found"));
 
         return new ListLinkResponse(linkResponses, linkResponses.size());
     }
@@ -58,18 +64,16 @@ public class LinkController {
      */
     // TODO: добавить логгер
     @PostMapping
-    public LinkResponse addLink(
+    public LinkResponse trackLink(
             @RequestHeader("Tg-Chat-Id") Long chatId,
-            @RequestBody AddLinkRequest request
+            @Valid @RequestBody AddLinkRequest request
     ) {
-        Optional<Link> link = linksService.getLinkByURI(request.link());
+        Link link = dtoEntityMapper.linkFromAddLinkRequest(request);
+        Chat chat = Chat.builder().chatId(chatId).build();
 
-        if (link.isPresent()) {
-            return linkMapper.linkToLinkResponse(chatService.addLinkToChat(link.get(), chatId));
-        } else {
-            throw new LinkNotSupportedException("The added link is not supported");
-        }
-
+        return dtoEntityMapper.linkToLinkResponse(
+            subscriptionService.trackLink(
+                chat, link, new HashSet<>(request.filters()), new HashSet<>(request.tags())).getLink());
     }
 
     /*
@@ -78,19 +82,14 @@ public class LinkController {
      */
     // TODO: добавить логгер
     @DeleteMapping
-    public LinkResponse removeLink(
+    public LinkResponse untrackLink(
             @RequestHeader("Tg-Chat-Id") Long chatId,
-            @RequestBody RemoveLinkRequest request
+            @Valid @RequestBody RemoveLinkRequest request
     ) {
-        Optional<Link> link = linksService.getLinkByURI(request.link());
+        Link link = dtoEntityMapper.linkFromRemoveLinkRequest(request);
+        Chat chat = Chat.builder().chatId(chatId).build();
 
-        if (link.isPresent()) {
-            chatService.untrackLink(link.get(), chatId);
-
-            return linkMapper.linkToLinkResponse(link.get());
-        } else {
-            throw new LinkNotSupportedException("The link being deleted is not supported");
-        }
-
+        return dtoEntityMapper.linkToLinkResponse(
+            subscriptionService.untrackLink(chat, link).getLink());
     }
 }
