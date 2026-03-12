@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler({LinkNotExistsException.class, ChatNotExistsException.class})
+    @ExceptionHandler(LinkNotExistsException.class)
     public ResponseEntity<String> linkNotExists(RuntimeException ex) {
         return new ResponseEntity<>(
              HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() + ": " + ex.getMessage(),
