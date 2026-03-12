@@ -28,11 +28,6 @@ public class Link {
     @Builder.Default
     private Set<ChatLink> trackingChats = new HashSet<>();
 
-    public Link(URI url, ResourceType resourceType) {
-        this.url = url;
-        this.resourceType = resourceType;
-    }
-
     public boolean addChat(ChatLink chatLink) {
         return trackingChats.add(chatLink);
     }
