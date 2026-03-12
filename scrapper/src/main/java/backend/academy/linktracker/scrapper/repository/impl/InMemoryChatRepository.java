@@ -1,20 +1,20 @@
 package backend.academy.linktracker.scrapper.repository.impl;
 
 import backend.academy.linktracker.scrapper.domain.Chat;
-import backend.academy.linktracker.scrapper.domain.Link;
-import backend.academy.linktracker.scrapper.exception.ChatAlreadyExistException;
-import backend.academy.linktracker.scrapper.exception.ChatNotExistException;
-import backend.academy.linktracker.scrapper.exception.LinkAlreadyTrackedException;
-import backend.academy.linktracker.scrapper.exception.LinkNotTrackedException;
+import backend.academy.linktracker.scrapper.domain.ChatLink;
 import backend.academy.linktracker.scrapper.repository.ChatRepository;
+import org.springframework.stereotype.Repository;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
+@Repository
 public class InMemoryChatRepository implements ChatRepository {
 
-    private Set<Chat> chatRepository;
+    private final Set<Chat> chatRepository;
+    private final AtomicLong idGenerator = new AtomicLong(1);
 
     public InMemoryChatRepository() {
         this.chatRepository = new HashSet<>();
@@ -22,18 +22,14 @@ public class InMemoryChatRepository implements ChatRepository {
 
     @Override
     public Chat save(Chat chat) {
-        boolean added = chatRepository.add(chat);
-
-        if (!added) {
-            throw new ChatAlreadyExistException("Chat: " + chat.getChatId() + "already exists");
-        }
+        chat.setId(idGenerator.getAndIncrement());
+        chatRepository.add(chat);
 
         return chat;
     }
 
     @Override
-    public void deleteById(long chatId) {
-        boolean isDeleted = false;
+    public void deleteByChatId(long chatId) {
         Iterator<Chat> iterator = chatRepository.iterator();
 
         while (iterator.hasNext()) {
@@ -41,12 +37,7 @@ public class InMemoryChatRepository implements ChatRepository {
 
             if (chat.getChatId() == chatId) {
                 iterator.remove();
-                isDeleted = true;
             }
-        }
-
-        if (!isDeleted) {
-            throw new ChatNotExistException("Chat: " + chatId + "not found for deletion");
         }
     }
 
@@ -62,49 +53,20 @@ public class InMemoryChatRepository implements ChatRepository {
     }
 
     @Override
-    public Link addLinkToChat(Link link, long chatId) {
-        Optional<Chat> chatOptional = findChatById(chatId);
+    public boolean untrackLink(Chat chat, ChatLink chatLink) {
+        boolean linkUnpinned = false;
+        Iterator<ChatLink> iterator = chat.getTrackedLinks().iterator();
 
-        if (chatOptional.isPresent()) {
-            boolean added = chatOptional.get().addLink(link);
+        while (iterator.hasNext()) {
+            ChatLink chatLinkNow = iterator.next();
 
-            if (!added) {
-                throw new LinkAlreadyTrackedException("The link is already being tracked by the chat");
+            if (chatLinkNow.equals(chatLink)) {
+                iterator.remove();
+                linkUnpinned = true;
             }
-
-        } else {
-            throw new ChatNotExistException("The chat we want to add a link to does not exist");
         }
 
-        return link;
+        return linkUnpinned;
     }
-
-    @Override
-    public void deleteLinkFromChat(Link link, long chatId) {
-        boolean deleted = false;
-        Optional<Chat> chatOptional = findChatById(chatId);
-
-        if (chatOptional.isPresent()) {
-            Iterator<Chat> iterator = chatRepository.iterator();
-
-            while (iterator.hasNext()) {
-                Chat chat = iterator.next();
-
-                if (chat.getChatId() == chatId) {
-                    chat.untrackLink(link);
-                    deleted = true;
-                }
-            }
-
-            if (!deleted) {
-                throw new LinkNotTrackedException("The link is not trackable.");
-            }
-
-        } else {
-            throw new ChatNotExistException("The chat we want to add a link to does not exist");
-        }
-
-    }
-
 
 }

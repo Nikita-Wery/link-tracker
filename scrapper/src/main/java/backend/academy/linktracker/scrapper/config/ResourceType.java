@@ -1,25 +1,22 @@
 package backend.academy.linktracker.scrapper.config;
 
-import java.util.regex.Pattern;
+import backend.academy.linktracker.scrapper.parser.LinkParser;
+import backend.academy.linktracker.scrapper.parser.impl.GithubLinkParser;
+import backend.academy.linktracker.scrapper.parser.impl.StackOverflowLinkParser;
 
 public enum ResourceType {
 
-    GITHUB_REPOSITORY(
-            Pattern.compile("^https://api\\.github\\.com/([^/]+)/([^/]+)$")
-    ),
+    GITHUB_REPOSITORY(new GithubLinkParser()),
 
-    // TODO: поменять паттерн возможно стоит
-    STACKOVERFLOW_QUESTION(
-            Pattern.compile("^https://api\\.stackexchange\\.com/2\\.3/questions/(\\d+)$")
-    );
+    STACKOVERFLOW_QUESTION(new StackOverflowLinkParser());
 
-    private final Pattern pattern;
+    private final LinkParser parser;
 
-    ResourceType(Pattern pattern) {
-        this.pattern = pattern;
+    ResourceType(LinkParser parser) {
+        this.parser = parser;
     }
 
-    public Pattern pattern() {
-        return pattern;
+    public LinkParser parser() {
+        return parser;
     }
 }

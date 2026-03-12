@@ -1,5 +1,7 @@
 package backend.academy.linktracker.scrapper.repository;
 
+import backend.academy.linktracker.scrapper.domain.Chat;
+import backend.academy.linktracker.scrapper.domain.ChatLink;
 import backend.academy.linktracker.scrapper.domain.Link;
 import java.net.URI;
 import java.time.OffsetDateTime;
@@ -16,4 +18,5 @@ public interface LinkRepository {
 
     Optional<Link> findLinkByURI(URI uri);
 
+    boolean deleteTrackingChat(Link link, ChatLink chatLink);
 }
