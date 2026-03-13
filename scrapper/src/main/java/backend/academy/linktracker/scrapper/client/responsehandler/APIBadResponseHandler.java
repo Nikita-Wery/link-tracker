@@ -13,7 +13,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Slf4j
 @Component
-public class APIBadResponseHandler implements DefaultBadResponseHandler {
+public class APIBadResponseHandler {
 
     public void handle(HttpRequest request, ClientHttpResponse response) throws IOException {
 

@@ -19,7 +19,7 @@ public class SystemArchitecture {
     @Pointcut("within(backend.academy..*) && !securityMethods()")
     public void allMethods() {}
 
-    @Pointcut("@annotation(backend.academy.linktracker.bot.annotations.MethodLogging)")
+    @Pointcut("@annotation(backend.academy.linktracker.bot.utils.annotations.MethodLogging)")
     public void methodLoggingMethods() {}
 
     /*

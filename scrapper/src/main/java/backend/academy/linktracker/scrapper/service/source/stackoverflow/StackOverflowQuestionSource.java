@@ -48,7 +48,7 @@ public class StackOverflowQuestionSource implements UpdateSource {
         return new LinkUpdate(
             link.getId(),
             link.getUrl(),
-            buildDescription(update),
+            buildDescription(update, link),
             link.getTrackingChats().stream()
                 .map(chatLink -> chatLink.getChat().getChatId()).collect(Collectors.toSet()),
             link.getResourceType(),
@@ -66,9 +66,9 @@ public class StackOverflowQuestionSource implements UpdateSource {
         return (Long) link.getResourceType().parser().parse(link.getUrl());
     }
 
-    protected String buildDescription(StackOverflowQuestionUpdateTime updateTime) {
-        return "QuestionId %s updated at %s, last push %s"
-            .formatted(updateTime.questionId(), updateTime.lastUpdate(), updateTime.lastEdit());
+    protected String buildDescription(StackOverflowQuestionUpdateTime updateTime, Link link) {
+        return "Вопрос с id %s, по ссылке %s, обновлён в %s, последний push %s"
+            .formatted(updateTime.questionId(), link.getUrl(), updateTime.lastUpdate(), updateTime.lastEdit());
     }
 
 }

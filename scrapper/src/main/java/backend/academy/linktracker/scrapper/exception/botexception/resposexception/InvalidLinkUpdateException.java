@@ -2,9 +2,9 @@ package backend.academy.linktracker.scrapper.exception.botexception.resposexcept
 
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 
-public class InvalidLinkUpdate extends BotApiException {
+public class InvalidLinkUpdateException extends BotApiException {
 
-    public InvalidLinkUpdate(String message) {
+    public InvalidLinkUpdateException(String message) {
         super(message);
     }
 }
