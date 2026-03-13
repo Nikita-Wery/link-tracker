@@ -58,11 +58,6 @@ public class LinkController {
         return new ListLinksResponse(linkResponses, linkResponses.size());
     }
 
-    /*
-        В будущем с добавлением Postgres, возможно достаточно будет chatService
-        в котором можно будет отловить PK/FK exception
-     */
-    // TODO: добавить логгер
     @PostMapping
     public LinkResponse trackLink(
             @RequestHeader("Tg-Chat-Id") Long chatId,
@@ -76,11 +71,6 @@ public class LinkController {
                 chat, link, new HashSet<>(request.filters()), new HashSet<>(request.tags())).getLink());
     }
 
-    /*
-        В будущем подумать на PK у Link и не ходить за
-        Link в репо
-     */
-    // TODO: добавить логгер
     @DeleteMapping
     public LinkResponse untrackLink(
             @RequestHeader("Tg-Chat-Id") Long chatId,

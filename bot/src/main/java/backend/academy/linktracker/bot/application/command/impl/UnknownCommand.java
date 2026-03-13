@@ -16,10 +16,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class UnknownCommand extends AbstractCommand<Update> {
 
+    public static final String COMMAND_NAME ="Неизвестная команда. Используйте /help";
+    public static final String COMMAND_DESCRIPTION = "/unknown";
+
     private final TelegramMessageSender telegramMessageSender;
 
     public UnknownCommand(TelegramMessageSender telegramMessageSender) {
-        super("/unknown", "Неизвестная команда. Используйте /help");
+        super(COMMAND_NAME, COMMAND_DESCRIPTION);
         this.telegramMessageSender = telegramMessageSender;
     }
 

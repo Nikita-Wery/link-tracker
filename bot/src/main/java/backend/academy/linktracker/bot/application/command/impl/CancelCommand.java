@@ -5,13 +5,12 @@ import com.pengrad.telegrambot.model.Update;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UntrackCommand extends AbstractCommand<Update> {
+public class CancelCommand extends AbstractCommand<Update> {
 
-    public static final String COMMAND_NAME = "/untrack";
-    public static final String COMMAND_DESCRIPTION ="Прекратить отслеживаение ссылки";
+    public static final String COMMAND_NAME = "/cancel";
+    public static final String COMMAND_DESCRIPTION = "Прервать выполнение текущего диалога";
 
-
-    public UntrackCommand() {
+    public CancelCommand() {
         super(COMMAND_NAME, COMMAND_DESCRIPTION);
     }
 

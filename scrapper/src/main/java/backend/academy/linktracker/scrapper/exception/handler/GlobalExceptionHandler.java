@@ -6,7 +6,6 @@ import backend.academy.linktracker.scrapper.exception.botexception.requestexcept
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.InvalidLinkInRequestException;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkAlreadyTrackedException;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkNotExistsException;
-import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkNotSupportedException;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkNotTrackedException;
 import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import org.springframework.http.HttpStatus;
@@ -58,16 +57,6 @@ public class GlobalExceptionHandler {
             dtoEntityMapper.buildApiErrorResponse(
                 LINK_ALREADY_TRACKED_EXCEPTION,
                 Integer.toString(HttpStatus.CONFLICT.value()),
-                ex)
-        );
-    }
-
-    @ExceptionHandler(LinkNotSupportedException.class)
-    public ResponseEntity<ApiErrorResponse> linkNotSupported(LinkNotSupportedException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-            dtoEntityMapper.buildApiErrorResponse(
-                LINK_NOT_SUPPORTED_EXCEPTION,
-                Integer.toString(HttpStatus.BAD_REQUEST.value()),
                 ex)
         );
     }

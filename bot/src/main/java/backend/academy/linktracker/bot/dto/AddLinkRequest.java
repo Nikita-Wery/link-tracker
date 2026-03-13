@@ -1,10 +1,11 @@
 package backend.academy.linktracker.bot.dto;
 
 import java.util.List;
+import java.util.Set;
 
 public record AddLinkRequest(
     String link,
-    List<String> tags,
-    List<String> filters
+    Set<String> tags,
+    Set<String> filters
 ) {
 }

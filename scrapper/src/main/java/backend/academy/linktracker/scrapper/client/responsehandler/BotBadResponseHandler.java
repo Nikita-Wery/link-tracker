@@ -2,8 +2,8 @@ package backend.academy.linktracker.scrapper.client.responsehandler;
 
 import backend.academy.linktracker.scrapper.dto.bot.ApiErrorResponse;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
-import backend.academy.linktracker.scrapper.exception.botexception.resposexception.BotServerException;
-import backend.academy.linktracker.scrapper.exception.botexception.resposexception.UnknownBotClientException;
+import backend.academy.linktracker.scrapper.exception.botexception.responsexception.BotServerException;
+import backend.academy.linktracker.scrapper.exception.botexception.responsexception.UnknownBotClientException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
@@ -60,7 +60,7 @@ public class BotBadResponseHandler {
                     kv("url", request.getURI())
                 );
 
-                throw new BotServerException("Bot exception 5xx");
+                throw new Scrapp("Bot exception 5xx");
             }
         }
     }
