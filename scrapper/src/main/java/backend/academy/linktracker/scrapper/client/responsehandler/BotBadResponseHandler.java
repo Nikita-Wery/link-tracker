@@ -60,7 +60,7 @@ public class BotBadResponseHandler {
                     kv("url", request.getURI())
                 );
 
-                throw new Scrapp("Bot exception 5xx");
+                throw new BotServerException("Bot exception 5xx");
             }
         }
     }
