@@ -36,7 +36,7 @@ public class GithubRepositorySource implements UpdateSource {
         return new LinkUpdate(
             link.getId(),
             link.getUrl(),
-            buildDescription(update),
+            buildDescription(update, link),
             link.getTrackingChats().stream()
                 .map(chatLink -> chatLink.getChat().getChatId()).collect(Collectors.toSet()),
             link.getResourceType(),
@@ -54,9 +54,9 @@ public class GithubRepositorySource implements UpdateSource {
         return (String[]) link.getResourceType().parser().parse(link.getUrl());
     }
 
-    protected String buildDescription(GithubRepositoryUpdateTime updateTime) {
-        return "Repository %s updated at %s, last push %s"
-                .formatted(updateTime.repositoryName(), updateTime.updateAt(), updateTime.pushedAt());
+    protected String buildDescription(GithubRepositoryUpdateTime updateTime, Link link) {
+        return "Репозиторий %s, по ссылке %s, обновлён в %s, последний push %s"
+                .formatted(updateTime.repositoryName(), link.getUrl(), updateTime.updateAt(), updateTime.pushedAt());
     }
 
 }

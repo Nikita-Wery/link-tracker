@@ -19,7 +19,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Slf4j
 @Component
-public class BotBadResponseHandler implements DefaultBadResponseHandler {
+public class BotBadResponseHandler {
 
     private final Map<String, BotApiException> clientExceptionMap;
     private final ObjectMapper objectMapper;
@@ -35,7 +35,6 @@ public class BotBadResponseHandler implements DefaultBadResponseHandler {
         this.objectMapper = objectMapper;
     }
 
-    @Override
     public void handle(HttpRequest request, ClientHttpResponse response) throws IOException {
 
         int status = response.getStatusCode().value();

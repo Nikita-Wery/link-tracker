@@ -1,4 +1,4 @@
-package backend.academy.linktracker.bot.annotations;
+package backend.academy.linktracker.bot.utils.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
