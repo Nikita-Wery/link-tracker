@@ -2,19 +2,21 @@ package backend.academy.linktracker.bot.application.dispatcher.impl;
 
 import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
 import backend.academy.linktracker.bot.application.dispatcher.UpdateDispatcher;
-import backend.academy.linktracker.bot.dialoge.DialogContext;
-import backend.academy.linktracker.bot.dialoge.DialogState;
-import backend.academy.linktracker.bot.dialoge.AbstractDialogStateMachine;
-import backend.academy.linktracker.bot.dialoge.DialogStateMachine;
+import backend.academy.linktracker.bot.dialog.DialogContext;
+import backend.academy.linktracker.bot.dialog.DialogState;
+import backend.academy.linktracker.bot.dialog.AbstractDialogStateMachine;
+import backend.academy.linktracker.bot.dialog.DialogStateMachine;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import backend.academy.linktracker.bot.utils.validator.CommandValidator;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Component
 public class DialogDispatcher implements UpdateDispatcher {
 
     private static final String DEFAULT_LOST_DIALOG_MESSAGE = "Пожалуйста, выполните действие заново";
@@ -51,7 +53,7 @@ public class DialogDispatcher implements UpdateDispatcher {
 
             return !message.text().isBlank()
                 && context.isPresent()
-                && !commandValidator.isCommand(message.text());
+                && !commandValidator.isCommand(message.text().split(" ")[0].trim());
 
         }
 

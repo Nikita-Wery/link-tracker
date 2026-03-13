@@ -2,38 +2,47 @@ package backend.academy.linktracker.bot.application.dispatcher.impl;
 
 import backend.academy.linktracker.bot.application.command.Command;
 import backend.academy.linktracker.bot.application.dispatcher.UpdateDispatcher;
+import backend.academy.linktracker.bot.repository.DialogContextStorage;
+import backend.academy.linktracker.bot.utils.validator.CommandValidator;
 import com.pengrad.telegrambot.model.Update;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import static net.logstash.logback.argument.StructuredArguments.kv;
 
 /**
  * Обработка события - команда
  *
  * @author Luzin Nikita
  */
+@Slf4j
 @Component
 public class CommandDispatcher implements UpdateDispatcher {
 
-    private final Logger log = LogManager.getLogger(CommandDispatcher.class);
-
-    private Map<String, Command<Update>> commands = new HashMap<>();
-
+    private final Map<String, Command<Update>> commands = new ConcurrentHashMap<>();
+    private final CommandValidator commandValidator;
+    private final DialogContextStorage contextStorage;
     private Command<Update> unknownCommand;
 
-    public CommandDispatcher(List<Command<Update>> commands) {
-        commands.stream().forEach(command -> {
+    public CommandDispatcher(
+            List<Command<Update>> commands,
+            CommandValidator commandValidator,
+            DialogContextStorage contextStorage) {
+
+        commands.forEach(command -> {
             if (!command.getCommandName().equals("/unknown")) {
                 this.commands.put(command.getCommandName(), command);
             } else {
                 unknownCommand = command;
             }
         });
+        this.commandValidator = commandValidator;
+        this.contextStorage = contextStorage;
     }
 
     @PostConstruct
@@ -53,13 +62,17 @@ public class CommandDispatcher implements UpdateDispatcher {
      */
     public void dispatch(Update update) {
         if (update.message() == null || update.message().text() == null) {
-            return;
+            log.error("The update did not have a message",
+                kv("telegram_update", update)
+            );
+        } else {
+            String text = update.message().text().split(" ")[0];
+
+            Command<Update> command = commands.getOrDefault(text, unknownCommand);
+            contextStorage.clearDialog(update.message().chat().id());
+            command.handle(update);
         }
 
-        String text = update.message().text().split(" ")[0];
-
-        Command<Update> command = commands.getOrDefault(text, unknownCommand);
-        command.handle(update);
     }
 
     /**
@@ -70,10 +83,9 @@ public class CommandDispatcher implements UpdateDispatcher {
      */
     @Override
     public boolean supports(Update update) {
-        if (update.message() != null
-                || update.message().text() != null && update.message().text().startsWith("/")) {
-
-            return true;
-        } else return false;
+        return update.message() != null
+            && !update.message().text().isBlank()
+            && commandValidator.isCommand(
+                update.message().text().split(" ")[0].trim());
     }
 }

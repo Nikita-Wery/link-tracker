@@ -17,11 +17,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class HelpCommand extends AbstractCommand<Update> {
 
+    public static final String COMMAND_NAME = "/help";
+    public static final String COMMAND_DESCRIPTION = "Список доступных команд";
+
     private final TelegramMessageSender telegramMessageSender;
     private final List<Command<Update>> commands;
 
     public HelpCommand(TelegramMessageSender telegramMessageSender, List<Command<Update>> commands) {
-        super("/help", "Список доступных команд");
+        super(COMMAND_NAME, COMMAND_DESCRIPTION);
         // необходимо из-за циклической зависимости
         commands.add(this);
         this.telegramMessageSender = telegramMessageSender;

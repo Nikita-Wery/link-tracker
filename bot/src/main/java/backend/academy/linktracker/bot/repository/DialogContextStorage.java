@@ -1,6 +1,6 @@
 package backend.academy.linktracker.bot.repository;
 
-import backend.academy.linktracker.bot.dialoge.DialogContext;
+import backend.academy.linktracker.bot.dialog.DialogContext;
 import org.springframework.stereotype.Repository;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +17,10 @@ public class DialogContextStorage {
 
     public Optional<DialogContext> findDialogContext(Long chatId) {
         return Optional.of(dialogState.get(chatId));
+    }
+
+    public void save(Long chatId, DialogContext dialogContext) {
+        dialogState.put(chatId, dialogContext);
     }
 
 }
