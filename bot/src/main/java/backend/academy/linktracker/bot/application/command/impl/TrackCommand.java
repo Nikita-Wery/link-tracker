@@ -14,13 +14,12 @@ public class TrackCommand extends AbstractCommand<Update> {
     public static final String COMMAND_NAME = "/track";
     public static final String COMMAND_DESCRIPTION = "Начать отслеживание ссылки";
 
-    private static final String COMMAND_TEXT
-        = "Отправьте ссылку на ресурс, который хотите отслеживать%n%n%s - чтобы прервать выполнение"
-                .formatted(CancelCommand.COMMAND_NAME);
+    private static final String COMMAND_TEXT =
+            "Отправьте ссылку на ресурс, который хотите отслеживать%n%n%s - чтобы прервать выполнение"
+                    .formatted(CancelCommand.COMMAND_NAME);
 
     private final TelegramMessageSender sender;
     private final DialogContextStorage contextStorage;
-
 
     public TrackCommand(TelegramMessageSender sender, DialogContextStorage contextStorage) {
         super(COMMAND_NAME, COMMAND_DESCRIPTION);
@@ -32,8 +31,6 @@ public class TrackCommand extends AbstractCommand<Update> {
     public void handle(Update update) {
         sender.sendMessage(update.message().chat().id(), COMMAND_TEXT);
 
-        contextStorage.save(
-            update.message().chat().id(),
-            new DialogContext(TrackingDialogStates.WAITING_URL));
+        contextStorage.save(update.message().chat().id(), new DialogContext(TrackingDialogStates.WAITING_URL));
     }
 }

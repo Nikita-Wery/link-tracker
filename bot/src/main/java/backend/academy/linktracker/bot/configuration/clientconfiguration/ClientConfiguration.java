@@ -14,24 +14,19 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 public class ClientConfiguration {
 
     @Bean
-    public ScrapperClient getScrapperClient(
-        ScrapperBadResponseHandler handler,
-        ScrapperProperties properties
-    ) {
+    public ScrapperClient getScrapperClient(ScrapperBadResponseHandler handler, ScrapperProperties properties) {
 
         RestClient restClient = RestClient.builder()
-            .baseUrl(properties.getHost())
-            .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
-            .build();
+                .baseUrl(properties.getHost())
+                .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
+                .build();
 
         return restClientFactoryMethod(restClient, ScrapperClient.class);
     }
 
     private <T> T restClientFactoryMethod(RestClient restClient, Class<T> clientType) {
-        HttpServiceProxyFactory factory =
-            HttpServiceProxyFactory.builderFor(
-                RestClientAdapter.create(restClient)
-            ).build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient))
+                .build();
 
         return factory.createClient(clientType);
     }

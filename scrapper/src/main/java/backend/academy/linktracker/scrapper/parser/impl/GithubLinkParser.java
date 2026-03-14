@@ -2,8 +2,8 @@ package backend.academy.linktracker.scrapper.parser.impl;
 
 import backend.academy.linktracker.scrapper.dto.github.RepoInfo;
 import backend.academy.linktracker.scrapper.parser.LinkParser;
-import org.springframework.stereotype.Component;
 import java.net.URI;
+import org.springframework.stereotype.Component;
 
 @Component
 public class GithubLinkParser implements LinkParser<RepoInfo> {
@@ -19,9 +19,7 @@ public class GithubLinkParser implements LinkParser<RepoInfo> {
 
             String[] segments = uri.getPath().split("/");
 
-            return segments.length >= 3
-                    && !segments[1].isBlank()
-                    && !segments[2].isBlank();
+            return segments.length >= 3 && !segments[1].isBlank() && !segments[2].isBlank();
 
         } catch (Exception e) {
             return false;

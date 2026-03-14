@@ -1,7 +1,7 @@
 package backend.academy.linktracker.scrapper.exception.externalexception;
 
-import lombok.Getter;
 import java.net.URI;
+import lombok.Getter;
 
 @Getter
 public class ExternalApiException extends RuntimeException {

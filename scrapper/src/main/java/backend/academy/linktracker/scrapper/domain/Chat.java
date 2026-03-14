@@ -1,12 +1,13 @@
 package backend.academy.linktracker.scrapper.domain;
 
+import backend.academy.linktracker.scrapper.utils.IdGenerator;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -41,4 +42,11 @@ public class Chat {
         return chatId.hashCode();
     }
 
+    public Long getId() {
+        if (this.id == null) {
+            this.id = IdGenerator.nextId();
+        }
+
+        return id;
+    }
 }

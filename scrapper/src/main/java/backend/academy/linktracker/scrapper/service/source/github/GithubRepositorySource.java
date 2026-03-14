@@ -7,9 +7,9 @@ import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.UpdateEvent;
 import backend.academy.linktracker.scrapper.dto.github.GithubRepositoryUpdateTime;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -30,18 +30,17 @@ public class GithubRepositorySource implements UpdateSource {
     public UpdateEvent getUpdates(Link link) {
         String[] ownerAndRepo = extractOwnerAndRepo(link);
 
-        GithubRepositoryUpdateTime update =
-                gitHubClient.getRepositoryUpdateTime(ownerAndRepo[0], ownerAndRepo[1]);
+        GithubRepositoryUpdateTime update = gitHubClient.getRepositoryUpdateTime(ownerAndRepo[0], ownerAndRepo[1]);
 
         return new LinkUpdate(
-            link.getId(),
-            link.getUrl(),
-            buildDescription(update, link),
-            link.getTrackingChats().stream()
-                .map(chatLink -> chatLink.getChat().getChatId()).collect(Collectors.toSet()),
-            link.getResourceType(),
-            update.updateAt()
-        );
+                link.getId(),
+                link.getUrl(),
+                buildDescription(update, link),
+                link.getTrackingChats().stream()
+                        .map(chatLink -> chatLink.getChat().getChatId())
+                        .collect(Collectors.toSet()),
+                link.getResourceType(),
+                update.updateAt());
     }
 
     protected String[] extractOwnerAndRepo(Link link) {
@@ -58,5 +57,4 @@ public class GithubRepositorySource implements UpdateSource {
         return "Репозиторий %s, по ссылке %s, обновлён в %s, последний push %s"
                 .formatted(updateTime.repositoryName(), link.getUrl(), updateTime.updateAt(), updateTime.pushedAt());
     }
-
 }

@@ -2,7 +2,6 @@ package backend.academy.linktracker.scrapper.repository;
 
 import backend.academy.linktracker.scrapper.domain.Chat;
 import backend.academy.linktracker.scrapper.domain.ChatLink;
-import backend.academy.linktracker.scrapper.domain.Link;
 import java.util.Optional;
 
 public interface ChatRepository {
@@ -11,7 +10,7 @@ public interface ChatRepository {
 
     void deleteByChatId(long chatId);
 
-    Optional<Chat> findChatById(long chatId);
+    Optional<Chat> findChatByChatId(long chatId);
 
     boolean untrackLink(Chat chat, ChatLink chatLink);
 }

@@ -10,5 +10,4 @@ public interface BotClient {
 
     @PostExchange("/updates")
     void sendUpdate(@RequestBody LinkUpdate update);
-
 }

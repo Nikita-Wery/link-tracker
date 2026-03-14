@@ -16,29 +16,17 @@ import org.springframework.web.service.annotation.PostExchange;
 public interface ScrapperClient {
 
     @PostExchange("/tg-chat/{id}")
-    void registerChat(
-            @PathVariable("id") Long id
-    );
+    void registerChat(@PathVariable("id") Long id);
 
     @DeleteExchange("/tg-chat/{id}")
-    void deleteChat(
-            @PathVariable("id") Long id
-    );
+    void deleteChat(@PathVariable("id") Long id);
 
     @GetExchange("/links")
-    ListLinksResponse getLinks(
-            @RequestHeader("Tg-Chat-Id") Long chatId
-    );
+    ListLinksResponse getLinks(@RequestHeader("Tg-Chat-Id") Long chatId);
 
     @PostExchange("/links")
-    LinkResponse addLink(
-            @RequestHeader("Tg-Chat-Id") Long chatId,
-            @RequestBody AddLinkRequest request
-    );
+    LinkResponse addLink(@RequestHeader("Tg-Chat-Id") Long chatId, @RequestBody AddLinkRequest request);
 
     @DeleteExchange("/links")
-    LinkResponse untrackLink(
-            @RequestHeader("Tg-Chat-Id") Long chatId,
-            @RequestBody RemoveLinkRequest request
-    );
+    LinkResponse untrackLink(@RequestHeader("Tg-Chat-Id") Long chatId, @RequestBody RemoveLinkRequest request);
 }

@@ -1,14 +1,15 @@
 package backend.academy.linktracker.scrapper.domain;
 
 import backend.academy.linktracker.scrapper.config.ResourceType;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
+import backend.academy.linktracker.scrapper.utils.IdGenerator;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 @Setter
 @Getter
@@ -37,8 +38,7 @@ public class Link {
         if (this == o) return true;
         if (o != null && o instanceof Link) {
             Link that = (Link) o;
-            return this.url.equals(that.url)
-                && this.resourceType.equals(that.resourceType);
+            return this.url.equals(that.url) && this.resourceType.equals(that.resourceType);
         }
         return false;
     }
@@ -48,4 +48,11 @@ public class Link {
         return url.hashCode() + resourceType.hashCode();
     }
 
+    public Long getId() {
+        if (this.id == null) {
+            this.id = IdGenerator.nextId();
+        }
+
+        return id;
+    }
 }

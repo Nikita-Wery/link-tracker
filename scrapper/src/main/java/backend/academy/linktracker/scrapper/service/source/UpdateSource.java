@@ -9,5 +9,4 @@ public interface UpdateSource {
     ResourceType getResourceType();
 
     UpdateEvent getUpdates(Link link);
-
 }

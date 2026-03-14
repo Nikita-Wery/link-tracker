@@ -1,10 +1,10 @@
 package backend.academy.linktracker.bot.repository;
 
 import backend.academy.linktracker.bot.dialog.DialogContext;
-import org.springframework.stereotype.Repository;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class DialogContextStorage {
@@ -22,5 +22,4 @@ public class DialogContextStorage {
     public void save(Long chatId, DialogContext dialogContext) {
         dialogState.put(chatId, dialogContext);
     }
-
 }

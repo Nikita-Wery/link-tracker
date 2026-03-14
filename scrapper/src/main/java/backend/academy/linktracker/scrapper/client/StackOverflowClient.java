@@ -14,7 +14,5 @@ public interface StackOverflowClient {
             @PathVariable long id,
             @RequestParam("site") String site,
             @RequestParam("key") String key,
-            @RequestParam("access_token") String accessToken
-    );
-
+            @RequestParam("access_token") String accessToken);
 }

@@ -3,18 +3,16 @@ package backend.academy.linktracker.scrapper.repository.impl;
 import backend.academy.linktracker.scrapper.domain.Chat;
 import backend.academy.linktracker.scrapper.domain.ChatLink;
 import backend.academy.linktracker.scrapper.repository.ChatRepository;
-import org.springframework.stereotype.Repository;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class InMemoryChatRepository implements ChatRepository {
 
     private final Set<Chat> chatRepository;
-    private final AtomicLong idGenerator = new AtomicLong(1);
 
     public InMemoryChatRepository() {
         this.chatRepository = new HashSet<>();
@@ -22,9 +20,9 @@ public class InMemoryChatRepository implements ChatRepository {
 
     @Override
     public Chat save(Chat chat) {
-        chat.setId(idGenerator.getAndIncrement());
-        chatRepository.add(chat);
+        chat.getId();
 
+        chatRepository.add(chat);
         return chat;
     }
 
@@ -42,7 +40,7 @@ public class InMemoryChatRepository implements ChatRepository {
     }
 
     @Override
-    public Optional<Chat> findChatById(long chatId) {
+    public Optional<Chat> findChatByChatId(long chatId) {
         Optional<Chat> result = Optional.empty();
 
         for (Chat chat : chatRepository) {
@@ -68,5 +66,4 @@ public class InMemoryChatRepository implements ChatRepository {
 
         return linkUnpinned;
     }
-
 }

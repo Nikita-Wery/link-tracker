@@ -17,6 +17,9 @@ app:
       enabled: true
     file:
       enabled: true
+  client:
+    scrapper:
+      host: "http://localhost:8081"
 
 
 

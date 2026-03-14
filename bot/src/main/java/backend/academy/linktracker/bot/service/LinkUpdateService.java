@@ -19,12 +19,10 @@ public class LinkUpdateService {
         for (Long chatId : linkUpdate.tgChatIds()) {
 
             if (linkUpdate.description() == null || linkUpdate.description().isBlank()) {
-                telegramMessageSender.sendMessage(chatId,
-                        DEFAULT_UPDATE_DESCRIPTION.formatted(linkUpdate.url()));
+                telegramMessageSender.sendMessage(chatId, DEFAULT_UPDATE_DESCRIPTION.formatted(linkUpdate.url()));
             } else {
                 telegramMessageSender.sendMessage(chatId, linkUpdate.description());
             }
-
         }
     }
 }

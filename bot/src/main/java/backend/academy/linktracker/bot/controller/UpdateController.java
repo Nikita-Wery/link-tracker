@@ -20,9 +20,7 @@ public class UpdateController {
     }
 
     @PostMapping
-    public void getUpdates(
-        @RequestParam LinkUpdate linkUpdate
-    ) {
+    public void getUpdates(@RequestParam LinkUpdate linkUpdate) {
         linkUpdateService.sendUpdateMessage(linkUpdate);
     }
 }

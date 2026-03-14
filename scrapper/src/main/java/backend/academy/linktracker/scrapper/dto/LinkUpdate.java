@@ -6,13 +6,8 @@ import java.time.OffsetDateTime;
 import java.util.Set;
 
 public record LinkUpdate(
-    Long id,
-    URI url,
-    String description,
-    Set<Long> tgChatIds,
-    ResourceType resourceType,
-    OffsetDateTime lastUpdate
-) implements UpdateEvent {
+        Long id, URI url, String description, Set<Long> tgChatIds, ResourceType resourceType, OffsetDateTime lastUpdate)
+        implements UpdateEvent {
 
     @Override
     public OffsetDateTime getLastUpdate() {

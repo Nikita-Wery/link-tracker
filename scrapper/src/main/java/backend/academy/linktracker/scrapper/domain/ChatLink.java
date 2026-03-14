@@ -1,12 +1,12 @@
 package backend.academy.linktracker.scrapper.domain;
 
 import jakarta.validation.constraints.NotNull;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -27,8 +27,7 @@ public class ChatLink {
             if (this == o) return true;
             if (o != null && o instanceof Id) {
                 Id that = (Id) o;
-                return this.chatId.equals(that.chatId)
-                    && this.linkId.equals(that.linkId);
+                return this.chatId.equals(that.chatId) && this.linkId.equals(that.linkId);
             }
             return false;
         }
@@ -44,15 +43,12 @@ public class ChatLink {
 
     private Id id;
 
-    private Set<String> tags = new HashSet<>();;
+    private Set<String> tags = new HashSet<>();
 
     private Set<String> filters = new HashSet<>();
 
     @Builder
-    public ChatLink(@NotNull Link link,
-                    @NotNull Chat chat,
-                    Set<String> tags,
-                    Set<String> filters) {
+    public ChatLink(@NotNull Link link, @NotNull Chat chat, Set<String> tags, Set<String> filters) {
         this.link = link;
         this.chat = chat;
 

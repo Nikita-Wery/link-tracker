@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class StartCommand extends AbstractCommand<Update> {
 
     public static final String COMMAND_NAME = "/start";
-    public static final String COMMAND_DESCRIPTION ="Готовы пообщаться?)";
+    public static final String COMMAND_DESCRIPTION = "Готовы пообщаться?)";
 
     private final TelegramMessageSender telegramMessageSender;
 

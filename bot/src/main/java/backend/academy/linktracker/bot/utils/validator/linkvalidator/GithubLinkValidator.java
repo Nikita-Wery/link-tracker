@@ -16,9 +16,7 @@ public class GithubLinkValidator implements LinkValidator {
 
             String[] segments = uri.getPath().split("/");
 
-            return segments.length >= 3
-                    && !segments[1].isBlank()
-                    && !segments[2].isBlank();
+            return segments.length >= 3 && !segments[1].isBlank() && !segments[2].isBlank();
 
         } catch (Exception e) {
             return false;
