@@ -1,7 +1,7 @@
 package backend.academy.linktracker.bot.utils.validator;
 
-import org.springframework.stereotype.Component;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 @Component
 public class LinkValidationProcessor {

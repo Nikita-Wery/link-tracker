@@ -3,8 +3,8 @@ package backend.academy.linktracker.scrapper.service;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.repository.ChatRepository;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
-import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
+import org.springframework.stereotype.Service;
 
 @Service
 public class LinkService {
@@ -18,5 +18,4 @@ public class LinkService {
     public void changeLastUpdate(Link link, OffsetDateTime newLastUpdate) {
         linkRepository.updateLastUpdate(link, newLastUpdate);
     }
-
 }

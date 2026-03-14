@@ -19,52 +19,43 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 public class ScrapperConfiguration {
 
     @Bean
-    public BotClient botClient(
-        BotBadResponseHandler handler,
-        BotProperties properties) {
+    public BotClient botClient(BotBadResponseHandler handler, BotProperties properties) {
 
         RestClient restClient = RestClient.builder()
-            .baseUrl(properties.getHost())
-            .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
-            .build();
+                .baseUrl(properties.getHost())
+                .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
+                .build();
 
         return restClientFactoryMethod(restClient, BotClient.class);
     }
 
     @Bean
-    public GitHubClient gitHubClient(
-        APIBadResponseHandler handler,
-        GithubProperties properties) {
+    public GitHubClient gitHubClient(APIBadResponseHandler handler, GithubProperties properties) {
 
         RestClient restClient = RestClient.builder()
-            .baseUrl(properties.getHost())
-            .defaultHeader("Authorization", "Bearer" + properties.getToken())
-            .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
-            .build();
+                .baseUrl(properties.getHost())
+                .defaultHeader("Authorization", "Bearer" + properties.getToken())
+                .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
+                .build();
 
         return restClientFactoryMethod(restClient, GitHubClient.class);
     }
 
     @Bean
-    public StackOverflowClient stackOverflowClient(
-        APIBadResponseHandler handler,
-        StackoverflowProperties properties) {
+    public StackOverflowClient stackOverflowClient(APIBadResponseHandler handler, StackoverflowProperties properties) {
 
         RestClient restClient = RestClient.builder()
-            .baseUrl(properties.getHost())
-            .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
-            .build();
+                .baseUrl(properties.getHost())
+                .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
+                .build();
 
         return restClientFactoryMethod(restClient, StackOverflowClient.class);
     }
 
     private <T> T restClientFactoryMethod(RestClient restClient, Class<T> clientType) {
-        HttpServiceProxyFactory factory =
-            HttpServiceProxyFactory.builderFor(
-                RestClientAdapter.create(restClient)
-            ).build();
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient))
+                .build();
 
         return factory.createClient(clientType);
     }
-
 }

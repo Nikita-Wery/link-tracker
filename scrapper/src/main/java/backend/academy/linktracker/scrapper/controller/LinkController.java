@@ -8,11 +8,12 @@ import backend.academy.linktracker.scrapper.dto.bot.ListLinksResponse;
 import backend.academy.linktracker.scrapper.dto.bot.RemoveLinkRequest;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.ChatNotExistsException;
 import backend.academy.linktracker.scrapper.service.ChatService;
-import backend.academy.linktracker.scrapper.service.LinkService;
 import backend.academy.linktracker.scrapper.service.SubscriptionService;
 import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
+import java.util.HashSet;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,39 +21,31 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import java.util.HashSet;
-import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/links")
 public class LinkController {
 
-    private final LinkService linksService;
     private final ChatService chatService;
     private final SubscriptionService subscriptionService;
     private final DtoEntityMapper dtoEntityMapper;
 
     public LinkController(
-            LinkService linksService,
-            ChatService chatService,
-            SubscriptionService subscriptionService,
-            DtoEntityMapper dtoEntityMapper) {
+            ChatService chatService, SubscriptionService subscriptionService, DtoEntityMapper dtoEntityMapper) {
 
-        this.linksService = linksService;
         this.chatService = chatService;
         this.subscriptionService = subscriptionService;
         this.dtoEntityMapper = dtoEntityMapper;
     }
 
     @GetMapping
-    public ListLinksResponse getLinks(
-            @RequestHeader("Tg-Chat-Id") Long chatId
-    ) {
-        List<LinkResponse> linkResponses =
-            chatService.getChatById(chatId).map(chat
-                    -> chat.getTrackedLinks().stream().map(
-                        chatLink -> dtoEntityMapper.linkToLinkResponse(chatLink.getLink())).toList())
+    public ListLinksResponse getLinks(@RequestHeader("Tg-Chat-Id") Long chatId) {
+        List<LinkResponse> linkResponses = chatService
+                .getChatById(chatId)
+                .map(chat -> chat.getTrackedLinks().stream()
+                        .map(chatLink -> dtoEntityMapper.linkToLinkResponse(chatLink.getLink()))
+                        .toList())
                 .orElseThrow(() -> new ChatNotExistsException("Chat not found"));
 
         return new ListLinksResponse(linkResponses, linkResponses.size());
@@ -60,26 +53,22 @@ public class LinkController {
 
     @PostMapping
     public LinkResponse trackLink(
-            @RequestHeader("Tg-Chat-Id") Long chatId,
-            @Valid @RequestBody AddLinkRequest request
-    ) {
+            @RequestHeader("Tg-Chat-Id") Long chatId, @Valid @RequestBody AddLinkRequest request) {
         Link link = dtoEntityMapper.linkFromAddLinkRequest(request);
         Chat chat = Chat.builder().chatId(chatId).build();
 
-        return dtoEntityMapper.linkToLinkResponse(
-            subscriptionService.trackLink(
-                chat, link, new HashSet<>(request.filters()), new HashSet<>(request.tags())).getLink());
+        return dtoEntityMapper.linkToLinkResponse(subscriptionService
+                .trackLink(chat, link, new HashSet<>(request.filters()), new HashSet<>(request.tags()))
+                .getLink());
     }
 
     @DeleteMapping
     public LinkResponse untrackLink(
-            @RequestHeader("Tg-Chat-Id") Long chatId,
-            @Valid @RequestBody RemoveLinkRequest request
-    ) {
+            @RequestHeader("Tg-Chat-Id") Long chatId, @Valid @RequestBody RemoveLinkRequest request) {
         Link link = dtoEntityMapper.linkFromRemoveLinkRequest(request);
         Chat chat = Chat.builder().chatId(chatId).build();
 
         return dtoEntityMapper.linkToLinkResponse(
-            subscriptionService.untrackLink(chat, link).getLink());
+                subscriptionService.untrackLink(chat, link).getLink());
     }
 }

@@ -1,9 +1,9 @@
 package backend.academy.linktracker.bot.dialog;
 
-import lombok.Getter;
-import lombok.Setter;
 import java.net.URI;
 import java.util.Set;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

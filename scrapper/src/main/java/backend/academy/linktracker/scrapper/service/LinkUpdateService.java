@@ -4,13 +4,13 @@ import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.UpdateEvent;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -20,15 +20,11 @@ public class LinkUpdateService {
     private final ApplicationEventPublisher publisher;
     private final LinkService linkService;
 
-    public LinkUpdateService(List<UpdateSource> sources,
-                             ApplicationEventPublisher publisher,
-                             LinkService linkService) {
+    public LinkUpdateService(List<UpdateSource> sources, ApplicationEventPublisher publisher, LinkService linkService) {
 
-            this.linkService = linkService;
-            this.publisher = publisher;
-            this.sourceMap = sources.stream()
-                .collect(Collectors.toMap(UpdateSource::getResourceType,
-                                          Function.identity()));
+        this.linkService = linkService;
+        this.publisher = publisher;
+        this.sourceMap = sources.stream().collect(Collectors.toMap(UpdateSource::getResourceType, Function.identity()));
     }
 
     public void process(Link link) {
@@ -49,7 +45,5 @@ public class LinkUpdateService {
         } else {
             log.info("Link {} has not been updated", link.getUrl());
         }
-
     }
-
 }

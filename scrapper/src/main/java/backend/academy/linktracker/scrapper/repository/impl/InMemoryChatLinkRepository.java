@@ -2,10 +2,10 @@ package backend.academy.linktracker.scrapper.repository.impl;
 
 import backend.academy.linktracker.scrapper.domain.ChatLink;
 import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
-import org.springframework.stereotype.Repository;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class InMemoryChatLinkRepository implements ChatLinkRepository {

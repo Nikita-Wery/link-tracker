@@ -1,5 +1,7 @@
 package backend.academy.linktracker.bot.application.dispatcher.impl;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import backend.academy.linktracker.bot.application.command.Command;
 import backend.academy.linktracker.bot.application.dispatcher.UpdateDispatcher;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
@@ -12,8 +14,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
-import static net.logstash.logback.argument.StructuredArguments.kv;
 
 /**
  * Обработка события - команда
@@ -30,9 +30,7 @@ public class CommandDispatcher implements UpdateDispatcher {
     private Command<Update> unknownCommand;
 
     public CommandDispatcher(
-            List<Command<Update>> commands,
-            CommandValidator commandValidator,
-            DialogContextStorage contextStorage) {
+            List<Command<Update>> commands, CommandValidator commandValidator, DialogContextStorage contextStorage) {
 
         commands.forEach(command -> {
             if (!command.getCommandName().equals("/unknown")) {
@@ -62,17 +60,14 @@ public class CommandDispatcher implements UpdateDispatcher {
      */
     public void dispatch(Update update) {
         if (update.message() == null || update.message().text() == null) {
-            log.error("The update did not have a message",
-                kv("telegram_update", update)
-            );
+            log.error("The update did not have a message", kv("telegram_update", update));
         } else {
-            String text = update.message().text().split(" ")[0];
+            String text = update.message().text().split(" ")[0].trim();
 
             Command<Update> command = commands.getOrDefault(text, unknownCommand);
             contextStorage.clearDialog(update.message().chat().id());
             command.handle(update);
         }
-
     }
 
     /**
@@ -84,8 +79,8 @@ public class CommandDispatcher implements UpdateDispatcher {
     @Override
     public boolean supports(Update update) {
         return update.message() != null
-            && !update.message().text().isBlank()
-            && commandValidator.isCommand(
-                update.message().text().split(" ")[0].trim());
+                && !update.message().text().isBlank()
+                && commandValidator.isCommand(
+                        update.message().text().split(" ")[0].trim());
     }
 }

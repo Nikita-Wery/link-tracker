@@ -25,31 +25,21 @@ public class GlobalExceptionHandler {
         this.dtoEntityMapper = dtoEntityMapper;
     }
 
-
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiErrorResponse> handleRequestBodyMismatch(HttpMessageNotReadableException ex) {
         ex = new InvalidLinkUpdateException(ex);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-              dtoEntityMapper.buildApiErrorResponse(
-                READING_REQUEST_BODY_EXCEPTION,
-                Integer.toString(HttpStatus.BAD_REQUEST.value()),
-                ex
-            )
-        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(dtoEntityMapper.buildApiErrorResponse(
+                        READING_REQUEST_BODY_EXCEPTION, Integer.toString(HttpStatus.BAD_REQUEST.value()), ex));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleRequestFileMismatch(MethodArgumentNotValidException ex) {
         ex = new InvalidPropertyInUpdateException(ex);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-            dtoEntityMapper.buildApiErrorResponse(
-                READING_FIELD_IN_REQUEST_EXCEPTION,
-                Integer.toString(HttpStatus.BAD_REQUEST.value()),
-                ex
-            )
-        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(dtoEntityMapper.buildApiErrorResponse(
+                        READING_FIELD_IN_REQUEST_EXCEPTION, Integer.toString(HttpStatus.BAD_REQUEST.value()), ex));
     }
-
 }

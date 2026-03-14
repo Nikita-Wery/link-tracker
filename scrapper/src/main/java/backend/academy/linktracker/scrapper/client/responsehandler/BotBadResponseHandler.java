@@ -1,21 +1,21 @@
 package backend.academy.linktracker.scrapper.client.responsehandler;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import backend.academy.linktracker.scrapper.dto.bot.ApiErrorResponse;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.exception.botexception.responsexception.BotServerException;
 import backend.academy.linktracker.scrapper.exception.botexception.responsexception.UnknownBotClientException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import static net.logstash.logback.argument.StructuredArguments.kv;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpRequest;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Component
@@ -24,13 +24,10 @@ public class BotBadResponseHandler {
     private final Map<String, BotApiException> clientExceptionMap;
     private final ObjectMapper objectMapper;
 
-    public BotBadResponseHandler(
-            ObjectMapper objectMapper,
-            List<BotApiException> responseExceptions) {
+    public BotBadResponseHandler(ObjectMapper objectMapper, List<BotApiException> responseExceptions) {
 
         this.clientExceptionMap = responseExceptions.stream()
-                .collect(Collectors.toMap(
-                    ex -> ex.getClass().getSimpleName(), Function.identity()));
+                .collect(Collectors.toMap(ex -> ex.getClass().getSimpleName(), Function.identity()));
 
         this.objectMapper = objectMapper;
     }
@@ -41,24 +38,23 @@ public class BotBadResponseHandler {
 
         switch (status / 100) {
             case 4 -> {
-                ApiErrorResponse responseBody = objectMapper
-                    .readValue(response.getBody(), ApiErrorResponse.class);
+                ApiErrorResponse responseBody = objectMapper.readValue(response.getBody(), ApiErrorResponse.class);
 
-                log.error("Client error received",
-                    kv("status_code", responseBody.code()),
-                    kv("exception_name", responseBody.exceptionName()),
-                    kv("exception_message", responseBody.exceptionMessage()),
-                    kv("stacktrace", responseBody.stackTrace())
-                );
+                log.error(
+                        "Client error received",
+                        kv("status_code", responseBody.code()),
+                        kv("exception_name", responseBody.exceptionName()),
+                        kv("exception_message", responseBody.exceptionMessage()),
+                        kv("stacktrace", responseBody.stackTrace()));
 
                 throw getExceptionByApiErrorResponseExName(responseBody);
             }
             case 5 -> {
-                log.error("Server error received",
-                    kv("status_code", status),
-                    kv("method", request.getMethod()),
-                    kv("url", request.getURI())
-                );
+                log.error(
+                        "Server error received",
+                        kv("status_code", status),
+                        kv("method", request.getMethod()),
+                        kv("url", request.getURI()));
 
                 throw new BotServerException("Bot exception 5xx");
             }
@@ -66,8 +62,7 @@ public class BotBadResponseHandler {
     }
 
     private BotApiException getExceptionByApiErrorResponseExName(ApiErrorResponse response) {
-        return clientExceptionMap.getOrDefault(response.exceptionName(),
-                new UnknownBotClientException("Unknown 4xx bot exception"));
+        return clientExceptionMap.getOrDefault(
+                response.exceptionName(), new UnknownBotClientException("Unknown 4xx bot exception"));
     }
-
 }

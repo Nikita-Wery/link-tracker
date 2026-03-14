@@ -3,7 +3,6 @@ package backend.academy.linktracker.scrapper.repository.impl;
 import backend.academy.linktracker.scrapper.domain.ChatLink;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
-import org.springframework.stereotype.Repository;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -11,6 +10,7 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class InMemoryLinkRepository implements LinkRepository {
@@ -38,9 +38,9 @@ public class InMemoryLinkRepository implements LinkRepository {
 
     @Override
     public Link save(Link link) {
-        link.setId(idGenerator.getAndIncrement());
-        linkRepository.add(link);
+        link.getId();
 
+        linkRepository.add(link);
         return link;
     }
 
@@ -71,5 +71,4 @@ public class InMemoryLinkRepository implements LinkRepository {
 
         return chatUnpinned;
     }
-
 }

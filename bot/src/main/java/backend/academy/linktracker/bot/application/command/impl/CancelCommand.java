@@ -15,7 +15,5 @@ public class CancelCommand extends AbstractCommand<Update> {
     }
 
     @Override
-    public void handle(Update data) {
-
-    }
+    public void handle(Update data) {}
 }

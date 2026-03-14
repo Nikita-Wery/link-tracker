@@ -9,5 +9,4 @@ public abstract class AbstractDialogStateMachine<T extends DialogState> implemen
     public AbstractDialogStateMachine(List<T> startState) {
         this.dialogStates = startState;
     }
-
 }

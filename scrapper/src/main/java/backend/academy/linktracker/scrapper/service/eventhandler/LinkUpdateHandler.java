@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 public class LinkUpdateHandler {
 
     private final BotClient botClient;
+
     public LinkUpdateHandler(BotClient botClient) {
         this.botClient = botClient;
     }
@@ -17,5 +18,4 @@ public class LinkUpdateHandler {
     public void handle(LinkUpdate event) {
         botClient.sendUpdate(event);
     }
-
 }

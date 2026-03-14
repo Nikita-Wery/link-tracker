@@ -1,8 +1,8 @@
 package backend.academy.linktracker.scrapper.parser.impl;
 
 import backend.academy.linktracker.scrapper.parser.LinkParser;
-import org.springframework.stereotype.Component;
 import java.net.URI;
+import org.springframework.stereotype.Component;
 
 @Component
 public class StackOverflowLinkParser implements LinkParser<Long> {
@@ -18,9 +18,7 @@ public class StackOverflowLinkParser implements LinkParser<Long> {
 
             String[] segments = uri.getPath().split("/");
 
-            return segments.length >= 3
-                    && "questions".equals(segments[1])
-                    && segments[2].matches("\\d+");
+            return segments.length >= 3 && "questions".equals(segments[1]) && segments[2].matches("\\d+");
 
         } catch (Exception e) {
             return false;

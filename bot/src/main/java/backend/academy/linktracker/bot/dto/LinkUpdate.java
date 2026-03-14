@@ -7,15 +7,11 @@ import java.net.URI;
 import java.util.Set;
 
 public record LinkUpdate(
-    @NotNull(message = "link id can not be null")
-    Long id,
+        @NotNull(message = "link id can not be null") Long id,
 
-    @NotBlank(message = "link url can not be blank")
-    URI url,
+        @NotBlank(message = "link url can not be blank") URI url,
 
-    String description,
+        String description,
 
-    @NotEmpty(message = "chats that follow the link can not be empty")
-    Set<Long> tgChatIds
-) {
-}
+        @NotEmpty(message = "chats that follow the link can not be empty")
+        Set<Long> tgChatIds) {}

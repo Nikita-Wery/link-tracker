@@ -4,14 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.OffsetDateTime;
 
 public record GithubRepositoryUpdateTime(
+        @JsonProperty("name") String repositoryName,
 
-    @JsonProperty("name")
-    String repositoryName,
+        @JsonProperty("pushed_at") OffsetDateTime pushedAt,
 
-    @JsonProperty("pushed_at")
-    OffsetDateTime pushedAt,
-
-    @JsonProperty("updated_at")
-    OffsetDateTime updateAt
-) {
-}
+        @JsonProperty("updated_at") OffsetDateTime updateAt) {}

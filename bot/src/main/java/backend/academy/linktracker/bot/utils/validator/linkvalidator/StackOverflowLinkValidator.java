@@ -16,9 +16,7 @@ public class StackOverflowLinkValidator implements LinkValidator {
 
             String[] segments = uri.getPath().split("/");
 
-            return segments.length >= 3
-                    && "questions".equals(segments[1])
-                    && segments[2].matches("\\d+");
+            return segments.length >= 3 && "questions".equals(segments[1]) && segments[2].matches("\\d+");
 
         } catch (Exception e) {
             return false;
