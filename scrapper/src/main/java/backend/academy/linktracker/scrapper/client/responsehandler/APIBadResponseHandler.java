@@ -3,6 +3,7 @@ package backend.academy.linktracker.scrapper.client.responsehandler;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -15,6 +16,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class APIBadResponseHandler {
 
+    @SuppressFBWarnings(
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public void handle(HttpRequest request, ClientHttpResponse response) throws IOException {
 
         int statusCode = response.getStatusCode().value();

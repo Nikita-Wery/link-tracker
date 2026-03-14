@@ -18,12 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class GlobalExceptionHandler {
 
-    private final String CHAT_ALREADY_EXISTS_EXCEPTION = "Данный чат уже существует";
-    private final String CHAT_NOT_EXISTS_EXCEPTION = "Данный чат не существует";
-    private final String LINK_ALREADY_TRACKED_EXCEPTION = "Данная ссылка уже отслеживается пользователем";
-    private final String LINK_NOT_SUPPORTED_EXCEPTION = "Данная ссылка сейчас не поддерживается для отслеживания";
-    private final String LINK_NOT_TRACKED_EXCEPTION = "Данная ссыка не отслеживается на даный момент";
-    private final String NULL_POINTER_EXCEPTION = "Entity было создано без необходимого свойства";
+    private static final String CHAT_ALREADY_EXISTS_EXCEPTION = "Данный чат уже существует";
+    private static final String CHAT_NOT_EXISTS_EXCEPTION = "Данный чат не существует";
+    private static final String LINK_ALREADY_TRACKED_EXCEPTION = "Данная ссылка уже отслеживается пользователем";
+    private static final String LINK_NOT_TRACKED_EXCEPTION = "Данная ссыка не отслеживается на даный момент";
+    private static final String NULL_POINTER_EXCEPTION = "Entity было создано без необходимого свойства";
 
     private final DtoEntityMapper dtoEntityMapper;
 

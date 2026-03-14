@@ -6,6 +6,7 @@ import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiException;
 import backend.academy.linktracker.scrapper.repository.impl.InMemoryLinkRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,6 +24,9 @@ public class LinkUpdateScheduler {
         this.inMemoryLinkRepository = inMemoryLinkRepository;
     }
 
+    @SuppressFBWarnings(
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     @Scheduled(fixedDelayString = "${app.scheduler.interval-update-ms}")
     public void checkLinks() {
         Set<Link> links = inMemoryLinkRepository.findAll();

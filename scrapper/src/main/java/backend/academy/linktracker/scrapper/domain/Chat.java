@@ -32,7 +32,7 @@ public class Chat {
         if (this == o) return true;
         if (o != null & o instanceof Chat) {
             Chat that = (Chat) o;
-            return this.chatId == that.chatId;
+            return this.chatId.equals(that.chatId);
         }
         return false;
     }

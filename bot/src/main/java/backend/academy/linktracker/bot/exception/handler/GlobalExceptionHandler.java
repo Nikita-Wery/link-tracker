@@ -16,8 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class GlobalExceptionHandler {
 
-    private final String READING_REQUEST_BODY_EXCEPTION = "Не получилось сопоставить класс и тело запроса";
-    private final String READING_FIELD_IN_REQUEST_EXCEPTION = "Не получилось сопоставить поле класса и тело запроса";
+    private static final String READING_REQUEST_BODY_EXCEPTION = "Не получилось сопоставить класс и тело запроса";
+    private static final String READING_FIELD_IN_REQUEST_EXCEPTION =
+            "Не получилось сопоставить поле класса и тело запроса";
 
     private final DtoEntityMapper dtoEntityMapper;
 

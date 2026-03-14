@@ -6,6 +6,7 @@ import backend.academy.linktracker.scrapper.dto.bot.ApiErrorResponse;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.exception.botexception.responsexception.BotServerException;
 import backend.academy.linktracker.scrapper.exception.botexception.responsexception.UnknownBotClientException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,9 @@ public class BotBadResponseHandler {
         this.objectMapper = objectMapper;
     }
 
+    @SuppressFBWarnings(
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public void handle(HttpRequest request, ClientHttpResponse response) throws IOException {
 
         int status = response.getStatusCode().value();
