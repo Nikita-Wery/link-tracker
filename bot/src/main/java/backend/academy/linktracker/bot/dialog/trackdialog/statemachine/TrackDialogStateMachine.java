@@ -3,8 +3,8 @@ package backend.academy.linktracker.bot.dialog.trackdialog.statemachine;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import backend.academy.linktracker.bot.application.command.impl.TrackCommand;
-import backend.academy.linktracker.bot.dialog.AbstractDialogStateMachine;
 import backend.academy.linktracker.bot.dialog.DialogContext;
+import backend.academy.linktracker.bot.dialog.DialogStateMachine;
 import backend.academy.linktracker.bot.dialog.Transition;
 import backend.academy.linktracker.bot.dialog.trackdialog.TrackingDialogStates;
 import backend.academy.linktracker.bot.dialog.trackdialog.graphs.TrackDialogGraph;
@@ -17,12 +17,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class TrackDialogStateMachine extends AbstractDialogStateMachine<TrackingDialogStates> {
+public class TrackDialogStateMachine implements DialogStateMachine<TrackingDialogStates> {
 
     private final TrackDialogGraph dialogGraph;
 
     public TrackDialogStateMachine(TrackDialogGraph dialogGraph) {
-        super(Arrays.stream(TrackingDialogStates.values()).toList());
         this.dialogGraph = dialogGraph;
     }
 

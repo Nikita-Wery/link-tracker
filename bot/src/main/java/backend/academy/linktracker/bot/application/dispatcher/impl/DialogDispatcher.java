@@ -2,7 +2,6 @@ package backend.academy.linktracker.bot.application.dispatcher.impl;
 
 import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
 import backend.academy.linktracker.bot.application.dispatcher.UpdateDispatcher;
-import backend.academy.linktracker.bot.dialog.AbstractDialogStateMachine;
 import backend.academy.linktracker.bot.dialog.DialogContext;
 import backend.academy.linktracker.bot.dialog.DialogState;
 import backend.academy.linktracker.bot.dialog.DialogStateMachine;
@@ -23,7 +22,7 @@ public class DialogDispatcher implements UpdateDispatcher {
 
     private final DialogContextStorage storage;
     private final CommandValidator commandValidator;
-    private final Map<DialogState, AbstractDialogStateMachine<? extends DialogState>> dialogStateMachines =
+    private final Map<DialogState, DialogStateMachine<? extends DialogState>> dialogStateMachines =
             new ConcurrentHashMap<>();
     private final TelegramMessageSender sender;
 
@@ -31,7 +30,7 @@ public class DialogDispatcher implements UpdateDispatcher {
             DialogContextStorage storage,
             CommandValidator commandValidator,
             TelegramMessageSender sender,
-            List<? extends AbstractDialogStateMachine<? extends DialogState>> dialogStateMachines) {
+            List<? extends DialogStateMachine<? extends DialogState>> dialogStateMachines) {
         dialogStateMachines.forEach(dialogStateMachine -> {
             dialogStateMachine.getAllStates().forEach(dialogState -> {
                 this.dialogStateMachines.put(dialogState, dialogStateMachine);
