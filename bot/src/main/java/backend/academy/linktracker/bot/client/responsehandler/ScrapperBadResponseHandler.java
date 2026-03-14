@@ -6,6 +6,7 @@ import backend.academy.linktracker.bot.dto.ApiErrorResponse;
 import backend.academy.linktracker.bot.exception.ScrapperApiException;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.UnknownScrapperApiException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,9 @@ public class ScrapperBadResponseHandler {
         this.mapper = mapper;
     }
 
+    @SuppressFBWarnings(
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public void handle(HttpRequest request, ClientHttpResponse response) throws IOException {
 
         int status = response.getStatusCode().value();

@@ -11,6 +11,7 @@ import backend.academy.linktracker.bot.exception.scrapperexception.responsexcept
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException;
 import backend.academy.linktracker.bot.utils.validator.LinkValidationProcessor;
 import com.pengrad.telegrambot.model.Update;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -45,6 +46,9 @@ public class UntrackCommand extends AbstractCommand<Update> {
     }
 
     @Override
+    @SuppressFBWarnings(
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public void handle(Update update) {
 
         String[] messageWords = update.message().text().split(" ");

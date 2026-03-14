@@ -13,6 +13,7 @@ import backend.academy.linktracker.bot.exception.scrapperexception.responsexcept
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import backend.academy.linktracker.bot.utils.validator.TagsValidator;
 import com.pengrad.telegrambot.model.Update;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,9 @@ public class TagsAction implements StateAction {
         this.tagsValidator = tagsValidator;
     }
 
+    @SuppressFBWarnings(
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     @Override
     public boolean execute(Update update, DialogContext context) {
 

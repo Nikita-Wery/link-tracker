@@ -7,6 +7,7 @@ import backend.academy.linktracker.bot.application.dispatcher.UpdateDispatcher;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import backend.academy.linktracker.bot.utils.validator.CommandValidator;
 import com.pengrad.telegrambot.model.Update;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +47,7 @@ public class CommandDispatcher implements UpdateDispatcher {
     @PostConstruct
     public void logCommands() {
         log.info("Commands loaded in Dispatcher:");
-        commands.keySet().forEach(cmd -> log.info(" - {}", cmd));
+        commands.keySet().forEach(cmd -> log.info("Command loaded: {}", cmd));
     }
 
     public List<Command<Update>> getListOfCommands() {
@@ -58,6 +59,9 @@ public class CommandDispatcher implements UpdateDispatcher {
      *
      * @param update содержит необходимую информацию для обработки
      */
+    @SuppressFBWarnings(
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public void dispatch(Update update) {
         if (update.message() == null || update.message().text() == null) {
             log.error("The update did not have a message", kv("telegram_update", update));

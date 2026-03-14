@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class LinkUpdateService {
 
-    private final String DEFAULT_UPDATE_DESCRIPTION = "Ссылка: %s, обновилась";
+    private static final String DEFAULT_UPDATE_DESCRIPTION = "Ссылка: %s, обновилась";
     private final TelegramMessageSender telegramMessageSender;
 
     public LinkUpdateService(TelegramMessageSender telegramMessageSender) {

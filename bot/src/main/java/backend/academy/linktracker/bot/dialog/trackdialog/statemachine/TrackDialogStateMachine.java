@@ -9,6 +9,7 @@ import backend.academy.linktracker.bot.dialog.Transition;
 import backend.academy.linktracker.bot.dialog.trackdialog.TrackingDialogStates;
 import backend.academy.linktracker.bot.dialog.trackdialog.graphs.TrackDialogGraph;
 import com.pengrad.telegrambot.model.Update;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,9 @@ public class TrackDialogStateMachine extends AbstractDialogStateMachine<Tracking
         this.dialogGraph = dialogGraph;
     }
 
+    @SuppressFBWarnings(
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     @Override
     public void handle(Update update, DialogContext context) {
 
