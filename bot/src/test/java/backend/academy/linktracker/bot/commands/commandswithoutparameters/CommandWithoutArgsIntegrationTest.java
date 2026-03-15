@@ -99,5 +99,4 @@ public class CommandWithoutArgsIntegrationTest {
         assertEquals(200L, sentMessage.getChatId());
         assertEquals("Неизвестная команда. Используйте /help", sentMessage.getText());
     }
-
 }
