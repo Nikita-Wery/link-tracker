@@ -1,5 +1,12 @@
 package backend.academy.linktracker.bot.commands.commandswithparameters;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispatcher;
 import backend.academy.linktracker.bot.client.ScrapperClient;
 import backend.academy.linktracker.bot.configuration.telgramconfiguration.TelegramTestConfiguration;
@@ -12,6 +19,9 @@ import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
+import java.net.URI;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,23 +33,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.net.URI;
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TelegramTestConfiguration.class)
 public class ListCommandIntegrationTests {
 
     private static final String NEVER_ATTACHED_LINK_MESSAGE =
-        "Чтобы получить список отслеживаемых ссылок, начните отслеживать хотя бы одну";
+            "Чтобы получить список отслеживаемых ссылок, начните отслеживать хотя бы одну";
     private static final String NO_TRACKED_LINKS_MESSAGE = "Сейчас вы не отслеживаете ни одной ссылки";
     public static final String ILLEGAL_TEG_MESSAGE = "Тэги введённые вами не могут существовать";
 
@@ -55,8 +54,8 @@ public class ListCommandIntegrationTests {
     @Autowired
     private CommandDispatcher commandDispatcher;
 
-//    @Autowired
-//    private ObjectMapper objectMapper;
+    //    @Autowired
+    //    private ObjectMapper objectMapper;
 
     private Update update;
     private Message message;
@@ -81,20 +80,19 @@ public class ListCommandIntegrationTests {
     @Test
     @DisplayName("Сценарий: пользователь впервые пользуется ботом")
     public void execute_FirstUse() {
-//        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(
-//            "chatNotExists",
-//            HttpStatus.NOT_FOUND.toString(),
-//            ChatNotExistsException.class.getSimpleName(),
-//            "chatNotExists",
-//            Collections.emptyList()
-//        );
+        //        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(
+        //            "chatNotExists",
+        //            HttpStatus.NOT_FOUND.toString(),
+        //            ChatNotExistsException.class.getSimpleName(),
+        //            "chatNotExists",
+        //            Collections.emptyList()
+        //        );
 
-//        ResponseEntity<ApiErrorResponse> response =
-//            ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiErrorResponse);
+        //        ResponseEntity<ApiErrorResponse> response =
+        //            ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiErrorResponse);
 
         when(message.text()).thenReturn("/list");
-        when(scrapperClient.getLinks(chat.id()))
-                .thenThrow(new ChatNotExistsException("chat not exists"));
+        when(scrapperClient.getLinks(chat.id())).thenThrow(new ChatNotExistsException("chat not exists"));
 
         commandDispatcher.dispatch(update);
 
@@ -127,10 +125,10 @@ public class ListCommandIntegrationTests {
     public void execute_UserHasLinks_UserSetTags() {
 
         List<LinkResponse> listOfResponses = List.of(
-            new LinkResponse(1L, URI.create("https://firstLink"), List.of("first"), Collections.emptyList()),
-            new LinkResponse(2L, URI.create("https://secondLink"), List.of("second"), Collections.emptyList()),
-            new LinkResponse(3L, URI.create("https://thirdLink"), List.of("second", "first"), Collections.emptyList())
-        );
+                new LinkResponse(1L, URI.create("https://firstLink"), List.of("first"), Collections.emptyList()),
+                new LinkResponse(2L, URI.create("https://secondLink"), List.of("second"), Collections.emptyList()),
+                new LinkResponse(
+                        3L, URI.create("https://thirdLink"), List.of("second", "first"), Collections.emptyList()));
 
         ListLinksResponse response = new ListLinksResponse(listOfResponses, listOfResponses.size());
 
@@ -144,9 +142,8 @@ public class ListCommandIntegrationTests {
 
         SendMessage sentMessage = argumentCaptor.getValue();
         assertTrue(sentMessage.getText().contains("https://firstLink")
-            && sentMessage.getText().contains("https://thirdLink")
-            && !sentMessage.getText().contains("https://secondLink")
-        );
+                && sentMessage.getText().contains("https://thirdLink")
+                && !sentMessage.getText().contains("https://secondLink"));
     }
 
     @Test
@@ -165,5 +162,4 @@ public class ListCommandIntegrationTests {
         SendMessage sentMessage = argumentCaptor.getValue();
         assertEquals(ILLEGAL_TEG_MESSAGE, sentMessage.getText());
     }
-
 }

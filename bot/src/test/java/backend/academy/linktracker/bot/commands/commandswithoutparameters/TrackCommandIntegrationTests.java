@@ -1,5 +1,11 @@
 package backend.academy.linktracker.bot.commands.commandswithoutparameters;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.linktracker.bot.application.command.impl.CancelCommand;
 import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispatcher;
 import backend.academy.linktracker.bot.client.ScrapperClient;
@@ -23,19 +29,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TelegramTestConfiguration.class)
 public class TrackCommandIntegrationTests {
 
     private static final String COMMAND_TEXT =
-        "Отправьте ссылку на ресурс, который хотите отслеживать%n%n%s - чтобы прервать выполнение"
-            .formatted(CancelCommand.COMMAND_NAME);
+            "Отправьте ссылку на ресурс, который хотите отслеживать%n%n%s - чтобы прервать выполнение"
+                    .formatted(CancelCommand.COMMAND_NAME);
 
     @MockitoBean
     private TelegramBot telegramBot;
@@ -79,9 +79,7 @@ public class TrackCommandIntegrationTests {
         ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
         verify(telegramBot).execute(argumentCaptor.capture());
 
-        ArgumentCaptor<DialogContext> dialogContext = ArgumentCaptor.forClass(
-            DialogContext.class
-        );
+        ArgumentCaptor<DialogContext> dialogContext = ArgumentCaptor.forClass(DialogContext.class);
         verify(contextStorage).save(eq(200L), dialogContext.capture());
 
         SendMessage sentMessage = argumentCaptor.getValue();
@@ -90,5 +88,4 @@ public class TrackCommandIntegrationTests {
 
         assertEquals(COMMAND_TEXT, sentMessage.getText());
     }
-
 }

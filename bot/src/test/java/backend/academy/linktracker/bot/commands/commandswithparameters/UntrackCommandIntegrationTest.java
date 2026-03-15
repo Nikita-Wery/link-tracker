@@ -1,5 +1,12 @@
 package backend.academy.linktracker.bot.commands.commandswithparameters;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispatcher;
 import backend.academy.linktracker.bot.client.ScrapperClient;
 import backend.academy.linktracker.bot.configuration.telgramconfiguration.TelegramTestConfiguration;
@@ -9,7 +16,6 @@ import backend.academy.linktracker.bot.exception.scrapperexception.responsexcept
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.LinkNotTrackedException;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import backend.academy.linktracker.bot.utils.validator.LinkValidationProcessor;
-import backend.academy.linktracker.bot.utils.validator.linkvalidator.GithubLinkValidator;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
@@ -27,27 +33,19 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.verify;
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = TelegramTestConfiguration.class)
 public class UntrackCommandIntegrationTest {
 
     private static final String MISMATCH_NUMBER_OF_ARGS_MESSAGE =
-        "За один раз можно открепить только одну ссылку, ни больше ни меньше";
+            "За один раз можно открепить только одну ссылку, ни больше ни меньше";
     private static final String INVALID_LINK_MESSAGE = "Извините, но в данный момент такая ссылка не поддерживается";
     private static final String SUCCESSFUL_LINK_UNPINNING_MESSAGE =
-        "Ссылка успешно откреплена и больше не отслеживается";
+            "Ссылка успешно откреплена и больше не отслеживается";
     private static final String USER_HAS_NEVER_ATTACHED_LINK_MESSAGE =
-        "Чтобы открепить ссылку, начните отслеживать хотя бы одну";
+            "Чтобы открепить ссылку, начните отслеживать хотя бы одну";
     private static final String USER_NOT_CURRENTLY_FOLLOWING_ANY_LINKS_MESSAGE =
-        "В данный момент вы не отслеживаете ни одной ссылки";
+            "В данный момент вы не отслеживаете ни одной ссылки";
 
     @MockitoBean
     private TelegramBot telegramBot;
@@ -168,7 +166,8 @@ public class UntrackCommandIntegrationTest {
         LinkResponse response = mock(LinkResponse.class);
         String link = "https://github.com/user/repo";
         when(message.text()).thenReturn("/untrack " + link);
-        when(scrapperClient.untrackLink(eq(chat.id()), any(RemoveLinkRequest.class))).thenReturn(response);
+        when(scrapperClient.untrackLink(eq(chat.id()), any(RemoveLinkRequest.class)))
+                .thenReturn(response);
 
         commandDispatcher.dispatch(update);
 
@@ -178,105 +177,4 @@ public class UntrackCommandIntegrationTest {
         SendMessage sentMessage = argumentCaptor.getValue();
         assertEquals(SUCCESSFUL_LINK_UNPINNING_MESSAGE, sentMessage.getText());
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
