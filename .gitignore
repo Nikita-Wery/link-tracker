@@ -20,6 +20,7 @@ buildNumber.properties
 
 ### IntelliJ IDEA ###
 scrapper/src/main/java/backend/academy/linktracker/scrapper/exception/handler/ApiSchedulerExceptionHandlerRegistry.java
+bot/logs/*
 .idea/*
 !.idea/codeStyles
 !.idea/externalDependencies.xml
