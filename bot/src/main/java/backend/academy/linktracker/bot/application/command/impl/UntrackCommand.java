@@ -59,7 +59,7 @@ public class UntrackCommand extends AbstractCommand<Update> {
             return;
         }
 
-        String link = messageWords[1];
+        String link = messageWords[1].trim();
 
         if (validator.isValid(link)) {
 

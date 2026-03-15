@@ -1,8 +1,10 @@
 package backend.academy.linktracker.bot.utils.validator.linkvalidator;
 
 import backend.academy.linktracker.bot.utils.validator.LinkValidator;
+import org.springframework.stereotype.Component;
 import java.net.URI;
 
+@Component
 public class GithubLinkValidator implements LinkValidator {
 
     @Override
