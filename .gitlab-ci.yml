@@ -52,4 +52,7 @@ test:
     - apk add --no-cache docker-cli
     - echo "$CI_JOB_TOKEN" | docker login gitlab.education.tbank.ru:443 -u gitlab-ci-token --password-stdin
   script:
+    - ./mvnw -pl bot,scrapper -am package -DskipTests=true -Djacoco.skip=true
+    - docker build --no-cache ./bot -t bot:0.0.1
+    - docker build --no-cache ./scrapper -t scrapper:0.0.1
     - ./mvnw verify
