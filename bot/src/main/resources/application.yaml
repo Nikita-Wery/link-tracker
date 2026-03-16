@@ -1,5 +1,5 @@
 server:
-  port: 8081
+  port: 8080
 
 spring:
   application:
@@ -16,7 +16,7 @@ app:
     console:
       enabled: true
     file:
-      enabled: true
+      enabled: false
   client:
     scrapper:
       host: "http://localhost:8081"

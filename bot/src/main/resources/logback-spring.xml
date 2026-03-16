@@ -13,19 +13,19 @@
 
     <timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
 
-    <condition class="ch.qos.logback.core.boolex.ExpressionPropertyCondition">
-        <expression>propertyEquals("LOGBACK_FILE_WRITER_ENABLED", "true")</expression>
-    </condition>
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${LOG_PATH}/log-${bySecond}.txt</file>
-        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
-            <includeContext>false</includeContext>
-        </encoder>
-    </appender>
+<!--    <condition class="ch.qos.logback.core.boolex.ExpressionPropertyCondition">-->
+<!--        <expression>propertyEquals("LOGBACK_FILE_WRITER_ENABLED", "true")</expression>-->
+<!--    </condition>-->
+<!--    <appender name="FILE" class="ch.qos.logback.core.FileAppender">-->
+<!--        <file>${LOG_PATH}/log-${bySecond}.txt</file>-->
+<!--        <encoder class="net.logstash.logback.encoder.LogstashEncoder">-->
+<!--            <includeContext>false</includeContext>-->
+<!--        </encoder>-->
+<!--    </appender>-->
 
-    <condition class="ch.qos.logback.core.boolex.ExpressionPropertyCondition">
-        <expression>propertyEquals("LOGBACK_CONSOLE_WRITER_ENABLED", "true")</expression>
-    </condition>
+<!--    <condition class="ch.qos.logback.core.boolex.ExpressionPropertyCondition">-->
+<!--        <expression>propertyEquals("LOGBACK_CONSOLE_WRITER_ENABLED", "true")</expression>-->
+<!--    </condition>-->
     <appender name = "STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <charset>UTF-8</charset>
@@ -40,7 +40,7 @@
     <logger name="backend.academy.linktracker.bot.configuration.logging.LogstashLoggerConfig"
             level="INFO"
             additivity="false">
-        <appender-ref ref="FILE"/>
+        <appender-ref ref="INFO"/>
     </logger>
 
 </configuration>
