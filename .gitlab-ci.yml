@@ -5,16 +5,6 @@ variables:
   MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
   GITLAB_DOCKER_PROXY: "gitlab.education.tbank.ru:443/backend-academy-java-2025/lecture-materials/dependency_proxy/containers"
 
-  DOCKER_AUTH_CONFIG: >
-    {
-      "auths": {
-        "gitlab.education.tbank.ru:443": {
-          "username": "gitlab-ci-token",
-          "password": "$CI_JOB_TOKEN"
-        }
-      }
-    }
-
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
@@ -32,7 +22,7 @@ cache:
     - .m2/repository/
 
 before_script:
-  - apk add --no-cache gcompat libc6-compat libstdc++
+  - apk add --no-cache gcompat
 
 build:
   stage: build
@@ -50,92 +40,23 @@ test:
   stage: test
   needs:
     - build
-
   services:
     - name: docker:29.0.1-dind
       alias: docker
-
   variables:
     DOCKER_HOST: tcp://docker:2376
     DOCKER_TLS_CERTDIR: "/certs"
     DOCKER_TLS_VERIFY: 1
     DOCKER_CERT_PATH: "${DOCKER_TLS_CERTDIR}/client"
-
     TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX: "${GITLAB_DOCKER_PROXY}/"
-
   tags:
     - dind
-
   before_script:
     - apk add --no-cache docker-cli
-
+    - apk add --no-cache gcompat libc6-compat libstdc++ docker-cli
     - echo "$CI_JOB_TOKEN" | docker login gitlab.education.tbank.ru:443 -u gitlab-ci-token --password-stdin
-
-    - docker pull ${GITLAB_DOCKER_PROXY}/eclipse-temurin:25-jdk-alpine || true
-
   script:
     - ./mvnw -pl bot,scrapper -am package -DskipTests=true -Djacoco.skip=true
-    - docker build ./bot -t bot:0.0.1
-    - docker build ./scrapper -t scrapper:0.0.1
+    - docker build ./bot -t "${GITLAB_DOCKER_PROXY}/bot:0.0.1"
+    - docker build ./scrapper -t "${GITLAB_DOCKER_PROXY}/scrapper:0.0.1"
     - ./mvnw verify
-#image: "${GITLAB_DOCKER_PROXY}/eclipse-temurin:25-jdk-alpine"
-#
-#variables:
-#  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
-#  GITLAB_DOCKER_PROXY: "gitlab.education.tbank.ru:443/backend-academy-java-2025/lecture-materials/dependency_proxy/containers"
-#
-#workflow:
-#  rules:
-#    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-#    - if: $CI_COMMIT_REF_PROTECTED == 'true'
-#    - if: $CI_COMMIT_BRANCH == 'master'
-#
-#stages:
-#  - build
-#  - lint
-#  - test
-#
-#cache:
-#  key: "$CI_COMMIT_REF_SLUG"
-#  paths:
-#    - .m2/repository/
-#
-#before_script:
-#  - apk add --no-cache gcompat
-#
-#build:
-#  stage: build
-#  script:
-#    - ./mvnw package -DskipTests=true -Djacoco.skip=true
-#
-#lint:
-#  stage: lint
-#  needs:
-#    - build
-#  script:
-#    - ./mvnw compile -am spotless:check modernizer:modernizer spotbugs:check pmd:check pmd:cpd-check
-#
-#test:
-#  stage: test
-#  needs:
-#    - build
-#  services:
-#    - name: docker:29.0.1-dind
-#      alias: docker
-#  variables:
-#    DOCKER_HOST: tcp://docker:2376
-#    DOCKER_TLS_CERTDIR: "/certs"
-#    DOCKER_TLS_VERIFY: 1
-#    DOCKER_CERT_PATH: "${DOCKER_TLS_CERTDIR}/client"
-#    TESTCONTAINERS_HUB_IMAGE_NAME_PREFIX: "${GITLAB_DOCKER_PROXY}/"
-#  tags:
-#    - dind
-#  before_script:
-#    - apk add --no-cache docker-cli
-#    - apk add --no-cache gcompat libc6-compat libstdc++ docker-cli
-#    - echo "$CI_JOB_TOKEN" | docker login gitlab.education.tbank.ru:443 -u gitlab-ci-token --password-stdin
-#  script:
-#    - ./mvnw -pl bot,scrapper -am package -DskipTests=true -Djacoco.skip=true
-#    - docker build ./bot -t "${GITLAB_DOCKER_PROXY}/bot:0.0.1"
-#    - docker build ./scrapper -t "${GITLAB_DOCKER_PROXY}/scrapper:0.0.1"
-#    - ./mvnw verify

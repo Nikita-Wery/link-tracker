@@ -7,6 +7,7 @@ spring:
 
 app:
   telegram:
+    enabled: true
     url: https://api.telegram.org/bot
     token: ${TELEGRAM_TOKEN} # Use env variable. DO NOT KEEP TOKEN HERE
     update-listener-sleep: 1s

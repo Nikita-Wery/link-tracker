@@ -10,7 +10,6 @@ import backend.academy.linktracker.scrapper.exception.botexception.requestexcept
 import backend.academy.linktracker.scrapper.service.ChatService;
 import backend.academy.linktracker.scrapper.service.SubscriptionService;
 import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
@@ -18,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,6 +54,7 @@ public class LinkController {
     @PostMapping
     public LinkResponse trackLink(
             @RequestHeader("Tg-Chat-Id") Long chatId, @Valid @RequestBody AddLinkRequest request) {
+
         Link link = dtoEntityMapper.linkFromAddLinkRequest(request);
         Chat chat = Chat.builder().chatId(chatId).build();
 

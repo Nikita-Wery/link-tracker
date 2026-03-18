@@ -1,8 +1,8 @@
 package backend.academy.linktracker.scrapper.service;
 
 import backend.academy.linktracker.scrapper.domain.Chat;
+import backend.academy.linktracker.scrapper.exception.botexception.requestexception.ChatAlreadyExistsException;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.ChatNotExistsException;
-import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkAlreadyTrackedException;
 import backend.academy.linktracker.scrapper.repository.ChatRepository;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -19,8 +19,8 @@ public class ChatService {
     public Chat addChat(Chat chat) {
         Optional<Chat> chatOptional = chatRepository.findChatByChatId(chat.getChatId());
 
-        if (chatOptional.isEmpty()) {
-            throw new LinkAlreadyTrackedException("The link is already being tracked by the chat");
+        if (chatOptional.isPresent()) {
+            throw new ChatAlreadyExistsException("Chat already exists");
         }
 
         return chatRepository.save(chat);
