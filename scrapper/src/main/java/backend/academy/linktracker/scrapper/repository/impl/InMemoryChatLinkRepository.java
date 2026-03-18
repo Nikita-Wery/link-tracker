@@ -5,8 +5,10 @@ import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+@Slf4j
 @Repository
 public class InMemoryChatLinkRepository implements ChatLinkRepository {
 
@@ -28,7 +30,9 @@ public class InMemoryChatLinkRepository implements ChatLinkRepository {
         Optional<ChatLink> result = Optional.empty();
 
         for (ChatLink chatLink : chatLinkRepository) {
-            if (chatLink.getId().equals(id)) result = Optional.of(chatLink);
+            if (chatLink.getId().equals(id)) {
+                result = Optional.of(chatLink);
+            }
         }
 
         return result;
@@ -36,7 +40,7 @@ public class InMemoryChatLinkRepository implements ChatLinkRepository {
 
     @Override
     public ChatLink deleteChatLink(ChatLink chatLink) {
-        chatLinkRepository.removeIf(chatLinkNow -> chatLinkNow.getId().equals(chatLinkNow.getId()));
+        chatLinkRepository.removeIf(chatLinkNow -> chatLinkNow.getId().equals(chatLink.getId()));
 
         return chatLink;
     }

@@ -10,6 +10,7 @@ import backend.academy.linktracker.scrapper.exception.botexception.requestexcept
 import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
 import backend.academy.linktracker.scrapper.repository.ChatRepository;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
+import java.util.Optional;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,9 +32,13 @@ public class SubscriptionService {
     }
 
     public ChatLink trackLink(Chat chat, Link link, Set<String> filters, Set<String> tags) {
+
+        Optional<Chat> chatOptional = chatRepository.findChatByChatId(chat.getChatId());
+        Optional<Link> linkOptional = linkRepository.findLinkByURI(link.getUrl());
+
         ChatLink chatLink = ChatLink.builder()
-                .chat(chat)
-                .link(link)
+                .chat(chatOptional.orElse(chat))
+                .link(linkOptional.orElse(link))
                 .filters(filters)
                 .tags(tags)
                 .build();
@@ -42,13 +47,9 @@ public class SubscriptionService {
             throw new LinkAlreadyTrackedException("The link is already being tracked by the chat");
         });
 
-        chatRepository
-                .findChatByChatId(chat.getChatId())
-                .ifPresentOrElse(c -> c.getTrackedLinks().add(chatLink), () -> chatRepository.save(chat));
+        if (chatOptional.isEmpty()) chatRepository.save(chat);
 
-        linkRepository
-                .findLinkByURI(link.getUrl())
-                .ifPresentOrElse(l -> l.getTrackingChats().add(chatLink), () -> linkRepository.save(link));
+        if (linkOptional.isEmpty()) linkRepository.save(link);
 
         return chatLinkRepository.save(chatLink);
     }

@@ -14,8 +14,10 @@ import lombok.Setter;
 public class ChatLink {
 
     public static class Id {
+        @Getter
         protected Long chatId;
 
+        @Getter
         protected Long linkId;
 
         public Id(Long linkId, Long chatId) {

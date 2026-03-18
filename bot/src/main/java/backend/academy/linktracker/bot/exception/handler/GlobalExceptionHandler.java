@@ -4,6 +4,7 @@ import backend.academy.linktracker.bot.dto.ApiErrorResponse;
 import backend.academy.linktracker.bot.exception.scrapperexception.requestexception.InvalidLinkUpdateException;
 import backend.academy.linktracker.bot.exception.scrapperexception.requestexception.InvalidPropertyInUpdateException;
 import backend.academy.linktracker.bot.utils.DtoEntityMapper;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -42,5 +43,21 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(dtoEntityMapper.buildApiErrorResponse(
                         READING_FIELD_IN_REQUEST_EXCEPTION, Integer.toString(HttpStatus.BAD_REQUEST.value()), ex));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiErrorResponse> handleConstraint(ConstraintViolationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(dtoEntityMapper.buildApiErrorResponse(
+                        READING_FIELD_IN_REQUEST_EXCEPTION, String.valueOf(HttpStatus.BAD_REQUEST.value()), ex));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiErrorResponse> handleAll(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(dtoEntityMapper.buildApiErrorResponse(
+                        HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                        String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR),
+                        ex));
     }
 }
