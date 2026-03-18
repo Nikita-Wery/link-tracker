@@ -134,10 +134,6 @@ class BotScrapperEndToEndTest {
 
         AddLinkRequest body = new AddLinkRequest(url, Collections.emptyList(), Collections.emptyList());
 
-        String addBody = """
-            { "link": "%s", "tags": [], "filters": [] }
-            """.formatted(url);
-
         var add = scrapperClient()
                 .post()
                 .uri("/links")
