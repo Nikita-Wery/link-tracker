@@ -57,9 +57,6 @@ public class CommandDispatcher implements UpdateDispatcher {
      *
      * @param update содержит необходимую информацию для обработки
      */
-    @SuppressFBWarnings(
-            value = "SLF4J_PLACE_HOLDER_MISMATCH",
-            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public void dispatch(Update update) {
         if (update.message() == null || update.message().text() == null) {
             log.error("The update did not have a message", kv("telegram_update", update));
