@@ -68,7 +68,7 @@
     <Match>
         <Package name="~.*\.jmh_generated"/>
     </Match>
-    
+
     <!-- Protobuf generated classes -->
     <Match>
         <Package name="backend.academy.linktracker.proto"/>
