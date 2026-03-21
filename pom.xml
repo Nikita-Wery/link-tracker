@@ -314,6 +314,10 @@
                         <rulesets>
                             <ruleset>pmd.xml</ruleset>
                         </rulesets>
+                        <exclude-pattern>.*/proto/.*</exclude-pattern>
+                           <excludeRoots>
+                            <excludeRoot>target/generated-sources</excludeRoot>
+                        </excludeRoots>
                     </configuration>
                     <dependencies>
                         <dependency>
