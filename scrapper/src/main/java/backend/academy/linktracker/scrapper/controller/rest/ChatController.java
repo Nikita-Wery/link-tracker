@@ -1,9 +1,9 @@
-package backend.academy.linktracker.scrapper.controller;
+package backend.academy.linktracker.scrapper.controller.rest;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import backend.academy.linktracker.scrapper.domain.Chat;
 import backend.academy.linktracker.scrapper.service.ChatService;
+import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,9 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
 
     private final ChatService chatService;
+    private final DtoEntityMapper dtoEntityMapper;
 
-    public ChatController(ChatService chatService) {
+    public ChatController(ChatService chatService, DtoEntityMapper dtoEntityMapper) {
         this.chatService = chatService;
+        this.dtoEntityMapper = dtoEntityMapper;
     }
 
     @SuppressFBWarnings(
@@ -30,7 +32,7 @@ public class ChatController {
     public void registerChat(@PathVariable("id") Long chatId) {
         log.info("chat_registration", kv("chat_id", chatId));
 
-        chatService.addChat(Chat.builder().chatId(chatId).build());
+        chatService.addChat(dtoEntityMapper.getChatFromChatId(chatId));
     }
 
     @SuppressFBWarnings(

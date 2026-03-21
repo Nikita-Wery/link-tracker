@@ -1,5 +1,6 @@
 package backend.academy.linktracker.scrapper.domain;
 
+import backend.academy.linktracker.scrapper.utils.IdGenerator;
 import jakarta.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,22 +14,22 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class ChatLink {
 
-    public static class Id {
+    public static class BusinessId {
         @Getter
         protected Long chatId;
 
         @Getter
         protected Long linkId;
 
-        public Id(Long linkId, Long chatId) {
+        public BusinessId(Long linkId, Long chatId) {
             this.linkId = linkId;
             this.chatId = chatId;
         }
 
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (o != null && o instanceof Id) {
-                Id that = (Id) o;
+            if (o != null && o instanceof BusinessId) {
+                BusinessId that = (BusinessId) o;
                 return this.chatId.equals(that.chatId) && this.linkId.equals(that.linkId);
             }
             return false;
@@ -39,11 +40,13 @@ public class ChatLink {
         }
     }
 
+    private Long id;
+
     private Link link;
 
     private Chat chat;
 
-    private Id id;
+    private BusinessId businessId;
 
     private Set<String> tags = new HashSet<>();
 
@@ -53,6 +56,7 @@ public class ChatLink {
     public ChatLink(@NotNull Link link, @NotNull Chat chat, Set<String> tags, Set<String> filters) {
         this.link = link;
         this.chat = chat;
+        this.id = IdGenerator.nextId();
 
         if (tags != null) {
             this.tags = tags;
@@ -61,9 +65,17 @@ public class ChatLink {
             this.filters = filters;
         }
 
-        this.id = new Id(link.getId(), chat.getId());
+        this.businessId = new BusinessId(link.getId(), chat.getId());
 
         link.addChat(this);
         chat.addLink(this);
+    }
+
+    public Long getId() {
+        if (this.id == null) {
+            this.id = IdGenerator.nextId();
+        }
+
+        return id;
     }
 }

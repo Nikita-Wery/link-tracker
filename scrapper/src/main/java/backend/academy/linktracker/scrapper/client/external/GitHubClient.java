@@ -1,4 +1,4 @@
-package backend.academy.linktracker.scrapper.client;
+package backend.academy.linktracker.scrapper.client.external;
 
 import backend.academy.linktracker.scrapper.dto.github.GithubRepositoryUpdateTime;
 import org.springframework.web.bind.annotation.PathVariable;

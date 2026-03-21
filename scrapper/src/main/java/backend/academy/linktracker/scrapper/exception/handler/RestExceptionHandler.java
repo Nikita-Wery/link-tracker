@@ -19,12 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @ControllerAdvice
 @RestController
-public class GlobalExceptionHandler {
+public class RestExceptionHandler {
 
-    private static final String CHAT_ALREADY_EXISTS_EXCEPTION = "Данный чат уже существует";
-    private static final String CHAT_NOT_EXISTS_EXCEPTION = "Данный чат не существует";
-    private static final String LINK_ALREADY_TRACKED_EXCEPTION = "Данная ссылка уже отслеживается пользователем";
-    private static final String LINK_NOT_TRACKED_EXCEPTION = "Данная ссыка не отслеживается на даный момент";
     private static final String NULL_POINTER_EXCEPTION = "Entity было создано без необходимого свойства";
     private static final String READING_REQUEST_BODY_EXCEPTION = "Не получилось сопоставить класс и тело запроса";
     private static final String READING_FIELD_IN_REQUEST_EXCEPTION =
@@ -32,7 +28,7 @@ public class GlobalExceptionHandler {
 
     private final DtoEntityMapper dtoEntityMapper;
 
-    public GlobalExceptionHandler(DtoEntityMapper dtoEntityMapper) {
+    public RestExceptionHandler(DtoEntityMapper dtoEntityMapper) {
         this.dtoEntityMapper = dtoEntityMapper;
     }
 
@@ -40,32 +36,25 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiErrorResponse> chatAlreadyExists(ChatAlreadyExistsException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(dtoEntityMapper.buildApiErrorResponse(
-                        CHAT_ALREADY_EXISTS_EXCEPTION, Integer.toString(HttpStatus.CONFLICT.value()), ex));
+                        ex.getDescription(), Integer.toString(HttpStatus.CONFLICT.value()), ex));
     }
 
     @ExceptionHandler(ChatNotExistsException.class)
     public ResponseEntity<ApiErrorResponse> chatNotExists(ChatNotExistsException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(dtoEntityMapper.buildApiErrorResponse(
-                        CHAT_NOT_EXISTS_EXCEPTION, Integer.toString(HttpStatus.NOT_FOUND.value()), ex));
-    }
-
-    @ExceptionHandler(LinkAlreadyTrackedException.class)
-    public ResponseEntity<ApiErrorResponse> linkAlreadyTracked(LinkAlreadyTrackedException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(dtoEntityMapper.buildApiErrorResponse(
-                        LINK_ALREADY_TRACKED_EXCEPTION, Integer.toString(HttpStatus.CONFLICT.value()), ex));
+                        ex.getDescription(), Integer.toString(HttpStatus.NOT_FOUND.value()), ex));
     }
 
     @ExceptionHandler(LinkNotTrackedException.class)
     public ResponseEntity<ApiErrorResponse> linkNotTracked(LinkNotTrackedException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(dtoEntityMapper.buildApiErrorResponse(
-                        LINK_NOT_TRACKED_EXCEPTION, Integer.toString(HttpStatus.NOT_FOUND.value()), ex));
+                        ex.getDescription(), Integer.toString(HttpStatus.CONTINUE.value()), ex));
     }
 
     @ExceptionHandler(LinkNotExistsException.class)
-    public ResponseEntity<String> linkNotExists(RuntimeException ex) {
+    public ResponseEntity<String> linkNotExists(LinkNotExistsException ex) {
         return new ResponseEntity<>(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() + ": " + ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
@@ -81,7 +70,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidLinkInRequestException.class)
     public ResponseEntity<String> invalidLinkInRequestException(InvalidLinkInRequestException ex) {
         return new ResponseEntity<>(
-                HttpStatus.BAD_REQUEST.getReasonPhrase() + " " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+                HttpStatus.BAD_REQUEST.getReasonPhrase() + ": " + ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ApiErrorResponse> linkAlreadyTracked(LinkAlreadyTrackedException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(dtoEntityMapper.buildApiErrorResponse(
+                        ex.getDescription(), Integer.toString(HttpStatus.CONTINUE.value()), ex));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -103,5 +99,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(dtoEntityMapper.buildApiErrorResponse(
                         READING_FIELD_IN_REQUEST_EXCEPTION, String.valueOf(HttpStatus.BAD_REQUEST.value()), ex));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleUnexpectedRuntimeException(Exception ex) {
+        return new ResponseEntity<>(
+                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() + ": " + ex.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

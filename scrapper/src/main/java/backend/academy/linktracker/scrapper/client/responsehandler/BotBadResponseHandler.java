@@ -5,7 +5,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 import backend.academy.linktracker.scrapper.dto.bot.ApiErrorResponse;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.exception.botexception.responsexception.BotServerException;
-import backend.academy.linktracker.scrapper.exception.botexception.responsexception.UnknownBotClientException;
+import backend.academy.linktracker.scrapper.exception.botexception.responsexception.UnknownBotException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
@@ -15,11 +15,9 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
-@Component
 public class BotBadResponseHandler {
 
     private final Map<String, BotApiException> clientExceptionMap;
@@ -67,6 +65,6 @@ public class BotBadResponseHandler {
 
     private BotApiException getExceptionByApiErrorResponseExName(ApiErrorResponse response) {
         return clientExceptionMap.getOrDefault(
-                response.exceptionName(), new UnknownBotClientException("Unknown 4xx bot exception"));
+                response.exceptionName(), new UnknownBotException("Unknown 4xx bot exception"));
     }
 }

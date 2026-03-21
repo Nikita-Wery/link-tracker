@@ -1,20 +1,32 @@
 package backend.academy.linktracker.bot.configuration.clientconfiguration;
 
 import backend.academy.linktracker.bot.client.ScrapperClient;
-import backend.academy.linktracker.bot.client.responsehandler.ScrapperBadResponseHandler;
+import backend.academy.linktracker.bot.client.responsehandler.RestScrapperBadResponseHandler;
+import backend.academy.linktracker.bot.configuration.conditionals.RestApiConditional;
+import backend.academy.linktracker.bot.exception.ScrapperApiException;
 import backend.academy.linktracker.bot.properties.ScrapperProperties;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
-public class ClientConfiguration {
+@Conditional(RestApiConditional.class)
+public class RestClientConfiguration {
 
     @Bean
-    public ScrapperClient getScrapperClient(ScrapperBadResponseHandler handler, ScrapperProperties properties) {
+    public RestScrapperBadResponseHandler restScrapperBadResponseHandler(
+            List<ScrapperApiException> exceptionList, ObjectMapper mapper) {
+        return new RestScrapperBadResponseHandler(exceptionList, mapper);
+    }
+
+    @Bean
+    public ScrapperClient getScrapperClient(RestScrapperBadResponseHandler handler, ScrapperProperties properties) {
 
         RestClient restClient = RestClient.builder()
                 .baseUrl(properties.getHost())

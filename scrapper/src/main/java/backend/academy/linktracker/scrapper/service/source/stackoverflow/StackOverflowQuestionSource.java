@@ -1,6 +1,6 @@
 package backend.academy.linktracker.scrapper.service.source.stackoverflow;
 
-import backend.academy.linktracker.scrapper.client.StackOverflowClient;
+import backend.academy.linktracker.scrapper.client.external.StackOverflowClient;
 import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;

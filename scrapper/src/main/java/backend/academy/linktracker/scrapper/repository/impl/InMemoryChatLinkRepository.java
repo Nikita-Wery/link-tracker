@@ -26,11 +26,11 @@ public class InMemoryChatLinkRepository implements ChatLinkRepository {
     }
 
     @Override
-    public Optional<ChatLink> findChatLinkById(ChatLink.Id id) {
+    public Optional<ChatLink> findChatLinkById(ChatLink.BusinessId id) {
         Optional<ChatLink> result = Optional.empty();
 
         for (ChatLink chatLink : chatLinkRepository) {
-            if (chatLink.getId().equals(id)) {
+            if (chatLink.getBusinessId().equals(id)) {
                 result = Optional.of(chatLink);
             }
         }

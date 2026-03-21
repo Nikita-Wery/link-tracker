@@ -4,6 +4,9 @@ server:
 spring:
   application:
     name: bot
+  grpc:
+    server:
+      port: 9090
 
 app:
   telegram:
@@ -20,7 +23,9 @@ app:
       enabled: false
   client:
     scrapper:
-      host: "http://localhost:8081"
+      host: http://localhost:8081
+      grpc-host: localhost:9091
+      api: both
 
 
 

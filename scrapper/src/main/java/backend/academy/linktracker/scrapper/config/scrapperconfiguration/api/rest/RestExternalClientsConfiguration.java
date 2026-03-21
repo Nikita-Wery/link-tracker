@@ -1,11 +1,8 @@
-package backend.academy.linktracker.scrapper.config.scrapperconfiguration;
+package backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.rest;
 
-import backend.academy.linktracker.scrapper.client.BotClient;
-import backend.academy.linktracker.scrapper.client.GitHubClient;
-import backend.academy.linktracker.scrapper.client.StackOverflowClient;
+import backend.academy.linktracker.scrapper.client.external.GitHubClient;
+import backend.academy.linktracker.scrapper.client.external.StackOverflowClient;
 import backend.academy.linktracker.scrapper.client.responsehandler.APIBadResponseHandler;
-import backend.academy.linktracker.scrapper.client.responsehandler.BotBadResponseHandler;
-import backend.academy.linktracker.scrapper.properties.BotProperties;
 import backend.academy.linktracker.scrapper.properties.GithubProperties;
 import backend.academy.linktracker.scrapper.properties.StackoverflowProperties;
 import org.springframework.context.annotation.Bean;
@@ -16,18 +13,7 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 @Configuration
-public class ScrapperConfiguration {
-
-    @Bean
-    public BotClient botClient(BotBadResponseHandler handler, BotProperties properties) {
-
-        RestClient restClient = RestClient.builder()
-                .baseUrl(properties.getHost())
-                .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
-                .build();
-
-        return restClientFactoryMethod(restClient, BotClient.class);
-    }
+public class RestExternalClientsConfiguration {
 
     @Bean
     public GitHubClient gitHubClient(APIBadResponseHandler handler, GithubProperties properties) {
