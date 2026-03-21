@@ -20,4 +20,10 @@ public class ScrapperProperties {
 
     @NotEmpty
     private String host;
+
+    @NotEmpty
+    private String grpcHost;
+
+    @NotEmpty
+    private String api;
 }

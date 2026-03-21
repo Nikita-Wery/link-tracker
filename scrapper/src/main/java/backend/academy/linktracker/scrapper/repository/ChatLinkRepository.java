@@ -7,7 +7,7 @@ public interface ChatLinkRepository {
 
     ChatLink save(ChatLink chatLink);
 
-    Optional<ChatLink> findChatLinkById(ChatLink.Id id);
+    Optional<ChatLink> findChatLinkById(ChatLink.BusinessId id);
 
     ChatLink deleteChatLink(ChatLink chatLink);
 }

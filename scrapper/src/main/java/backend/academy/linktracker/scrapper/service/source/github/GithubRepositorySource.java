@@ -1,6 +1,6 @@
 package backend.academy.linktracker.scrapper.service.source.github;
 
-import backend.academy.linktracker.scrapper.client.GitHubClient;
+import backend.academy.linktracker.scrapper.client.external.GitHubClient;
 import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;

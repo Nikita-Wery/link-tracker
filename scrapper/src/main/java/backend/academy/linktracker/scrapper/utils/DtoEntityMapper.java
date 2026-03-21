@@ -1,6 +1,8 @@
 package backend.academy.linktracker.scrapper.utils;
 
 import backend.academy.linktracker.scrapper.config.ResourceType;
+import backend.academy.linktracker.scrapper.domain.Chat;
+import backend.academy.linktracker.scrapper.domain.ChatLink;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.bot.AddLinkRequest;
 import backend.academy.linktracker.scrapper.dto.bot.ApiErrorResponse;
@@ -15,16 +17,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class DtoEntityMapper {
 
-    public LinkResponse linkToLinkResponse(Link link) {
+    public Chat getChatFromChatId(Long chatId) {
+        return Chat.builder().chatId(chatId).build();
+    }
+
+    public LinkResponse linkToLinkResponse(ChatLink link) {
         return new LinkResponse(
                 link.getId(),
-                link.getUrl(),
-                link.getTrackingChats().stream()
-                        .flatMap(chatLink -> chatLink.getTags().stream())
-                        .toList(),
-                link.getTrackingChats().stream()
-                        .flatMap(chatLink -> chatLink.getFilters().stream())
-                        .toList());
+                link.getLink().getUrl(),
+                link.getTags().stream().toList(),
+                link.getFilters().stream().toList());
     }
 
     public Link linkFromAddLinkRequest(AddLinkRequest request) {

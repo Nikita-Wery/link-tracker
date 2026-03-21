@@ -1,7 +1,12 @@
 package backend.academy.linktracker.scrapper.exception.botexception.requestexception;
 
-public class LinkNotExistsException extends RuntimeException {
+import backend.academy.linktracker.scrapper.exception.botexception.ScrapperApiException;
+
+public class LinkNotExistsException extends ScrapperApiException {
+
+    private static final String LINK_NOT_EXISTS = "Общий шаблон ссылки не существует";
+
     public LinkNotExistsException(String message) {
-        super(message);
+        super(message, LINK_NOT_EXISTS);
     }
 }

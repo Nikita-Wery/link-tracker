@@ -18,4 +18,10 @@ public class BotProperties {
 
     @NotEmpty
     private String host;
+
+    @NotEmpty
+    private String grpcHost;
+
+    @NotEmpty
+    private String api;
 }

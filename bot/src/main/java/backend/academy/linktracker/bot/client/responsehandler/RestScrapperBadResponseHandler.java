@@ -15,17 +15,15 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
-@Component
-public class ScrapperBadResponseHandler {
+public class RestScrapperBadResponseHandler {
 
     private final Map<String, ScrapperApiException> clientExceptionMap;
     private final ObjectMapper mapper;
 
-    public ScrapperBadResponseHandler(List<ScrapperApiException> responseExceptions, ObjectMapper mapper) {
+    public RestScrapperBadResponseHandler(List<ScrapperApiException> responseExceptions, ObjectMapper mapper) {
         this.clientExceptionMap = responseExceptions.stream()
                 .collect(Collectors.toMap(ex -> ex.getClass().getSimpleName(), Function.identity()));
         this.mapper = mapper;
@@ -43,7 +41,7 @@ public class ScrapperBadResponseHandler {
                 ApiErrorResponse responseBody = mapper.readValue(response.getBody(), ApiErrorResponse.class);
 
                 log.error(
-                        "Client error received",
+                        "Rest client error received",
                         kv("status_code", responseBody.code()),
                         kv("exception_name", responseBody.exceptionName()),
                         kv("exception_message", responseBody.exceptionMessage()),

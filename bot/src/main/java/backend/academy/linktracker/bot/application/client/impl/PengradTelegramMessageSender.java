@@ -4,6 +4,7 @@ import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
  * @author Luzin Nikita
  */
 @Component
+@ConditionalOnProperty(name = "app.telegram.enabled", havingValue = "true", matchIfMissing = true)
 public class PengradTelegramMessageSender implements TelegramMessageSender {
 
     private final TelegramBot telegramBot;
