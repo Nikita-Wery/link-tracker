@@ -7,7 +7,6 @@ import backend.academy.linktracker.bot.application.command.impl.UnknownCommand;
 import backend.academy.linktracker.bot.application.dispatcher.UpdateDispatcher;
 import backend.academy.linktracker.bot.utils.CommandValidator;
 import com.pengrad.telegrambot.model.Update;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
