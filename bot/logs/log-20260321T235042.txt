@@ -1,0 +1,1 @@
+{"@timestamp":"2026-03-21T23:50:50.98372307+03:00","@version":"1","message":"AFTER method calling","logger_name":"backend.academy.linktracker.bot.configuration.logging.LogstashLoggerConfig","thread_name":"main","level":"INFO","level_value":20000,"chatId":"200","requestId":"37e450b8-cfc7-4438-bb5b-f5e60ba16927","service":"bot-service","event":"call command"}

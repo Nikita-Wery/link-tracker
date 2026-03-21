@@ -17,13 +17,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class HelpCommand extends AbstractCommand<Update> {
 
+    public static final String COMMAND_NAME = "/help";
+    private static final String COMMAND_DESCRIPTION = "Список доступных команд";
+
     private final TelegramMessageSender telegramMessageSender;
     private final List<Command<Update>> commands;
 
     public HelpCommand(TelegramMessageSender telegramMessageSender, List<Command<Update>> commands) {
-        super("/help", "Список доступных команд");
-        // необходимо из-за циклической зависимости
-        commands.add(this);
+        super(COMMAND_NAME, COMMAND_DESCRIPTION);
         this.telegramMessageSender = telegramMessageSender;
         this.commands = commands;
     }
@@ -39,7 +40,7 @@ public class HelpCommand extends AbstractCommand<Update> {
         Long chatId = data.message().chat().id();
 
         String helpMessage = commands.stream()
-                .filter(command -> !command.getCommandName().equals("/unknown"))
+                .filter(command -> !command.getCommandName().equals(UnknownCommand.COMMAND_NAME))
                 .sorted(Comparator.comparing(Command::getCommandName))
                 .map(cmd -> String.format("%s - %s", cmd.getCommandName(), cmd.getCommandDescription()))
                 .collect(Collectors.joining("\n", "Доступные команды:\n", ""));

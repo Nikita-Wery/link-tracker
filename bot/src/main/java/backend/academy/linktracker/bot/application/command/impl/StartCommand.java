@@ -13,17 +13,19 @@ import org.springframework.stereotype.Component;
 @Component
 public class StartCommand extends AbstractCommand<Update> {
 
+    public static final String COMMAND_NAME = "/start";
+    private static final String COMMAND_DESCRIPTION = "Готовы пообщаться?)";
+
     private final TelegramMessageSender telegramMessageSender;
 
     public StartCommand(TelegramMessageSender telegramMessageSender) {
-        super("/start", "Готовы пообщаться?)");
+        super(COMMAND_NAME, COMMAND_DESCRIPTION);
         this.telegramMessageSender = telegramMessageSender;
     }
 
     /**
      * Выводит приветственное сообщение пользователю
-     *
-     * @param data данные, необходимые для отправки сообщения
+     * * @param data данные, необходимые для отправки сообщения
      */
     @Override
     public void handle(Update data) {

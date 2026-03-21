@@ -14,9 +14,4 @@ public interface Command<T> {
     String getCommandDescription();
 
     String getCommandName();
-
-    //    @Autowired
-    //    default void registerMySelf(CommandDispatcher commandDispatcher) {
-    //        commandDispatcher.register(getCommandName(), this);
-    //    }
 }
