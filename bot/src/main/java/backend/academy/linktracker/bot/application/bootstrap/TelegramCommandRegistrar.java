@@ -26,7 +26,7 @@ public class TelegramCommandRegistrar {
 
     /**
      * Регестрирует доступные команды в telegram боте
-     * используется TelegramAPT
+     * используется TelegramAPI
      */
     public void registerCommands() {
         List<BotCommand> botCommands = commands.stream()
