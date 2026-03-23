@@ -36,7 +36,9 @@ public class ChatLink {
         }
 
         public int hashCode() {
-            return chatId.hashCode() + linkId.hashCode();
+            int result = (chatId == null ? 0 : chatId.hashCode());
+            result = 31 * result + (linkId == null ? 0 : linkId.hashCode());
+            return result;
         }
     }
 
@@ -50,19 +52,14 @@ public class ChatLink {
 
     private Set<String> tags = new HashSet<>();
 
-    private Set<String> filters = new HashSet<>();
-
     @Builder
-    public ChatLink(@NotNull Link link, @NotNull Chat chat, Set<String> tags, Set<String> filters) {
+    public ChatLink(@NotNull Link link, @NotNull Chat chat, Set<String> tags) {
         this.link = link;
         this.chat = chat;
         this.id = IdGenerator.nextId();
 
         if (tags != null) {
             this.tags = tags;
-        }
-        if (filters != null) {
-            this.filters = filters;
         }
 
         this.businessId = new BusinessId(link.getId(), chat.getId());

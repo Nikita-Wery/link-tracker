@@ -20,7 +20,6 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,17 +79,6 @@ public class ListCommandIntegrationTests {
     @Test
     @DisplayName("Сценарий: пользователь впервые пользуется ботом")
     public void execute_FirstUse() {
-        //        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(
-        //            "chatNotExists",
-        //            HttpStatus.NOT_FOUND.toString(),
-        //            ChatNotExistsException.class.getSimpleName(),
-        //            "chatNotExists",
-        //            Collections.emptyList()
-        //        );
-
-        //        ResponseEntity<ApiErrorResponse> response =
-        //            ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiErrorResponse);
-
         when(message.text()).thenReturn("/list");
         when(scrapperClient.getLinks(chat.id())).thenThrow(new ChatNotExistsException("chat not exists"));
 
@@ -125,10 +113,9 @@ public class ListCommandIntegrationTests {
     public void execute_UserHasLinks_UserSetTags() {
 
         List<LinkResponse> listOfResponses = List.of(
-                new LinkResponse(1L, URI.create("https://firstLink"), List.of("first"), Collections.emptyList()),
-                new LinkResponse(2L, URI.create("https://secondLink"), List.of("second"), Collections.emptyList()),
-                new LinkResponse(
-                        3L, URI.create("https://thirdLink"), List.of("second", "first"), Collections.emptyList()));
+                new LinkResponse(1L, URI.create("https://firstLink"), List.of("first")),
+                new LinkResponse(2L, URI.create("https://secondLink"), List.of("second")),
+                new LinkResponse(3L, URI.create("https://thirdLink"), List.of("second", "first")));
 
         ListLinksResponse response = new ListLinksResponse(listOfResponses, listOfResponses.size());
 

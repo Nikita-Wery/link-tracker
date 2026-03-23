@@ -2,12 +2,11 @@ package backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.re
 
 import backend.academy.linktracker.scrapper.client.inner.RestBotClient;
 import backend.academy.linktracker.scrapper.client.responsehandler.BotBadResponseHandler;
-import backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.conditional.RestApiConditional;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.properties.BotProperties;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
@@ -16,7 +15,7 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import tools.jackson.databind.ObjectMapper;
 
 @Configuration
-@Conditional(RestApiConditional.class)
+@ConditionalOnProperty(name = "app.client.bot.api.rest.enabled", havingValue = "true", matchIfMissing = true)
 public class RestBotClientConfiguration {
 
     @Bean

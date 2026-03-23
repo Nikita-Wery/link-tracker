@@ -56,8 +56,8 @@ public class ScrapperGrpcEndpoint extends ScrapperServiceGrpc.ScrapperServiceImp
         Chat chat = dtoEntityMapper.getChatFromChatId(grpcreq.getChatId());
         Link link = dtoEntityMapper.linkFromAddLinkRequest(request);
 
-        LinkResponse linkResponse = grpcMapper.linkToGrpcLinkResponse(subscriptionService.trackLink(
-                chat, link, new HashSet<>(request.filters()), new HashSet<>(request.tags())));
+        LinkResponse linkResponse = grpcMapper.linkToGrpcLinkResponse(
+                subscriptionService.trackLink(chat, link, new HashSet<>(request.tags())));
 
         responseObserver.onNext(linkResponse);
         responseObserver.onCompleted();

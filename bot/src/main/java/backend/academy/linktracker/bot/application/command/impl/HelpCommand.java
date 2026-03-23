@@ -25,7 +25,6 @@ public class HelpCommand extends AbstractCommand<Update> {
 
     public HelpCommand(TelegramMessageSender telegramMessageSender, List<Command<Update>> commands) {
         super(COMMAND_NAME, COMMAND_DESCRIPTION);
-        commands.add(this);
         this.telegramMessageSender = telegramMessageSender;
         this.commands = commands;
     }

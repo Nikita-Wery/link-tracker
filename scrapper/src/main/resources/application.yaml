@@ -22,4 +22,9 @@ app:
     bot:
       host: http://localhost:8080
       grpc-host: localhost:9090
-      api: both
+      api:
+        rest:
+          enabled: true
+        grpc:
+          enabled: false
+

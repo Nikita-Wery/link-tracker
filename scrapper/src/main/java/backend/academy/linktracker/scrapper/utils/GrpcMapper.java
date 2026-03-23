@@ -30,10 +30,7 @@ public class GrpcMapper {
     }
 
     public AddLinkRequest mapAddLinkRequest(backend.academy.linktracker.proto.AddLinkRequest req) {
-        return new AddLinkRequest(
-                req.getUrl(),
-                req.getTagsList().stream().toList(),
-                req.getTagsList().stream().toList());
+        return new AddLinkRequest(req.getUrl(), req.getTagsList().stream().toList());
     }
 
     public RemoveLinkRequest mapRemoveLinkRequest(backend.academy.linktracker.proto.RemoveLinkRequest req) {

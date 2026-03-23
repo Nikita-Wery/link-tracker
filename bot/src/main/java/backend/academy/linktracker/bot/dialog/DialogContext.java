@@ -12,7 +12,6 @@ public class DialogContext {
     private DialogState state;
     private URI url;
     private Set<String> tags;
-    private Set<String> filters;
 
     public DialogContext(DialogState firstState) {
         this.state = firstState;

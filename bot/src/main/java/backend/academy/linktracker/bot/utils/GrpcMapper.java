@@ -4,7 +4,6 @@ import backend.academy.linktracker.bot.dto.LinkResponse;
 import backend.academy.linktracker.bot.dto.LinkUpdate;
 import backend.academy.linktracker.bot.dto.ListLinksResponse;
 import java.net.URI;
-import java.util.Collections;
 import java.util.HashSet;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +20,7 @@ public class GrpcMapper {
 
     public LinkResponse mapLinkResponseFromProto(backend.academy.linktracker.proto.LinkResponse linkResponseProto) {
         return new LinkResponse(
-                linkResponseProto.getId(),
-                URI.create(linkResponseProto.getUrl()),
-                linkResponseProto.getTagsList(),
-                Collections.emptyList());
+                linkResponseProto.getId(), URI.create(linkResponseProto.getUrl()), linkResponseProto.getTagsList());
     }
 
     public ListLinksResponse mapListLinksResponseFromProto(

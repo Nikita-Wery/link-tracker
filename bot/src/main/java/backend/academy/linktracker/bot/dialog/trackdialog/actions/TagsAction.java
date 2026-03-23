@@ -14,8 +14,6 @@ import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import backend.academy.linktracker.bot.utils.validator.TagsValidator;
 import com.pengrad.telegrambot.model.Update;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -58,12 +56,7 @@ public class TagsAction implements StateAction {
 
         if (tagsValidator.validate(messageText) && messageText.split(",").length <= ALLOWED_NUMBER_OF_TAGS) {
 
-            context.setFilters(Arrays.stream(update.message().text().split(","))
-                    .filter(word -> !word.isBlank())
-                    .collect(Collectors.toSet()));
-
-            AddLinkRequest addLinkRequest =
-                    new AddLinkRequest(context.getUrl().toString(), context.getTags(), context.getFilters());
+            AddLinkRequest addLinkRequest = new AddLinkRequest(context.getUrl().toString(), context.getTags());
 
             try {
                 client.addLink(update.message().chat().id(), addLinkRequest);

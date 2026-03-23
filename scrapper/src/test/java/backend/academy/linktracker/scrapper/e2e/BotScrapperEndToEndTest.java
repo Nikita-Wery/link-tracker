@@ -56,14 +56,16 @@ class BotScrapperEndToEndTest {
             .withExposedPorts(8080, 9090)
             .withEnv("APP_LOGGER_FILE_ENABLED", "false")
             .withEnv("APP_TELEGRAM_ENABLED", "false")
-            .withEnv("APP_CLIENT_SCRAPPER_API", "both")
+            .withEnv("APP_CLIENT_SCRAPPER_API_GRPC_ENABLED", "true")
+            .withEnv("APP_CLIENT_SCRAPPER_API_REST_ENABLED", "true")
             .waitingFor(Wait.forHttp("/actuator/health").forPort(8080).withStartupTimeout(Duration.ofMinutes(2)));
 
     @Container
     static GenericContainer<?> scrapper = new GenericContainer<>(SCRAPPER_IMAGE)
             .withExposedPorts(8081, 9091)
             .withEnv("SPRING_TASK_SCHEDULING_ENABLED", "false")
-            .withEnv("APP_CLIENT_BOT_API", "both")
+            .withEnv("APP_CLIENT_BOT_API_REST_ENABLED", "true")
+            .withEnv("APP_CLIENT_BOT_API_GRPC_ENABLED", "true")
             .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
             .waitingFor(Wait.forHttp("/actuator/health").forPort(8081).withStartupTimeout(Duration.ofMinutes(2)));
 
@@ -202,7 +204,7 @@ class BotScrapperEndToEndTest {
                 .toBodilessEntity();
         assertEquals(200, reg.getStatusCode().value());
 
-        AddLinkRequest body = new AddLinkRequest(url, Collections.emptyList(), Collections.emptyList());
+        AddLinkRequest body = new AddLinkRequest(url, Collections.emptyList());
 
         var add = scrapperRestClient()
                 .post()
@@ -262,7 +264,7 @@ class BotScrapperEndToEndTest {
 
         scrapperRestClient().post().uri("/tg-chat/{id}", chatId).retrieve().toBodilessEntity();
 
-        AddLinkRequest body = new AddLinkRequest(url, Collections.emptyList(), Collections.emptyList());
+        AddLinkRequest body = new AddLinkRequest(url, Collections.emptyList());
 
         scrapperRestClient()
                 .post()
@@ -347,7 +349,7 @@ class BotScrapperEndToEndTest {
                 .retrieve()
                 .toBodilessEntity();
 
-        AddLinkRequest addBody = new AddLinkRequest(url, Collections.emptyList(), Collections.emptyList());
+        AddLinkRequest addBody = new AddLinkRequest(url, Collections.emptyList());
 
         scrapperRestClient()
                 .post()
@@ -418,7 +420,7 @@ class BotScrapperEndToEndTest {
         long firstTimeUseChatId = 9L;
         String url = "https://github.com/user/repo4";
 
-        AddLinkRequest addBody = new AddLinkRequest(url, Collections.emptyList(), Collections.emptyList());
+        AddLinkRequest addBody = new AddLinkRequest(url, Collections.emptyList());
 
         scrapperRestClient()
                 .post()
@@ -457,7 +459,7 @@ class BotScrapperEndToEndTest {
 
         scrapperRestClient().post().uri("/tg-chat/{id}", chatId).retrieve().toBodilessEntity();
 
-        AddLinkRequest addBody = new AddLinkRequest(url, Collections.emptyList(), Collections.emptyList());
+        AddLinkRequest addBody = new AddLinkRequest(url, Collections.emptyList());
 
         var resp = scrapperRestClient()
                 .post()
