@@ -36,7 +36,7 @@ public class ChatLink {
         }
 
         public int hashCode() {
-            int result = (chatId == null ? 0 : chatId.hashCode());
+            int result = chatId == null ? 0 : chatId.hashCode();
             result = 31 * result + (linkId == null ? 0 : linkId.hashCode());
             return result;
         }
