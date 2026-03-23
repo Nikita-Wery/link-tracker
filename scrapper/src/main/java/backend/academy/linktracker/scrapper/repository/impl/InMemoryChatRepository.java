@@ -28,15 +28,7 @@ public class InMemoryChatRepository implements ChatRepository {
 
     @Override
     public void deleteByChatId(long chatId) {
-        Iterator<Chat> iterator = chatRepository.iterator();
-
-        while (iterator.hasNext()) {
-            Chat chat = iterator.next();
-
-            if (chat.getChatId() == chatId) {
-                iterator.remove();
-            }
-        }
+        chatRepository.removeIf(chat -> chat.getChatId().equals(chatId));
     }
 
     @Override
@@ -44,7 +36,7 @@ public class InMemoryChatRepository implements ChatRepository {
         Optional<Chat> result = Optional.empty();
 
         for (Chat chat : chatRepository) {
-            if (chat.getChatId() == chatId) result = Optional.of(chat);
+            if (chat.getChatId() == chatId) return Optional.of(chat);
         }
 
         return result;
@@ -52,18 +44,15 @@ public class InMemoryChatRepository implements ChatRepository {
 
     @Override
     public boolean untrackLink(Chat chat, ChatLink chatLink) {
-        boolean linkUnpinned = false;
         Iterator<ChatLink> iterator = chat.getTrackedLinks().iterator();
 
         while (iterator.hasNext()) {
-            ChatLink chatLinkNow = iterator.next();
-
-            if (chatLinkNow.equals(chatLink)) {
+            if (iterator.next().equals(chatLink)) {
                 iterator.remove();
-                linkUnpinned = true;
+                return true;
             }
         }
 
-        return linkUnpinned;
+        return false;
     }
 }

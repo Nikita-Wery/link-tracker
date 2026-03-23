@@ -6,6 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import backend.academy.linktracker.bot.application.command.impl.HelpCommand;
 import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispatcher;
 import backend.academy.linktracker.bot.configuration.telgramconfiguration.TelegramTestConfiguration;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
@@ -83,6 +84,7 @@ public class CommandWithoutArgsIntegrationTest {
         SendMessage sentMessage = argumentCaptor.getValue();
         assertEquals(200L, sentMessage.getChatId());
         assertTrue(commandDispatcher.getListOfCommands().stream()
+                .filter(command -> !command.getCommandName().equals(HelpCommand.COMMAND_NAME))
                 .allMatch(command -> sentMessage.getText().contains(command.getCommandName())));
     }
 

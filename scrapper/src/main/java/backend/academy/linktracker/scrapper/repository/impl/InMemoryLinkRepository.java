@@ -32,6 +32,7 @@ public class InMemoryLinkRepository implements LinkRepository {
         for (Link changableLink : linkRepository) {
             if (changableLink.equals(link)) {
                 link.setLatestUpdateTime(latestUpdateTime);
+                return;
             }
         }
     }
@@ -49,7 +50,7 @@ public class InMemoryLinkRepository implements LinkRepository {
         Optional<Link> result = Optional.empty();
 
         for (Link link : linkRepository) {
-            if (link.getUrl().equals(url)) result = Optional.of(link);
+            if (link.getUrl().equals(url)) return Optional.of(link);
         }
 
         return result;
@@ -57,18 +58,15 @@ public class InMemoryLinkRepository implements LinkRepository {
 
     @Override
     public boolean deleteTrackingChat(Link link, ChatLink chatLink) {
-        boolean chatUnpinned = false;
         Iterator<ChatLink> iterator = link.getTrackingChats().iterator();
 
         while (iterator.hasNext()) {
-            ChatLink chatLinkNow = iterator.next();
-
-            if (chatLinkNow.equals(chatLink)) {
+            if (iterator.next().equals(chatLink)) {
                 iterator.remove();
-                chatUnpinned = true;
+                return true;
             }
         }
 
-        return chatUnpinned;
+        return false;
     }
 }

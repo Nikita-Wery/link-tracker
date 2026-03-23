@@ -25,7 +25,11 @@ app:
     scrapper:
       host: http://localhost:8081
       grpc-host: localhost:9091
-      api: both
+      api:
+        rest:
+          enabled: true
+        grpc:
+          enabled: false
 
 
 

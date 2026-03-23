@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,7 @@ public class ListCommand extends AbstractCommand<Update> {
     private static final String NEVER_ATTACHED_LINK_MESSAGE =
             "Чтобы получить список отслеживаемых ссылок, начните отслеживать хотя бы одну";
     private static final String NO_TRACKED_LINKS_MESSAGE = "Сейчас вы не отслеживаете ни одной ссылки";
+    private static final Pattern wordSeparators = Pattern.compile("[,\\s]+");
 
     private final ScrapperClient client;
     private final TelegramMessageSender sender;
@@ -44,7 +46,9 @@ public class ListCommand extends AbstractCommand<Update> {
     public void handle(Update update) {
         Long chatId = update.message().chat().id();
         String[] tags = Arrays.copyOfRange(
-                update.message().text().split(" "), 1, update.message().text().split(" ").length);
+                update.message().text().split(wordSeparators.pattern()),
+                1,
+                update.message().text().split(wordSeparators.pattern()).length);
 
         try {
             ListLinksResponse listLinksResponse = client.getLinks(chatId);

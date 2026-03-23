@@ -32,7 +32,7 @@ public class SubscriptionService {
         this.chatLinkRepository = chatLinkRepository;
     }
 
-    public ChatLink trackLink(Chat chat, Link link, Set<String> filters, Set<String> tags) {
+    public ChatLink trackLink(Chat chat, Link link, Set<String> tags) {
 
         Optional<Chat> chatOptional = chatRepository.findChatByChatId(chat.getChatId());
         Optional<Link> linkOptional = linkRepository.findLinkByURI(link.getUrl());
@@ -40,7 +40,6 @@ public class SubscriptionService {
         ChatLink chatLink = ChatLink.builder()
                 .chat(chatOptional.orElse(chat))
                 .link(linkOptional.orElse(link))
-                .filters(filters)
                 .tags(tags)
                 .build();
 

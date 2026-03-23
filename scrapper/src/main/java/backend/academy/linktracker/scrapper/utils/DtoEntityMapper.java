@@ -23,10 +23,7 @@ public class DtoEntityMapper {
 
     public LinkResponse linkToLinkResponse(ChatLink link) {
         return new LinkResponse(
-                link.getId(),
-                link.getLink().getUrl(),
-                link.getTags().stream().toList(),
-                link.getFilters().stream().toList());
+                link.getId(), link.getLink().getUrl(), link.getTags().stream().toList());
     }
 
     public Link linkFromAddLinkRequest(AddLinkRequest request) {

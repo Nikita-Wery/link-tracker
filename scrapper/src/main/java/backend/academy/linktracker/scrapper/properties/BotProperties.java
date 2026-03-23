@@ -22,6 +22,7 @@ public class BotProperties {
     @NotEmpty
     private String grpcHost;
 
-    @NotEmpty
-    private String api;
+    private boolean restEnabled;
+
+    private boolean grpcEnabled;
 }

@@ -3,18 +3,17 @@ package backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.gr
 import backend.academy.linktracker.proto.BotServiceGrpc;
 import backend.academy.linktracker.scrapper.client.inner.GrpcBotClient;
 import backend.academy.linktracker.scrapper.client.responsehandler.GrpcBotBadResponseHandler;
-import backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.conditional.GrpcApiConditional;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.properties.BotProperties;
 import io.grpc.ManagedChannel;
 import java.util.List;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.grpc.client.GrpcChannelFactory;
 
 @Configuration
-@Conditional(GrpcApiConditional.class)
+@ConditionalOnProperty(name = "app.client.bot.api.grpc.enabled", havingValue = "true")
 public class GrpcBotClientConfiguration {
 
     @Bean
