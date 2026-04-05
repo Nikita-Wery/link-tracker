@@ -23,11 +23,13 @@ import io.grpc.health.v1.HealthCheckRequest;
 import io.grpc.health.v1.HealthCheckResponse;
 import io.grpc.health.v1.HealthGrpc;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Set;
 import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -37,10 +39,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.Network;
+import org.testcontainers.containers.startupcheck.OneShotStartupCheckStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @Testcontainers
@@ -48,26 +53,106 @@ import org.testcontainers.utility.DockerImageName;
 class BotScrapperEndToEndTest {
 
     static final DockerImageName BOT_IMAGE = DockerImageName.parse("bot:0.0.1");
-
     static final DockerImageName SCRAPPER_IMAGE = DockerImageName.parse("scrapper:0.0.1");
+    static final DockerImageName LIQUIBASE_IMAGE = DockerImageName.parse("liquibase/liquibase:latest-alpine");
 
-    @Container
-    static GenericContainer<?> bot = new GenericContainer<>(BOT_IMAGE)
+    static final String MIGRATIONS_PATH =
+        Paths.get("").toAbsolutePath().getParent().resolve("migrations").toString();
+
+    static Network network = Network.newNetwork();
+
+    static GenericContainer<?> bot;
+
+    static GenericContainer<?> scrapper;
+
+    static PostgreSQLContainer postgreSQLContainer;
+
+    static GenericContainer<?> liquibaseContainer;
+
+    @BeforeAll
+    static void upContainers() {
+        postgreSQLContainer = new PostgreSQLContainer("postgres:18-alpine")
+        .withDatabaseName("linktracker_db")
+        .withUsername("test")
+        .withPassword("test")
+        .withNetwork(network)
+        .withNetworkAliases("postgres")
+        .waitingFor(Wait.forListeningPort());
+
+        postgreSQLContainer.start();
+
+        liquibaseContainer = new GenericContainer<>(LIQUIBASE_IMAGE)
+                .withNetwork(network)
+                .withFileSystemBind(MIGRATIONS_PATH, "/liquibase/changelog", BindMode.READ_ONLY)
+                .withCommand(
+                        "--url=jdbc:postgresql://postgres:5432/linktracker_db",
+                        "--username=test",
+                        "--password=test",
+                        "--changeLogFile=changelog-root.yaml",
+                        "update"
+                )
+                .withStartupCheckStrategy(new OneShotStartupCheckStrategy());
+
+        liquibaseContainer.start();
+
+        bot = new GenericContainer<>(BOT_IMAGE)
             .withExposedPorts(8080, 9090)
             .withEnv("APP_LOGGER_FILE_ENABLED", "false")
             .withEnv("APP_TELEGRAM_ENABLED", "false")
             .withEnv("APP_CLIENT_SCRAPPER_API_GRPC_ENABLED", "true")
             .withEnv("APP_CLIENT_SCRAPPER_API_REST_ENABLED", "true")
+
+            .withEnv("APP_CLIENT_SCRAPPER_HOST", "http://scrapper:8081")
+            .withEnv("APP_CLIENT_SCRAPPER_GRPC_HOST", "scrapper:9091")
+            .withNetwork(network)
+            .withNetworkAliases("bot")
             .waitingFor(Wait.forHttp("/actuator/health").forPort(8080).withStartupTimeout(Duration.ofMinutes(2)));
 
-    @Container
-    static GenericContainer<?> scrapper = new GenericContainer<>(SCRAPPER_IMAGE)
+        bot.start();
+
+        scrapper = new GenericContainer<>(SCRAPPER_IMAGE)
             .withExposedPorts(8081, 9091)
             .withEnv("SPRING_TASK_SCHEDULING_ENABLED", "false")
             .withEnv("APP_CLIENT_BOT_API_REST_ENABLED", "true")
             .withEnv("APP_CLIENT_BOT_API_GRPC_ENABLED", "true")
+
+            .withEnv("APP_CLIENT_BOT_HOST", "http://bot:8080")
+            .withEnv("APP_CLIENT_BOT_GRPC_HOST", "bot:9090")
+
+            .withEnv("DB_HOST", "postgres")
+            .withEnv("DB_PORT", "5432")
+            .withEnv("DB_NAME", "linktracker_db")
+            .withEnv("DB_USERNAME", "test")
+            .withEnv("DB_PASSWORD", "test")
+
+            .withEnv("SPRING_LIQUIBASE_ENABLED", "false")
             .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+            .withNetwork(network)
+            .withNetworkAliases("scrapper")
             .waitingFor(Wait.forHttp("/actuator/health").forPort(8081).withStartupTimeout(Duration.ofMinutes(2)));
+
+
+        scrapper.start();
+    }
+
+    static void waitLiquibaseFinished(GenericContainer<?> liquibase) {
+        while (liquibase.isRunning()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        Long exitCode = liquibase.getCurrentContainerInfo()
+                .getState()
+                .getExitCodeLong();
+
+        if (exitCode == null || exitCode != 0) {
+            throw new RuntimeException("Liquibase failed: " + liquibase.getLogs());
+        }
+    }
 
     private RestClient botRestClient() {
         return RestClient.builder()
@@ -233,7 +318,7 @@ class BotScrapperEndToEndTest {
     @Order(5)
     void grpc_scrapper_addAndGetLink() {
         long chatId = 5L;
-        String url = "https://github.com/user/repo";
+        String url = "https://github.com/user/repo3";
 
         var stub = scrapperGrpcClient();
 
@@ -304,7 +389,7 @@ class BotScrapperEndToEndTest {
     @Order(7)
     void grpc_scrapper_addAndDeleteLink() {
         long chatId = 6L;
-        String url = "https://github.com/user/repo2";
+        String url = "https://github.com/user/repo4";
 
         var stub = scrapperGrpcClient();
 

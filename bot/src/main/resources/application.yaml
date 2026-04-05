@@ -23,14 +23,12 @@ app:
       enabled: false
   client:
     scrapper:
-      host: http://localhost:8081
-      grpc-host: localhost:9091
+      host: ${APP_CLIENT_SCRAPPER_HOST:http://localhost:8081}
+      grpc-host: ${APP_CLIENT_SCRAPPER_GRPC_HOST:localhost:9091}
+#      host: http://localhost:8081
+#      grpc-host: localhost:9091
       api:
         rest:
           enabled: true
         grpc:
           enabled: false
-
-
-
-

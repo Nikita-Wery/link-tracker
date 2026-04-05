@@ -10,26 +10,30 @@ import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
 import backend.academy.linktracker.scrapper.dto.bot.RemoveLinkRequest;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.InvalidLinkInRequestException;
 import java.net.URI;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
+//TODO: фиксануть builder
 public class DtoEntityMapper {
 
     public Chat getChatFromChatId(Long chatId) {
-        return Chat.builder().chatId(chatId).build();
+        return new Chat(chatId);
     }
 
     public LinkResponse linkToLinkResponse(ChatLink link) {
         return new LinkResponse(
-                link.getId(), link.getLink().getUrl(), link.getTags().stream().toList());
+                link.getChatLinkId(), link.getLink().getUrl(), link.getTags().stream().toList());
     }
 
     public Link linkFromAddLinkRequest(AddLinkRequest request) {
-        ResourceType type = getResourceTypeFromURI(request.link());
+        ResourceType type = ResourceTypeMapper.getResourceTypeFromURI(
+            request.link()).orElseThrow(
+            () -> new InvalidLinkInRequestException("Unsupported link type " + request.link()));
 
-        return Link.builder().url(URI.create(request.link())).resourceType(type).build();
+        return new Link(request.link(), type, OffsetDateTime.now());
     }
 
     public ApiErrorResponse buildApiErrorResponse(String description, String statusCode, Exception ex) {
@@ -49,15 +53,10 @@ public class DtoEntityMapper {
     }
 
     public Link linkFromRemoveLinkRequest(RemoveLinkRequest request) {
-        ResourceType type = getResourceTypeFromURI(request.link());
+        ResourceType type = ResourceTypeMapper.getResourceTypeFromURI(
+            request.link()).orElseThrow(
+                () -> new InvalidLinkInRequestException("Unsupported link type " + request.link()));
 
-        return Link.builder().url(URI.create(request.link())).resourceType(type).build();
-    }
-
-    private ResourceType getResourceTypeFromURI(String url) {
-        return Arrays.stream(ResourceType.values())
-                .filter(req -> req.parser().supports(url))
-                .findFirst()
-                .orElseThrow(() -> new InvalidLinkInRequestException("Unsupported link type " + url));
+        return new Link(request.link(), type, OffsetDateTime.now());
     }
 }

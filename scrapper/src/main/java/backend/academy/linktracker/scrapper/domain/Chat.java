@@ -1,27 +1,34 @@
 package backend.academy.linktracker.scrapper.domain;
 
-import backend.academy.linktracker.scrapper.utils.IdGenerator;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
 
+@Entity
+@Table(name = "chats")
 @Getter
 @Setter
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor
 public class Chat {
 
-    private Long id;
+    @Id
+    @Column(name = "chat_id")
+    private long chatId;
 
-    @NotNull
-    private final Long chatId;
-
-    @Builder.Default
+    @OneToMany(mappedBy = "chat")
     private Set<ChatLink> trackedLinks = new HashSet<>();
+
+    public Chat(long chatId) {
+        this.chatId = chatId;
+    }
 
     public boolean addLink(ChatLink chatLink) {
         return trackedLinks.add(chatLink);
@@ -32,21 +39,14 @@ public class Chat {
         if (this == o) return true;
         if (o != null & o instanceof Chat) {
             Chat that = (Chat) o;
-            return this.chatId.equals(that.chatId);
+            return this.chatId == that.chatId;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return chatId.hashCode();
+        return Objects.hashCode(chatId);
     }
 
-    public Long getId() {
-        if (this.id == null) {
-            this.id = IdGenerator.nextId();
-        }
-
-        return id;
-    }
 }

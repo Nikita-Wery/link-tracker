@@ -1,0 +1,80 @@
+version: '3.9'
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+#    ports:
+#      - "5432:5432"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  liquibase:
+    container_name: liquibase-migrations
+    image: liquibase/liquibase:4.29
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - --searchPath=/changesets
+      - --changelog-file=changelog-root.yaml
+      - --url=jdbc:postgresql://postgres:5432/${DB_NAME}
+      - --username=${DB_USERNAME}
+      - --password=${DB_PASSWORD}
+      - update
+    volumes:
+      - ./migrations:/changesets
+    networks:
+      - backend
+
+  scrapper:
+    build:
+      context: ./scrapper
+    env_file:
+      - ./.env
+    container_name: scrapper
+    depends_on:
+      postgres:
+        condition: service_healthy
+      liquibase:
+        condition: service_completed_successfully
+    environment:
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      APP_CLIENT_BOT_HOST: http://bot:8080
+      APP_CLIENT_BOT_GRPC_HOST: bot:9090
+    ports:
+      - "8081:8081"
+      - "9091:9091"
+    networks:
+      - backend
+
+  bot:
+    build:
+      context: ./bot
+    env_file:
+      - ./.env
+    container_name: bot
+    depends_on:
+      - scrapper
+    environment:
+      APP_CLIENT_SCRAPPER_HOST: http://scrapper:8081
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+    networks:
+      - backend

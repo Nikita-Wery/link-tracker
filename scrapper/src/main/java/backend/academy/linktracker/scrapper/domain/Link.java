@@ -1,33 +1,63 @@
 package backend.academy.linktracker.scrapper.domain;
 
 import backend.academy.linktracker.scrapper.config.ResourceType;
-import backend.academy.linktracker.scrapper.utils.IdGenerator;
-import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Builder;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
+@Entity
+@Table(name = "links")
 @Setter
 @Getter
-@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Link {
 
-    private Long id;
+    @Id
+    @Column(name = "link_id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "link_seq")
+    @SequenceGenerator(
+        name = "link_seq",
+        sequenceName = "link_sequence"
+    )
+    private Long linkId;
+
+    // TODO: навесить index
+    @NotNull
+    @Column(nullable = false, length = 2048, unique = true, updatable = false)
+    private String url;
 
     @NotNull
-    private final URI url;
+    @Column(name = "resource_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ResourceType resourceType;
 
-    @NotNull
-    private final ResourceType resourceType;
-
+    @Column(name = "latest_update_time")
     private OffsetDateTime latestUpdateTime;
 
-    @Builder.Default
+    @OneToMany(mappedBy = "link")
     private Set<ChatLink> trackingChats = new HashSet<>();
+
+    public Link(String url, ResourceType resourceType, OffsetDateTime latestUpdateTime) {
+        this.url = url;
+        this.resourceType = resourceType;
+        this.latestUpdateTime = latestUpdateTime;
+    }
 
     public boolean addChat(ChatLink chatLink) {
         return trackingChats.add(chatLink);
@@ -48,11 +78,4 @@ public class Link {
         return url.hashCode() + resourceType.hashCode();
     }
 
-    public Long getId() {
-        if (this.id == null) {
-            this.id = IdGenerator.nextId();
-        }
-
-        return id;
-    }
 }

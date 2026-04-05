@@ -6,11 +6,12 @@ import java.util.Optional;
 
 public interface ChatRepository {
 
+    boolean existsById(long chatId);
+
     Chat save(Chat chat);
 
-    void deleteByChatId(long chatId);
+    int deleteByChatId(long chatId);
 
     Optional<Chat> findChatByChatId(long chatId);
 
-    boolean untrackLink(Chat chat, ChatLink chatLink);
 }
