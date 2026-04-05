@@ -19,7 +19,6 @@ buildNumber.properties
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
-scrapper/src/main/java/backend/academy/linktracker/scrapper/exception/handler/ApiSchedulerExceptionHandlerRegistry.java
 bot/logs/*
 .idea/*
 !.idea/codeStyles
@@ -28,6 +27,11 @@ bot/logs/*
 *.iws
 *.iml
 *.ipr
+
+### Not used ###
+scrapper/src/main/java/backend/academy/linktracker/scrapper/exception/handler/ApiSchedulerExceptionHandlerRegistry.java
+scrapper/src/main/java/backend/academy/linktracker/scrapper/domain/LinkV2.java
+scrapper/src/main/java/backend/academy/linktracker/scrapper/repository/impl/inmemory
 
 ### Eclipse ###
 .apt_generated

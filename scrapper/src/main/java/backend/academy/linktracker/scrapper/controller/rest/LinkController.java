@@ -1,6 +1,7 @@
 package backend.academy.linktracker.scrapper.controller.rest;
 
 import backend.academy.linktracker.scrapper.domain.Chat;
+import backend.academy.linktracker.scrapper.domain.ChatLink;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.bot.AddLinkRequest;
 import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
@@ -40,9 +41,7 @@ public class LinkController {
 
     @GetMapping
     public ListLinksResponse getLinks(@RequestHeader("Tg-Chat-Id") Long chatId) {
-        List<LinkResponse> linkResponses = subscriptionService.getTrackedLinksByChatId(chatId).stream()
-                .map(dtoEntityMapper::linkToLinkResponse)
-                .toList();
+        List<LinkResponse> linkResponses = subscriptionService.getLinkResponsesByChatId(chatId);
 
         return new ListLinksResponse(linkResponses, linkResponses.size());
     }
@@ -53,9 +52,10 @@ public class LinkController {
 
         Link link = dtoEntityMapper.linkFromAddLinkRequest(request);
         Chat chat = dtoEntityMapper.getChatFromChatId(chatId);
+        ChatLink chatLink = new ChatLink(link, chat, new HashSet<>(request.tags()));
 
         return dtoEntityMapper.linkToLinkResponse(
-                subscriptionService.trackLink(chat, link, new HashSet<>(request.tags())));
+                subscriptionService.trackLink(chatLink));
     }
 
     @DeleteMapping
@@ -63,7 +63,9 @@ public class LinkController {
             @RequestHeader("Tg-Chat-Id") Long chatId, @Valid @RequestBody RemoveLinkRequest request) {
         Link link = dtoEntityMapper.linkFromRemoveLinkRequest(request);
         Chat chat = dtoEntityMapper.getChatFromChatId(chatId);
+        ChatLink chatLink = new ChatLink(link, chat);
 
-        return dtoEntityMapper.linkToLinkResponse(subscriptionService.untrackLink(chat, link));
+        return dtoEntityMapper.linkToLinkResponse(subscriptionService.untrackLink(chatLink));
     }
+
 }

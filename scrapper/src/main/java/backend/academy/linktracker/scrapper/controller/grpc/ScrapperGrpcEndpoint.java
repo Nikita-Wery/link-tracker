@@ -43,9 +43,8 @@ public class ScrapperGrpcEndpoint extends ScrapperServiceGrpc.ScrapperServiceImp
 
     @Override
     public void getLinks(GetLinksRequest req, StreamObserver<ListLinksResponse> responseObserver) {
-        List<ChatLink> links = subscriptionService.getTrackedLinksByChatId(req.getChatId());
+        ListLinksResponse linksResponse = subscriptionService.getProtoListLinksResponseByChatId(req.getChatId());
 
-        ListLinksResponse linksResponse = grpcMapper.listOfLinksToLinksResponse(links);
         responseObserver.onNext(linksResponse);
         responseObserver.onCompleted();
     }
@@ -53,11 +52,13 @@ public class ScrapperGrpcEndpoint extends ScrapperServiceGrpc.ScrapperServiceImp
     @Override
     public void addLink(AddLinkRequest grpcreq, StreamObserver<LinkResponse> responseObserver) {
         backend.academy.linktracker.scrapper.dto.bot.AddLinkRequest request = grpcMapper.mapAddLinkRequest(grpcreq);
+
         Chat chat = dtoEntityMapper.getChatFromChatId(grpcreq.getChatId());
         Link link = dtoEntityMapper.linkFromAddLinkRequest(request);
+        ChatLink chatLink = new ChatLink(link, chat, new HashSet<>(request.tags()));
 
         LinkResponse linkResponse = grpcMapper.linkToGrpcLinkResponse(
-                subscriptionService.trackLink(chat, link, new HashSet<>(request.tags())));
+                subscriptionService.trackLink(chatLink));
 
         responseObserver.onNext(linkResponse);
         responseObserver.onCompleted();
@@ -67,10 +68,12 @@ public class ScrapperGrpcEndpoint extends ScrapperServiceGrpc.ScrapperServiceImp
     public void deleteLink(RemoveLinkRequest grpcreq, StreamObserver<LinkResponse> responseObserver) {
         backend.academy.linktracker.scrapper.dto.bot.RemoveLinkRequest request =
                 grpcMapper.mapRemoveLinkRequest(grpcreq);
+
         Chat chat = dtoEntityMapper.getChatFromChatId(grpcreq.getChatId());
         Link link = dtoEntityMapper.linkFromRemoveLinkRequest(request);
+        ChatLink chatLink = new ChatLink(link, chat);
 
-        ChatLink chatLink = subscriptionService.untrackLink(chat, link);
+        chatLink = subscriptionService.untrackLink(chatLink);
 
         LinkResponse linkResponse = grpcMapper.linkToGrpcLinkResponse(chatLink);
         responseObserver.onNext(linkResponse);

@@ -1,98 +1,98 @@
 package backend.academy.linktracker.scrapper.service;
 
-import backend.academy.linktracker.scrapper.domain.Chat;
+import backend.academy.linktracker.proto.ListLinksResponse;
 import backend.academy.linktracker.scrapper.domain.ChatLink;
-import backend.academy.linktracker.scrapper.domain.Link;
-import backend.academy.linktracker.scrapper.exception.botexception.requestexception.ChatNotExistsException;
+import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkAlreadyTrackedException;
-import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkNotExistsException;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkNotTrackedException;
 import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
-import backend.academy.linktracker.scrapper.repository.ChatRepository;
-import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import backend.academy.linktracker.scrapper.repository.ChatRepository;
+import backend.academy.linktracker.scrapper.repository.LinkRepository;
+import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
+import backend.academy.linktracker.scrapper.utils.GrpcMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Slf4j
 @Service
+@AllArgsConstructor
+//TODO: builder fix needed
 public class SubscriptionService {
 
+    private final ChatLinkRepository chatLinkRepository;
     private final ChatRepository chatRepository;
     private final LinkRepository linkRepository;
-    private final ChatLinkRepository chatLinkRepository;
+    private final GrpcMapper grpcMapper;
+    private final DtoEntityMapper dtoEntityMapper;
 
-    public SubscriptionService(
-            ChatRepository chatRepository, LinkRepository linkRepository, ChatLinkRepository chatLinkRepository) {
+    // TODO: добавить @Transactional
+    @Transactional
+    @SuppressFBWarnings(
+        value = "SLF4J_PLACE_HOLDER_MISMATCH",
+        justification = "Используем StructuredArguments для JSON, placeholders не нужны")
+    public ChatLink trackLink(ChatLink chatLink) {
 
-        this.chatRepository = chatRepository;
-        this.linkRepository = linkRepository;
-        this.chatLinkRepository = chatLinkRepository;
-    }
+        try {
 
-    public ChatLink trackLink(Chat chat, Link link, Set<String> tags) {
-
-        Optional<Chat> chatOptional = chatRepository.findChatByChatId(chat.getChatId());
-        Optional<Link> linkOptional = linkRepository.findLinkByURI(link.getUrl());
-
-        ChatLink chatLink = ChatLink.builder()
-                .chat(chatOptional.orElse(chat))
-                .link(linkOptional.orElse(link))
-                .tags(tags)
-                .build();
-
-        chatLinkRepository.findChatLinkById(chatLink.getBusinessId()).ifPresent(cl -> {
-            throw new LinkAlreadyTrackedException("The link is already being tracked by the chat");
-        });
-
-        if (chatOptional.isEmpty()) chatRepository.save(chat);
-
-        if (linkOptional.isEmpty()) linkRepository.save(link);
-
-        return chatLinkRepository.save(chatLink);
-    }
-
-    public ChatLink untrackLink(Chat chat, Link link) {
-
-        Chat chatEntity = chatRepository
-                .findChatByChatId(chat.getChatId())
-                .orElseThrow(() ->
-                        new ChatNotExistsException("The chat you are trying to unpin the link from does not exist"));
-
-        Link linkEntity = linkRepository
-                .findLinkByURI(link.getUrl())
-                .orElseThrow(() ->
-                        new LinkNotExistsException("The link you are trying to unlink the user from does not exist"));
-
-        ChatLink.BusinessId chatLinkId = new ChatLink.BusinessId(linkEntity.getId(), chatEntity.getId());
-
-        ChatLink chatLink = chatLinkRepository
-                .findChatLinkById(chatLinkId)
-                .orElseThrow(() -> new LinkNotTrackedException("The link was not tracked"));
-
-        chatLinkRepository.deleteChatLink(chatLink);
-
-        boolean linkNotTrackedByChat = chatRepository.untrackLink(chatEntity, chatLink);
-
-        boolean userHasBeenUnlinked = linkRepository.deleteTrackingChat(linkEntity, chatLink);
-
-        if (!linkNotTrackedByChat) {
-            throw new LinkNotTrackedException("The link was not tracked from the chat side");
+            chatRepository.save(chatLink.getChat());
+            linkRepository.save(chatLink.getLink());
+        } catch (DataIntegrityViolationException ex) {
+            log.info("When adding a chatlink, either the chat or the link already existed");
         }
 
-        if (!userHasBeenUnlinked) {
-            throw new LinkNotTrackedException("The chat was not pinned from the link side");
+        try {
+
+            chatLink = chatLinkRepository.save(chatLink);
+        } catch (DataIntegrityViolationException ex) {
+            log.warn("Link already tracked",
+                kv("chat_id", chatLink.getChat().getChatId()),
+                kv("link_url", chatLink.getLink().getUrl())
+            );
+            throw new LinkAlreadyTrackedException("The link is already being tracked by the chat");
         }
 
         return chatLink;
     }
 
-    public List<ChatLink> getTrackedLinksByChatId(Long chatId) {
-        Chat chat =
-                chatRepository.findChatByChatId(chatId).orElseThrow(() -> new ChatNotExistsException("Chat not found"));
+    @Transactional
+    public ChatLink untrackLink(ChatLink chatLink) {
 
-        return chat.getTrackedLinks().stream().toList();
+        Optional<ChatLink> deletedChatLinkId = chatLinkRepository.deleteChatLinkReturningChatLink(chatLink);
+
+        if (deletedChatLinkId.isEmpty()) {
+            throw new LinkNotTrackedException("The link was not tracked from the chat side");
+        }
+
+        return deletedChatLinkId.get();
     }
+
+    // TODO: @Transactional
+    @Transactional
+    public List<ChatLink> getTrackedLinksByChatId(Long chatId) {
+
+        return chatLinkRepository.findChatLinksByChatId(chatId);
+    }
+
+    // TODO: @Transactional
+    @Transactional
+    public List<LinkResponse> getLinkResponsesByChatId(Long chatId) {
+        return getTrackedLinksByChatId(chatId).stream()
+                .map(dtoEntityMapper::linkToLinkResponse)
+                .toList();
+    }
+
+    // TODO: @Transactional
+    @Transactional
+    public ListLinksResponse getProtoListLinksResponseByChatId(long chatId) {
+        return grpcMapper.listOfLinksToLinksResponse(getTrackedLinksByChatId(chatId));
+    }
+
 }

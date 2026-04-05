@@ -24,7 +24,6 @@ public class GrpcBotClient {
         try {
             stub.sendUpdate(linkUpdateProto);
         } catch (StatusRuntimeException e) {
-            //            if (e.getStatus().getCode() == Status.Code.ALREADY_EXISTS) return;
             throw responseHandler.handle(e);
         }
     }

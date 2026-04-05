@@ -8,6 +8,7 @@ import backend.academy.linktracker.scrapper.dto.UpdateEvent;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowQuestionUpdateTime;
 import backend.academy.linktracker.scrapper.properties.StackoverflowProperties;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
+import java.net.URI;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -43,8 +44,8 @@ public class StackOverflowQuestionSource implements UpdateSource {
                 stackoverflowProperties.getAccessToken());
 
         return new LinkUpdate(
-                link.getId(),
-                link.getUrl(),
+                link.getLinkId(),
+                URI.create(link.getUrl()),
                 buildDescription(update, link),
                 link.getTrackingChats().stream()
                         .map(chatLink -> chatLink.getChat().getChatId())
@@ -60,7 +61,7 @@ public class StackOverflowQuestionSource implements UpdateSource {
             throw new IllegalArgumentException("Invalid StackOverflow URL: " + link.getUrl());
         }
 
-        return (Long) link.getResourceType().parser().parse(link.getUrl());
+        return (Long) link.getResourceType().parser().parse(URI.create(link.getUrl()));
     }
 
     protected String buildDescription(StackOverflowQuestionUpdateTime updateTime, Link link) {

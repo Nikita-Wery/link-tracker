@@ -7,6 +7,7 @@ import com.pengrad.telegrambot.model.BotCommand;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SetMyCommands;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
  *
  * @author Luzin Nikita
  */
+@Slf4j
 @Component
 public class TelegramCommandRegistrar {
 
@@ -35,6 +37,10 @@ public class TelegramCommandRegistrar {
                 .map(cmd -> new BotCommand(cmd.getCommandName(), cmd.getCommandDescription()))
                 .toList();
 
-        telegramBot.execute(new SetMyCommands(botCommands.toArray(new BotCommand[0])));
+        try {
+            telegramBot.execute(new SetMyCommands(botCommands.toArray(new BotCommand[0])));
+        } catch (Exception e) {
+            log.error("Error sending available commands when the bot start", e);
+        }
     }
 }

@@ -93,6 +93,29 @@
             <artifactId>grpc-services</artifactId>
         </dependency>
 
+        <!-- Database: -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <!-- or: spring-boot-starter-data-jpa -->
+            <artifactId>spring-boot-starter-data-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <!-- or: spring-boot-starter-flyway -->
+            <artifactId>spring-boot-starter-liquibase</artifactId>
+        </dependency>
+
+        <!-- PostgresDependency LastVersion -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.10</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- GraphQL: -->
         <!-- <dependency> -->
         <!--     <groupId>org.springframework.boot</groupId> -->
@@ -191,6 +214,12 @@
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>9.0</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs-annotations</artifactId>
+            <version>4.9.8</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

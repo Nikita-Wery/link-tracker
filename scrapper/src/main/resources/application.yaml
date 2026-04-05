@@ -4,11 +4,23 @@ server:
 spring:
   application:
     name: scrapper
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:linktracker_db}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: validate
   grpc:
     server:
       port: 9091
 
 app:
+  db:
+    access-type: orm
   scheduler:
     interval-update-ms: 60000
   client:
@@ -20,11 +32,10 @@ app:
       host: https://api.github.com
       token: ${GITHUB_TOKEN} # Use env variable. DO NOT KEEP TOKEN HERE
     bot:
-      host: http://localhost:8080
-      grpc-host: localhost:9090
+      host: ${APP_CLIENT_BOT_HOST:http://localhost:8080}
+      grpc-host: ${APP_CLIENT_BOT_GRPC_HOST:localhost:9090}
       api:
         rest:
           enabled: true
         grpc:
           enabled: false
-

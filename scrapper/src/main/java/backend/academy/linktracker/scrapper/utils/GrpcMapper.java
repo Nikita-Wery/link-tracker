@@ -13,8 +13,8 @@ public class GrpcMapper {
 
     public LinkResponse linkToGrpcLinkResponse(ChatLink chatLink) {
         return LinkResponse.newBuilder()
-                .setId(chatLink.getId())
-                .setUrl(String.valueOf(chatLink.getLink().getUrl()))
+                .setId(chatLink.getChatLinkId())
+                .setUrl(chatLink.getLink().getUrl())
                 .addAllTags(chatLink.getTags())
                 .build();
     }

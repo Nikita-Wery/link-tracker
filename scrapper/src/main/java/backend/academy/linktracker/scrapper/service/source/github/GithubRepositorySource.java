@@ -7,6 +7,7 @@ import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.UpdateEvent;
 import backend.academy.linktracker.scrapper.dto.github.GithubRepositoryUpdateTime;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
+import java.net.URI;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,8 +34,8 @@ public class GithubRepositorySource implements UpdateSource {
         GithubRepositoryUpdateTime update = gitHubClient.getRepositoryUpdateTime(ownerAndRepo[0], ownerAndRepo[1]);
 
         return new LinkUpdate(
-                link.getId(),
-                link.getUrl(),
+                link.getLinkId(),
+                URI.create(link.getUrl()),
                 buildDescription(update, link),
                 link.getTrackingChats().stream()
                         .map(chatLink -> chatLink.getChat().getChatId())
@@ -50,7 +51,7 @@ public class GithubRepositorySource implements UpdateSource {
             throw new IllegalArgumentException("Invalid GitHub URL: " + link.getUrl());
         }
 
-        return (String[]) link.getResourceType().parser().parse(link.getUrl());
+        return (String[]) link.getResourceType().parser().parse(URI.create(link.getUrl()));
     }
 
     protected String buildDescription(GithubRepositoryUpdateTime updateTime, Link link) {
