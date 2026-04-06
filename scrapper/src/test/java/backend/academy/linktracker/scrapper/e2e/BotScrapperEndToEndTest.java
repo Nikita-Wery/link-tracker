@@ -287,6 +287,7 @@ class BotScrapperEndToEndTest {
                 .uri("/tg-chat/{id}", chatId)
                 .retrieve()
                 .toBodilessEntity();
+
         assertEquals(200, reg.getStatusCode().value());
 
         AddLinkRequest body = new AddLinkRequest(url, Collections.emptyList());

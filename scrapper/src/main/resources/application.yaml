@@ -20,7 +20,7 @@ spring:
 
 app:
   db:
-    access-type: orm
+    access-type: sql
   scheduler:
     interval-update-ms: 60000
   client:
