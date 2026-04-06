@@ -13,7 +13,7 @@ public class JdbcChatRepository implements ChatRepository {
 
     // language=sql
     private static final String INSERT_CHAT
-        = "INSERT INTO chats (chat_id) VALUES :chatId";
+        = "INSERT INTO chats (chat_id) VALUES (:chatId)";
 
     // language=sql
     private static final String DELETE_CHAT_BY_ID
@@ -40,7 +40,7 @@ public class JdbcChatRepository implements ChatRepository {
     @Override
     public Chat save(Chat chat) {
         jdbcClient.sql(INSERT_CHAT)
-            .param(chat.getChatId())
+            .param("chatId", chat.getChatId())
             .update();
 
         return chat;
@@ -62,5 +62,4 @@ public class JdbcChatRepository implements ChatRepository {
             ))
             .optional();
     }
-
 }

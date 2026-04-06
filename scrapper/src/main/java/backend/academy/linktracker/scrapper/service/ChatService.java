@@ -1,16 +1,15 @@
 package backend.academy.linktracker.scrapper.service;
 
 import backend.academy.linktracker.scrapper.domain.Chat;
-import backend.academy.linktracker.scrapper.exception.botexception.ScrapperApiException;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.ChatAlreadyExistsException;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.ChatNotExistsException;
 import backend.academy.linktracker.scrapper.repository.ChatRepository;
-import java.util.Optional;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
@@ -24,13 +23,17 @@ public class ChatService {
         this.chatRepository = chatRepository;
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     @SuppressFBWarnings(
         value = "SLF4J_PLACE_HOLDER_MISMATCH",
         justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public Chat addChat(Chat chat) {
 
+        // TODO:
+        log.warn("USER ADDED ID: {}", chat.getChatId());
+
         try {
+
             return chatRepository.save(chat);
         } catch (DataIntegrityViolationException ex) {
             log.warn("Chat already exists",

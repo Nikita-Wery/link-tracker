@@ -21,7 +21,7 @@ public class JdbcLinkRepository implements LinkRepository {
 
     // language=sql
     private static final String INSERT_LINK
-        = "INSERT INTO links (link_id, url, resource_type, latest_update_time) VALUES (:linkId, :url, :type, :latestUpdate)";
+        = "INSERT INTO links (link_id, url, resource_type, latest_update_time) VALUES (?, ?, ?, ?)";
 
     // language=sql
     private static final String UPDATE_UPD_TIME
@@ -85,10 +85,10 @@ public class JdbcLinkRepository implements LinkRepository {
         link.setLinkId(id);
 
         jdbcClient.sql(INSERT_LINK)
-            .param("linkId", link.getLinkId())
-            .param("url", link.getUrl())
-            .param("type", link.getResourceType())
-            .param("latestUpdate", link.getLatestUpdateTime())
+            .param(1, link.getLinkId())
+            .param(2, link.getUrl())
+            .param(3, link.getResourceType().name())
+            .param(4, link.getLatestUpdateTime())
             .update();
 
         return link;
