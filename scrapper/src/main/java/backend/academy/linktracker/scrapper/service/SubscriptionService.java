@@ -4,7 +4,6 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import backend.academy.linktracker.proto.ListLinksResponse;
 import backend.academy.linktracker.scrapper.domain.ChatLink;
-import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.ChatAlreadyExistsException;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkAlreadyExistsException;
@@ -57,7 +56,7 @@ public class SubscriptionService {
             log.warn(
                     "Link already tracked",
                     kv("chat_id", chatLink.getChat().getChatId()),
-                    kv("link_url", chatLink.getLink().getUrl()),
+                    kv("chat_link_id", chatLink.getChatLinkId()),
                     ex);
             throw new LinkAlreadyTrackedException("The link is already being tracked by the chat");
         }
@@ -73,14 +72,6 @@ public class SubscriptionService {
 
     @Transactional
     public List<ChatLink> getTrackedLinksByChatId(Long chatId) {
-
-        log.info("GET REQUEST, CHATID: {}", chatId);
-        log.info(
-                "CHATS IN REPOSITORY, ID: {}",
-                chatService.getChatById(chatId).orElseGet(null).getChatId());
-        for (Link link : linkService.findAllLinks()) {
-            log.info("LINK IN REPOSITORY {}", link.getUrl());
-        }
 
         return chatLinkRepository.findChatLinksByChatId(chatId);
     }
