@@ -1,13 +1,13 @@
 package backend.academy.linktracker.scrapper.domain;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -48,5 +48,4 @@ public class Chat {
     public int hashCode() {
         return Objects.hashCode(chatId);
     }
-
 }

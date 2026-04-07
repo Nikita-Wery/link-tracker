@@ -1,9 +1,6 @@
 package backend.academy.linktracker.scrapper.domain;
 
 import backend.academy.linktracker.scrapper.config.ResourceType;
-import java.time.OffsetDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,6 +11,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,10 +31,7 @@ public class Link {
     @Id
     @Column(name = "link_id")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "link_seq")
-    @SequenceGenerator(
-        name = "link_seq",
-        sequenceName = "link_sequence"
-    )
+    @SequenceGenerator(name = "link_seq", sequenceName = "link_sequence")
     private Long linkId;
 
     // TODO: навесить index
@@ -77,5 +74,4 @@ public class Link {
     public int hashCode() {
         return url.hashCode() + resourceType.hashCode();
     }
-
 }

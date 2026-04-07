@@ -8,8 +8,7 @@ public class ResourceTypeMapper {
 
     public static Optional<ResourceType> getResourceTypeFromURI(String url) {
         return Arrays.stream(ResourceType.values())
-            .filter(req -> req.parser().supports(url))
-            .findFirst();
+                .filter(req -> req.parser().supports(url))
+                .findFirst();
     }
-
 }

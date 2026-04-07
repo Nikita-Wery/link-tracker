@@ -1,19 +1,19 @@
-//package backend.academy.linktracker.scrapper.repository.impl.inmemory;
+// package backend.academy.linktracker.scrapper.repository.impl.inmemory;
 //
-//import backend.academy.linktracker.scrapper.domain.ChatLink;
-//import backend.academy.linktracker.scrapper.domain.Link;
-//import backend.academy.linktracker.scrapper.repository.LinkRepository;
-//import java.net.URI;
-//import java.time.OffsetDateTime;
-//import java.util.HashSet;
-//import java.util.Iterator;
-//import java.util.Optional;
-//import java.util.Set;
-//import java.util.concurrent.atomic.AtomicLong;
-//import org.springframework.stereotype.Repository;
+// import backend.academy.linktracker.scrapper.domain.ChatLink;
+// import backend.academy.linktracker.scrapper.domain.Link;
+// import backend.academy.linktracker.scrapper.repository.LinkRepository;
+// import java.net.URI;
+// import java.time.OffsetDateTime;
+// import java.util.HashSet;
+// import java.util.Iterator;
+// import java.util.Optional;
+// import java.util.Set;
+// import java.util.concurrent.atomic.AtomicLong;
+// import org.springframework.stereotype.Repository;
 //
-//@Repository
-//public class InMemoryLinkRepository implements LinkRepository {
+// @Repository
+// public class InMemoryLinkRepository implements LinkRepository {
 //
 //    private final Set<Link> linkRepository;
 //    private final AtomicLong idGenerator = new AtomicLong(1);
@@ -69,4 +69,4 @@
 //
 //        return false;
 //    }
-//}
+// }

@@ -6,11 +6,13 @@ import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcChatLinkRepository;
 import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcChatRepository;
 import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcLinkRepository;
+import javax.sql.DataSource;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import javax.sql.DataSource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 @ConditionalOnProperty(name = "app.db.access-type", havingValue = "sql")
@@ -22,13 +24,17 @@ public class JdbcRepositoryConfiguration {
     }
 
     @Bean
-    LinkRepository linkRepository(JdbcClient jdbcClient) {
+    public PlatformTransactionManager transactionManager(DataSource ds) {
+        return new DataSourceTransactionManager(ds);
+    }
+
+    @Bean
+    public LinkRepository linkRepository(JdbcClient jdbcClient) {
         return new JdbcLinkRepository(jdbcClient);
     }
 
     @Bean
-    ChatLinkRepository chatLinkRepository(JdbcClient jdbcClient, DataSource dataSource) {
-    return new JdbcChatLinkRepository(jdbcClient, dataSource);
+    public ChatLinkRepository chatLinkRepository(JdbcClient jdbcClient, DataSource dataSource) {
+        return new JdbcChatLinkRepository(jdbcClient, dataSource);
     }
-
 }

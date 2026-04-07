@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface JpaChatRepository extends JpaRepository<Chat, Long> {
 
     @Modifying
@@ -13,5 +15,4 @@ public interface JpaChatRepository extends JpaRepository<Chat, Long> {
         DELETE FROM Chat c WHERE c.chatId = :chatId
     """)
     int deleteByChatId(@Param("chatId") long chatId);
-
 }

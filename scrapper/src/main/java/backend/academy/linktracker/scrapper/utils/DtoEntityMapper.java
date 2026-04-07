@@ -9,14 +9,12 @@ import backend.academy.linktracker.scrapper.dto.bot.ApiErrorResponse;
 import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
 import backend.academy.linktracker.scrapper.dto.bot.RemoveLinkRequest;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.InvalidLinkInRequestException;
-import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
-//TODO: фиксануть builder
 public class DtoEntityMapper {
 
     public Chat getChatFromChatId(Long chatId) {
@@ -25,13 +23,14 @@ public class DtoEntityMapper {
 
     public LinkResponse linkToLinkResponse(ChatLink link) {
         return new LinkResponse(
-                link.getChatLinkId(), link.getLink().getUrl(), link.getTags().stream().toList());
+                link.getChatLinkId(),
+                link.getLink().getUrl(),
+                link.getTags().stream().toList());
     }
 
     public Link linkFromAddLinkRequest(AddLinkRequest request) {
-        ResourceType type = ResourceTypeMapper.getResourceTypeFromURI(
-            request.link()).orElseThrow(
-            () -> new InvalidLinkInRequestException("Unsupported link type " + request.link()));
+        ResourceType type = ResourceTypeMapper.getResourceTypeFromURI(request.link())
+                .orElseThrow(() -> new InvalidLinkInRequestException("Unsupported link type " + request.link()));
 
         return new Link(request.link(), type, OffsetDateTime.now());
     }
@@ -53,9 +52,8 @@ public class DtoEntityMapper {
     }
 
     public Link linkFromRemoveLinkRequest(RemoveLinkRequest request) {
-        ResourceType type = ResourceTypeMapper.getResourceTypeFromURI(
-            request.link()).orElseThrow(
-                () -> new InvalidLinkInRequestException("Unsupported link type " + request.link()));
+        ResourceType type = ResourceTypeMapper.getResourceTypeFromURI(request.link())
+                .orElseThrow(() -> new InvalidLinkInRequestException("Unsupported link type " + request.link()));
 
         return new Link(request.link(), type, OffsetDateTime.now());
     }
