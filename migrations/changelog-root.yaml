@@ -5,6 +5,6 @@ databaseChangeLog:
   - include:
       file: ./changelog-tables/001_init_tables.yaml
       relativeToChangelogFile: true
-#  - includeAll:
-#      path: changelog-indexes
-#      relativeToChangelogFile: true
+  - include:
+      file: ./changelog-indexes/001_init_indexes.yaml
+      relativeToChangelogFile: true

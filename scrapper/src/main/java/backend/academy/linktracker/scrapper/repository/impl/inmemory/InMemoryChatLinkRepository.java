@@ -1,17 +1,17 @@
-//package backend.academy.linktracker.scrapper.repository.impl.inmemory;
+// package backend.academy.linktracker.scrapper.repository.impl.inmemory;
 //
-//import backend.academy.linktracker.scrapper.domain.ChatLink;
-//import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
-//import java.util.HashSet;
-//import java.util.Iterator;
-//import java.util.Optional;
-//import java.util.Set;
-//import lombok.extern.slf4j.Slf4j;
-//import org.springframework.stereotype.Repository;
+// import backend.academy.linktracker.scrapper.domain.ChatLink;
+// import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
+// import java.util.HashSet;
+// import java.util.Iterator;
+// import java.util.Optional;
+// import java.util.Set;
+// import lombok.extern.slf4j.Slf4j;
+// import org.springframework.stereotype.Repository;
 //
-//@Slf4j
-//@Repository
-//public class InMemoryChatLinkRepository implements ChatLinkRepository {
+// @Slf4j
+// @Repository
+// public class InMemoryChatLinkRepository implements ChatLinkRepository {
 //
 //    private final Set<ChatLink> chatLinkRepository;
 //
@@ -53,4 +53,4 @@
 //
 //        return chatLink;
 //    }
-//}
+// }

@@ -13,6 +13,8 @@ public interface LinkRepository {
 
     Link save(Link link);
 
+    Link saveAndFlush(Link link);
+
     Optional<Link> findLinkByURI(String uri);
 
     boolean existsById(long linkId);

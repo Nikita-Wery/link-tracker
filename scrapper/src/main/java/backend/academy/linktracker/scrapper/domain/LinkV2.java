@@ -1,9 +1,9 @@
-//@Entity
-//@Table(name = "chat_link")
-//@Getter
-//@Setter
-//@NoArgsConstructor
-//public class ChatLink {
+// @Entity
+// @Table(name = "chat_link")
+// @Getter
+// @Setter
+// @NoArgsConstructor
+// public class ChatLink {
 //
 //    @Embeddable
 //    @NoArgsConstructor
@@ -100,4 +100,4 @@
 //        return Objects.hash(id);
 //    }
 //
-//}
+// }

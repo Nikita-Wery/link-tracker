@@ -3,9 +3,9 @@ package backend.academy.linktracker.scrapper.repository.impl.orm;
 import backend.academy.linktracker.scrapper.domain.Chat;
 import backend.academy.linktracker.scrapper.repository.ChatRepository;
 import backend.academy.linktracker.scrapper.repository.impl.orm.jpa.JpaChatRepository;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
-import java.util.Optional;
 
 @Repository
 @AllArgsConstructor
@@ -21,6 +21,13 @@ public class OrmChatRepository implements ChatRepository {
     @Override
     public Chat save(Chat chat) {
         return jpaChatRepository.save(chat);
+    }
+
+    @Override
+    public Chat saveAndFlush(Chat chat) {
+        Chat savedChat = save(chat);
+        jpaChatRepository.flush();
+        return savedChat;
     }
 
     @Override

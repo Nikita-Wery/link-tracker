@@ -54,8 +54,7 @@ public class LinkController {
         Chat chat = dtoEntityMapper.getChatFromChatId(chatId);
         ChatLink chatLink = new ChatLink(link, chat, new HashSet<>(request.tags()));
 
-        return dtoEntityMapper.linkToLinkResponse(
-                subscriptionService.trackLink(chatLink));
+        return dtoEntityMapper.linkToLinkResponse(subscriptionService.trackLink(chatLink));
     }
 
     @DeleteMapping
@@ -67,5 +66,4 @@ public class LinkController {
 
         return dtoEntityMapper.linkToLinkResponse(subscriptionService.untrackLink(chatLink));
     }
-
 }

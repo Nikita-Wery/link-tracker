@@ -12,7 +12,6 @@ import backend.academy.linktracker.scrapper.utils.GrpcMapper;
 import com.google.protobuf.Empty;
 import io.grpc.stub.StreamObserver;
 import java.util.HashSet;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.grpc.server.service.GrpcService;
 
@@ -57,8 +56,7 @@ public class ScrapperGrpcEndpoint extends ScrapperServiceGrpc.ScrapperServiceImp
         Link link = dtoEntityMapper.linkFromAddLinkRequest(request);
         ChatLink chatLink = new ChatLink(link, chat, new HashSet<>(request.tags()));
 
-        LinkResponse linkResponse = grpcMapper.linkToGrpcLinkResponse(
-                subscriptionService.trackLink(chatLink));
+        LinkResponse linkResponse = grpcMapper.linkToGrpcLinkResponse(subscriptionService.trackLink(chatLink));
 
         responseObserver.onNext(linkResponse);
         responseObserver.onCompleted();

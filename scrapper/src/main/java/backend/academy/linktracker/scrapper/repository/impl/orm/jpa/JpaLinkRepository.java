@@ -1,14 +1,16 @@
 package backend.academy.linktracker.scrapper.repository.impl.orm.jpa;
 
 import backend.academy.linktracker.scrapper.domain.Link;
+import java.time.OffsetDateTime;
+import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.time.OffsetDateTime;
-import java.util.Optional;
-import java.util.Set;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface JpaLinkRepository extends JpaRepository<Link, Long> {
 
     Optional<Link> findLinkByUrl(String url);
@@ -24,8 +26,6 @@ public interface JpaLinkRepository extends JpaRepository<Link, Long> {
         WHERE id > :lastId
         ORDER BY id
         LIMIT :size
-        """,
-        nativeQuery = true)
+        """, nativeQuery = true)
     Set<Link> findBatchLink(@Param("lastId") long lastLinkId, @Param("size") int size);
-
 }
