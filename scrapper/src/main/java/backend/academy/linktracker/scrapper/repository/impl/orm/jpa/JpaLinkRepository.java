@@ -2,8 +2,9 @@ package backend.academy.linktracker.scrapper.repository.impl.orm.jpa;
 
 import backend.academy.linktracker.scrapper.domain.Link;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,11 +22,5 @@ public interface JpaLinkRepository extends JpaRepository<Link, Long> {
     """)
     void updateLastUpdate(@Param("linkId") long linkId, @Param("newLatestUpdTime") OffsetDateTime newLatestUpdateTime);
 
-    @Query(value = """
-        SELECT * FROM links
-        WHERE id > :lastId
-        ORDER BY id
-        LIMIT :size
-        """, nativeQuery = true)
-    Set<Link> findBatchLink(@Param("lastId") long lastLinkId, @Param("size") int size);
+    List<Link> findLinkByLinkIdGreaterThan(Long linkIdIsGreaterThan, Pageable pageable);
 }

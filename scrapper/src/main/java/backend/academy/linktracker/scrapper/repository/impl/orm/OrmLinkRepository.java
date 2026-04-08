@@ -5,9 +5,13 @@ import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import backend.academy.linktracker.scrapper.repository.impl.orm.jpa.JpaLinkRepository;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -17,8 +21,9 @@ public class OrmLinkRepository implements LinkRepository {
     private JpaLinkRepository jpaLinkRepository;
 
     @Override
-    public Set<Link> findBatchLink(long lastLinkId, int size) {
-        return jpaLinkRepository.findBatchLink(lastLinkId, size);
+    public List<Link> findByLinkIdGreaterThan(long lastLinkId, int size) {
+        Pageable page = PageRequest.of(0, size, Sort.by("linkId").ascending());
+        return jpaLinkRepository.findLinkByLinkIdGreaterThan(lastLinkId, page);
     }
 
     @Override

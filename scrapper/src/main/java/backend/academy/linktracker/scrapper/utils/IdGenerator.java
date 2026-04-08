@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public final class IdGenerator {
 
-    private static final AtomicLong COUNTER = new AtomicLong(System.currentTimeMillis());
+    private static final AtomicLong COUNTER = new AtomicLong(System.nanoTime());
 
     private IdGenerator() {}
 
