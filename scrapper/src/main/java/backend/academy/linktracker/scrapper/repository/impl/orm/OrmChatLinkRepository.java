@@ -33,7 +33,7 @@ public class OrmChatLinkRepository implements ChatLinkRepository {
 
     @Override
     public List<ChatLink> findChatLinksByChatId(long chatId) {
-        return jpaChatLinkRepository.findChatLinkByChatChatId(chatId);
+        return jpaChatLinkRepository.findLinkByChatChatId(chatId);
     }
 
     @Override

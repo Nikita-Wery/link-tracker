@@ -2,12 +2,13 @@ package backend.academy.linktracker.scrapper.repository;
 
 import backend.academy.linktracker.scrapper.domain.Link;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 public interface LinkRepository {
 
-    Set<Link> findBatchLink(long lastLinkId, int size);
+    List<Link> findByLinkIdGreaterThan(long lastLinkId, int size);
 
     void updateLastUpdate(Link link, OffsetDateTime newLatestUpdateTime);
 

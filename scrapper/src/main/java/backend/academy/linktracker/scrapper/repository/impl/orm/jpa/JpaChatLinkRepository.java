@@ -18,5 +18,5 @@ public interface JpaChatLinkRepository extends JpaRepository<ChatLink, Long> {
     """)
     Optional<ChatLink> findChatLinkWithTagsInitializeOnly(@Param("chatId") long chatId, @Param("linkUrl") String url);
 
-    List<ChatLink> findChatLinkByChatChatId(long chatChatId);
+    List<ChatLink> findLinkByChatChatId(long chatChatId);
 }

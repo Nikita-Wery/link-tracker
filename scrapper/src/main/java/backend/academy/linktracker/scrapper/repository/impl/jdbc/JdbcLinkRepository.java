@@ -4,6 +4,7 @@ import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -57,13 +58,13 @@ public class JdbcLinkRepository implements LinkRepository {
     private final JdbcClient jdbcClient;
 
     @Override
-    public Set<Link> findBatchLink(long lastLinkId, int size) {
+    public List<Link> findByLinkIdGreaterThan(long lastLinkId, int size) {
         return jdbcClient
                 .sql(BATCH_SELECT)
                 .param("lastId", lastLinkId)
                 .param("size", size)
                 .query(rsLinkMapper)
-                .set();
+                .list();
     }
 
     @Override
