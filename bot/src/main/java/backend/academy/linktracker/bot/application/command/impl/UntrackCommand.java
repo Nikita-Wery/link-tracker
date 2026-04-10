@@ -69,8 +69,10 @@ public class UntrackCommand extends AbstractCommand<Update> {
                 client.untrackLink(chatId, removeLinkRequest);
                 sender.sendMessage(chatId, SUCCESSFUL_LINK_UNPINNING_MESSAGE);
             } catch (ChatNotExistsException ex) {
+                log.warn("The user has never interacted with the bot before");
                 sender.sendMessage(chatId, USER_HAS_NEVER_ATTACHED_LINK_MESSAGE);
             } catch (LinkNotTrackedException ex) {
+                log.warn("The user attempted to unpin an untracked link.");
                 sender.sendMessage(chatId, USER_NOT_CURRENTLY_FOLLOWING_ANY_LINKS_MESSAGE);
             } catch (ScrapperServerException ex) {
                 log.error("Scrapper server error", kv("raw_link", link), ex);
