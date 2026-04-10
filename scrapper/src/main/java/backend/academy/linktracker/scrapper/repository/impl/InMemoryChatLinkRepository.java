@@ -44,13 +44,14 @@ public class InMemoryChatLinkRepository implements ChatLinkRepository {
         Iterator<ChatLink> iterator = chatLinkRepository.iterator();
 
         while (iterator.hasNext()) {
-            if (iterator.next().equals(chatLink)) {
-                ChatLink result = iterator.next();
+            ChatLink current = iterator.next();
+
+            if (current.equals(chatLink)) {
                 iterator.remove();
-                return result;
+                return current;
             }
         }
 
-        return chatLink;
+        return null;
     }
 }
