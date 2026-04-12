@@ -70,13 +70,13 @@ public class SubscriptionService {
                 .orElseThrow(() -> new LinkNotTrackedException("The link was not tracked from the chat side"));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<ChatLink> getTrackedLinksByChatId(Long chatId) {
 
         return chatLinkRepository.findChatLinksByChatId(chatId);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<LinkResponse> getLinkResponsesByChatId(Long chatId) {
 
         return getTrackedLinksByChatId(chatId).stream()

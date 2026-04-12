@@ -7,7 +7,6 @@ import backend.academy.linktracker.scrapper.dto.bot.AddLinkRequest;
 import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
 import backend.academy.linktracker.scrapper.dto.bot.ListLinksResponse;
 import backend.academy.linktracker.scrapper.dto.bot.RemoveLinkRequest;
-import backend.academy.linktracker.scrapper.service.ChatService;
 import backend.academy.linktracker.scrapper.service.SubscriptionService;
 import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import jakarta.validation.Valid;
@@ -25,14 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/links")
 public class LinkController {
 
-    private final ChatService chatService;
     private final SubscriptionService subscriptionService;
     private final DtoEntityMapper dtoEntityMapper;
 
-    public LinkController(
-            ChatService chatService, SubscriptionService subscriptionService, DtoEntityMapper dtoEntityMapper) {
+    public LinkController(SubscriptionService subscriptionService, DtoEntityMapper dtoEntityMapper) {
 
-        this.chatService = chatService;
         this.subscriptionService = subscriptionService;
         this.dtoEntityMapper = dtoEntityMapper;
     }

@@ -20,6 +20,7 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Immutable;
 
 @Entity
 @Table(
@@ -44,10 +45,18 @@ public class ChatLink {
     @JoinColumn(name = "link_url", referencedColumnName = "url", updatable = false, nullable = false)
     private Link link;
 
+    @Immutable
+    @Column(name = "link_url", insertable = false, updatable = false, nullable = false)
+    private String linkUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
     @JoinColumn(name = "chat_id", referencedColumnName = "chat_id", updatable = false, nullable = false)
     private Chat chat;
+
+    @Immutable
+    @Column(name = "chat_id", insertable = false, updatable = false, nullable = false)
+    private Long chatId;
 
     @ElementCollection
     @CollectionTable(name = "chat_link_tags", joinColumns = @JoinColumn(name = "chat_link_id"))
@@ -80,6 +89,6 @@ public class ChatLink {
 
     @Override
     public int hashCode() {
-        return Objects.hash(chat, link);
+        return Objects.hash(chatId, linkUrl);
     }
 }

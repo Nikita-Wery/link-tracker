@@ -1,5 +1,6 @@
 package backend.academy.linktracker.scrapper.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -23,7 +24,7 @@ public class Chat {
     @Column(name = "chat_id")
     private long chatId;
 
-    @OneToMany(mappedBy = "chat")
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.REMOVE)
     private Set<ChatLink> trackedLinks = new HashSet<>();
 
     public Chat(long chatId) {
