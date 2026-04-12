@@ -96,13 +96,13 @@ class LinkControllerTest {
     void trackLink_Success() throws Exception {
         Long chatId = 1L;
 
-        AddLinkRequest request = new AddLinkRequest("https://example.com", List.of("tag1"));
+        AddLinkRequest request = new AddLinkRequest("https://github.com/torvalds/repo1", List.of("tag1"));
 
-        Link link = new Link("https://example.com", mock(ResourceType.class), OffsetDateTime.now());
+        Link link = new Link("https://github.com/torvalds/repo1", mock(ResourceType.class), OffsetDateTime.now());
         Chat chat = new Chat(chatId);
         ChatLink chatLink = new ChatLink(link, chat, new HashSet<>(request.tags()));
 
-        LinkResponse response = new LinkResponse(1L, "https://example.com", List.of("tag1"));
+        LinkResponse response = new LinkResponse(1L, "https://github.com/torvalds/repo1", List.of("tag1"));
 
         given(dtoEntityMapper.linkFromAddLinkRequest(any())).willReturn(link);
         given(dtoEntityMapper.getChatFromChatId(chatId)).willReturn(chat);
@@ -114,7 +114,7 @@ class LinkControllerTest {
                         .contentType(String.valueOf(MediaType.APPLICATION_JSON))
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.url").value("https://example.com"))
+                .andExpect(jsonPath("$.url").value("https://github.com/torvalds/repo1"))
                 .andExpect(jsonPath("$.tags[0]").value("tag1"));
     }
 
@@ -123,13 +123,13 @@ class LinkControllerTest {
     void untrackLink_Success() throws Exception {
         Long chatId = 1L;
 
-        RemoveLinkRequest request = new RemoveLinkRequest("https://example.com");
+        RemoveLinkRequest request = new RemoveLinkRequest("https://github.com/torvalds/repo1");
 
-        Link link = new Link("https://example.com", mock(ResourceType.class), OffsetDateTime.now());
+        Link link = new Link("https://github.com/torvalds/repo1", mock(ResourceType.class), OffsetDateTime.now());
         Chat chat = new Chat(chatId);
         ChatLink chatLink = new ChatLink(link, chat);
 
-        LinkResponse response = new LinkResponse(1L, "https://example.com", List.of());
+        LinkResponse response = new LinkResponse(1L, "https://github.com/torvalds/repo1", List.of());
 
         given(dtoEntityMapper.linkFromRemoveLinkRequest(any())).willReturn(link);
         given(dtoEntityMapper.getChatFromChatId(chatId)).willReturn(chat);
@@ -141,7 +141,7 @@ class LinkControllerTest {
                         .contentType(String.valueOf(MediaType.APPLICATION_JSON))
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.url").value("https://example.com"));
+                .andExpect(jsonPath("$.url").value("https://github.com/torvalds/repo1"));
     }
 
     @Test

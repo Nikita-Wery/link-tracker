@@ -13,6 +13,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -71,6 +72,6 @@ public class Link {
 
     @Override
     public int hashCode() {
-        return url == null ? 0 : url.hashCode();
+        return Objects.hash(url);
     }
 }
