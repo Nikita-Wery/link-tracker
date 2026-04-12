@@ -9,6 +9,7 @@ import backend.academy.linktracker.scrapper.exception.botexception.requestexcept
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkNotTrackedException;
 import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @ControllerAdvice
 @RestController
 public class RestExceptionHandler {
@@ -62,6 +64,7 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<String> nullPointerException(NullPointerException ex) {
+        log.error("Unexpected null pointer exception", ex);
         return new ResponseEntity<>(
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase() + " " + NULL_POINTER_EXCEPTION + ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR);

@@ -34,7 +34,6 @@ public class Link {
     @SequenceGenerator(name = "link_seq", sequenceName = "link_sequence")
     private Long linkId;
 
-    // TODO: навесить index
     @NotNull
     @Column(nullable = false, length = 2048, unique = true, updatable = false)
     private String url;
@@ -72,6 +71,6 @@ public class Link {
 
     @Override
     public int hashCode() {
-        return url.hashCode() + resourceType.hashCode();
+        return url == null ? 0 : url.hashCode();
     }
 }

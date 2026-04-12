@@ -8,7 +8,6 @@ import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import java.util.Optional;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -30,14 +29,9 @@ public class LinkService {
         linkRepository.updateLastUpdate(link, newLastUpdate);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<Link> findLinkByUri(String url) {
         return linkRepository.findLinkByURI(url);
-    }
-
-    @Transactional
-    public Set<Link> findAllLinks() {
-        return linkRepository.findAll();
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

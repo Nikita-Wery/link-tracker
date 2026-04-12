@@ -39,7 +39,7 @@ public class ChatService {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<Chat> getChatById(long chatId) {
         return chatRepository.findChatByChatId(chatId);
     }
