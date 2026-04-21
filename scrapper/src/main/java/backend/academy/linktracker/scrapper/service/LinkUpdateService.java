@@ -2,8 +2,12 @@ package backend.academy.linktracker.scrapper.service;
 
 import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
+import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.UpdateEvent;
+import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
+import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiException;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -16,34 +20,46 @@ import org.springframework.stereotype.Service;
 @Service
 public class LinkUpdateService {
 
-    private final Map<ResourceType, UpdateSource> sourceMap;
+    private final Map<ResourceType, UpdateSource<LinkUpdate>> sourceMap;
     private final ApplicationEventPublisher publisher;
-    private final LinkService linkService;
+    private final LinkUpdateWorker linkUpdateWorker;
 
-    public LinkUpdateService(List<UpdateSource> sources, ApplicationEventPublisher publisher, LinkService linkService) {
+    public LinkUpdateService(List<UpdateSource<LinkUpdate>> sources,
+                            ApplicationEventPublisher publisher,
+                            LinkUpdateWorker linkUpdateWorker) {
 
-        this.linkService = linkService;
+        this.linkUpdateWorker = linkUpdateWorker;
         this.publisher = publisher;
         this.sourceMap = sources.stream().collect(Collectors.toMap(UpdateSource::getResourceType, Function.identity()));
     }
 
     public void process(Link link) {
 
-        UpdateSource source = sourceMap.get(link.getResourceType());
+        UpdateSource<LinkUpdate> source = sourceMap.get(link.getResourceType());
 
         if (source == null) {
             log.error("No handler found for the link: {}", link.getUrl());
-            throw new IllegalStateException("No source for " + link.getResourceType());
+            return;
         }
 
-        UpdateEvent updateEvent = source.getUpdates(link);
+        try {
+            List<? extends UpdateEvent> updateEvents = source.getUpdates(link);
 
-        if (updateEvent.getLastUpdate().isAfter(link.getLatestUpdateTime())) {
-            linkService.changeLastUpdate(link, updateEvent.getLastUpdate());
+            if (updateEvents.isEmpty()) {
+                log.info("Link {} has not been updated", link.getUrl());
+                return;
+            }
 
-            publisher.publishEvent(updateEvent);
-        } else {
-            log.info("Link {} has not been updated", link.getUrl());
+            linkUpdateWorker.submit(new UpdateLinkDto(link.getLinkId(), updateEvents.getLast().getLastUpdate()));
+
+            for (UpdateEvent event : updateEvents) {
+                publisher.publishEvent(event);
+            }
+
+        } catch (ExternalApiException e) {
+            log.warn("API exception was catched in {}", Thread.currentThread().getName());
         }
     }
+
 }
+

@@ -1,13 +1,22 @@
 package backend.academy.linktracker.scrapper.config;
 
 import backend.academy.linktracker.scrapper.parser.LinkParser;
-import backend.academy.linktracker.scrapper.parser.impl.GithubLinkParser;
-import backend.academy.linktracker.scrapper.parser.impl.StackOverflowLinkParser;
+import backend.academy.linktracker.scrapper.parser.impl.github.GithubRepositoryIssuesParser;
+import backend.academy.linktracker.scrapper.parser.impl.github.GithubRepositoryLinkParser;
+import backend.academy.linktracker.scrapper.parser.impl.stackoverflow.StackOverflowAnswersParser;
+import backend.academy.linktracker.scrapper.parser.impl.stackoverflow.StackOverflowCommentsParser;
+import backend.academy.linktracker.scrapper.parser.impl.stackoverflow.StackOverflowLinkParser;
 
 public enum ResourceType {
-    GITHUB_REPOSITORY(new GithubLinkParser()),
+    GITHUB_REPOSITORY(new GithubRepositoryLinkParser()),
 
-    STACKOVERFLOW_QUESTION(new StackOverflowLinkParser());
+    GITHUB_REPOSITORY_ISSUE(new GithubRepositoryIssuesParser(new GithubRepositoryLinkParser())),
+
+    STACKOVERFLOW_QUESTION(new StackOverflowLinkParser()),
+
+    STACKOVERFLOW_COMMENTS(new StackOverflowCommentsParser()),
+
+    STACKOVERFLOW_ANSWERS(new StackOverflowAnswersParser());
 
     private final LinkParser<?> parser;
 

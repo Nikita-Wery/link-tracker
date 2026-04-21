@@ -4,17 +4,18 @@ import backend.academy.linktracker.scrapper.client.external.GitHubClient;
 import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
-import backend.academy.linktracker.scrapper.dto.UpdateEvent;
 import backend.academy.linktracker.scrapper.dto.github.GithubRepositoryUpdateTime;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class GithubRepositorySource implements UpdateSource {
+public class GithubRepositorySource implements UpdateSource<LinkUpdate> {
 
     private final GitHubClient gitHubClient;
 
@@ -24,38 +25,49 @@ public class GithubRepositorySource implements UpdateSource {
 
     @Override
     public ResourceType getResourceType() {
-        return ResourceType.GITHUB_REPOSITORY;
+        return ResourceType.GITHUB_REPOSITORY_ISSUE;
     }
 
     @Override
-    public UpdateEvent getUpdates(Link link) {
+    public List<LinkUpdate> getUpdates(Link link) {
+
+        List<LinkUpdate> updates = new ArrayList<>();
+
         String[] ownerAndRepo = extractOwnerAndRepo(link);
 
         GithubRepositoryUpdateTime update = gitHubClient.getRepositoryUpdateTime(ownerAndRepo[0], ownerAndRepo[1]);
 
-        return new LinkUpdate(
-                link.getLinkId(),
-                URI.create(link.getUrl()),
-                buildDescription(update, link),
-                link.getTrackingChats().stream()
-                        .map(chatLink -> chatLink.getChat().getChatId())
-                        .collect(Collectors.toSet()),
-                link.getResourceType(),
-                update.updateAt());
+        if (update.updateAt().isAfter(link.getLatestUpdateTime())) {
+            updates.add(toLinkUpdate(update, link));
+        }
+
+        return updates;
     }
 
-    protected String[] extractOwnerAndRepo(Link link) {
+    private String[] extractOwnerAndRepo(Link link) {
 
-        if (!link.getResourceType().equals(ResourceType.GITHUB_REPOSITORY)) {
-            log.error("The URL format: {}, does not match with {}", link.getUrl(), ResourceType.GITHUB_REPOSITORY);
+        if (!link.getResourceType().equals(ResourceType.GITHUB_REPOSITORY_ISSUE)) {
+            log.error("The URL format: {}, does not match with {}", link.getUrl(), ResourceType.GITHUB_REPOSITORY_ISSUE);
             throw new IllegalArgumentException("Invalid GitHub URL: " + link.getUrl());
         }
 
         return (String[]) link.getResourceType().parser().parse(URI.create(link.getUrl()));
     }
 
-    protected String buildDescription(GithubRepositoryUpdateTime updateTime, Link link) {
+    private String buildDescription(GithubRepositoryUpdateTime updateTime, Link link) {
         return "Репозиторий %s, по ссылке %s, обновлён в %s, последний push %s"
                 .formatted(updateTime.repositoryName(), link.getUrl(), updateTime.updateAt(), updateTime.pushedAt());
+    }
+
+    private LinkUpdate toLinkUpdate(GithubRepositoryUpdateTime update, Link link) {
+        return new LinkUpdate(
+            link.getLinkId(),
+            URI.create(link.getUrl()),
+            buildDescription(update, link),
+            link.getTrackingChats().stream()
+                .map(chatLink -> chatLink.getChat().getChatId())
+                .collect(Collectors.toSet()),
+            link.getResourceType(),
+            update.updateAt());
     }
 }

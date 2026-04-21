@@ -1,11 +1,11 @@
-package backend.academy.linktracker.scrapper.parser.impl;
+package backend.academy.linktracker.scrapper.parser.impl.stackoverflow;
 
 import backend.academy.linktracker.scrapper.parser.LinkParser;
-import java.net.URI;
 import org.springframework.stereotype.Component;
+import java.net.URI;
 
 @Component
-public class StackOverflowLinkParser implements LinkParser<Long> {
+public class StackOverflowCommentsParser implements LinkParser<Long> {
 
     @Override
     public boolean supports(String url) {
@@ -18,7 +18,8 @@ public class StackOverflowLinkParser implements LinkParser<Long> {
 
             String[] segments = uri.getPath().split("/");
 
-            return segments.length >= 3 && "questions".equals(segments[1]) && segments[2].matches("\\d+");
+
+            return segments.length == 3 && "questions".equals(segments[1]) && segments[2].matches("\\d+") && "comments".equals(segments[3]);
 
         } catch (Exception e) {
             return false;

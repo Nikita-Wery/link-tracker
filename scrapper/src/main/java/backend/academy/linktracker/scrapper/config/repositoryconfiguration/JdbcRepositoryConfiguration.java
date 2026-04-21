@@ -5,6 +5,7 @@ import backend.academy.linktracker.scrapper.repository.ChatRepository;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcChatLinkRepository;
 import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcChatRepository;
+import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcHelper;
 import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcLinkRepository;
 import javax.sql.DataSource;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -29,8 +30,8 @@ public class JdbcRepositoryConfiguration {
     }
 
     @Bean
-    public LinkRepository linkRepository(JdbcClient jdbcClient) {
-        return new JdbcLinkRepository(jdbcClient);
+    public LinkRepository linkRepository(JdbcClient jdbcClient, JdbcHelper jdbcHelper) {
+        return new JdbcLinkRepository(jdbcClient, jdbcHelper);
     }
 
     @Bean

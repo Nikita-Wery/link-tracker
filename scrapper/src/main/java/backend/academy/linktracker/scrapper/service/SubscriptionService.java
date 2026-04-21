@@ -3,7 +3,9 @@ package backend.academy.linktracker.scrapper.service;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import backend.academy.linktracker.proto.ListLinksResponse;
+import backend.academy.linktracker.scrapper.domain.Chat;
 import backend.academy.linktracker.scrapper.domain.ChatLink;
+import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.ChatAlreadyExistsException;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkAlreadyExistsException;
@@ -38,13 +40,17 @@ public class SubscriptionService {
     public ChatLink trackLink(ChatLink chatLink) {
 
         try {
-            chatService.addChat(chatLink.getChat());
+
+            Chat savedChat = chatService.addChat(chatLink.getChat());
+            chatLink.setChat(savedChat);
         } catch (ChatAlreadyExistsException e) {
             log.info("When adding a chatlink, either the chat already existed");
         }
 
         try {
-            linkService.addLink(chatLink.getLink());
+
+            Link savedLink = linkService.addLink(chatLink.getLink());
+            chatLink.setLink(savedLink);
         } catch (LinkAlreadyExistsException e) {
             log.info("When adding a chatlink, either the link already existed");
         }

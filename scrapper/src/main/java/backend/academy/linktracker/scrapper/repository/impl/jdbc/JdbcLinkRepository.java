@@ -2,12 +2,16 @@ package backend.academy.linktracker.scrapper.repository.impl.jdbc;
 
 import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
+import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
@@ -56,15 +60,25 @@ public class JdbcLinkRepository implements LinkRepository {
     };
 
     private final JdbcClient jdbcClient;
+    private final JdbcHelper jdbcHelper;
 
     @Override
-    public List<Link> findByLinkIdGreaterThan(long lastLinkId, int size) {
-        return jdbcClient
+    public Slice<Link> findByLinkIdGreaterThan(long lastLinkId, int size) {
+
+        List<Link> result = jdbcClient
                 .sql(BATCH_SELECT)
                 .param("lastId", lastLinkId)
-                .param("size", size)
+                .param("size", size + 1)
                 .query(rsLinkMapper)
                 .list();
+
+        boolean hasNext = result.size() > size;
+
+        List<Link> content = hasNext
+                ? result.subList(0, size)
+                : result;
+
+        return new SliceImpl<>(content, PageRequest.of(0, size), hasNext);
     }
 
     @Override
@@ -74,6 +88,11 @@ public class JdbcLinkRepository implements LinkRepository {
                 .param("newLatestUpdTime", offsetDateTime)
                 .param("linkId", link.getLinkId())
                 .update();
+    }
+
+    @Override
+    public void updateLastUpdateBatch(List<UpdateLinkDto> batch, int batchSize) {
+        jdbcHelper.updateLastUpdateBatch(batch, batchSize);
     }
 
     @Override

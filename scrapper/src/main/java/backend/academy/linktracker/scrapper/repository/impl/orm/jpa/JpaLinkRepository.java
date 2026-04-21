@@ -5,6 +5,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -22,5 +23,5 @@ public interface JpaLinkRepository extends JpaRepository<Link, Long> {
     """)
     void updateLastUpdate(@Param("linkId") long linkId, @Param("newLatestUpdTime") OffsetDateTime newLatestUpdateTime);
 
-    List<Link> findLinkByLinkIdGreaterThan(Long linkIdIsGreaterThan, Pageable pageable);
+    Slice<Link> findLinkByLinkIdGreaterThan(Long linkIdIsGreaterThan, Pageable pageable);
 }

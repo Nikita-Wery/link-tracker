@@ -20,6 +20,7 @@ import java.util.Set;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Immutable;
 
 @Entity
@@ -42,12 +43,12 @@ public class ChatLink {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
-    @JoinColumn(name = "link_url", referencedColumnName = "url", updatable = false, nullable = false)
+    @JoinColumn(name = "link_id", referencedColumnName = "link_id", updatable = false, nullable = false)
     private Link link;
 
     @Immutable
-    @Column(name = "link_url", insertable = false, updatable = false, nullable = false)
-    private String linkUrl;
+    @Column(name = "link_id", insertable = false, updatable = false, nullable = false)
+    private Long linkId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
@@ -61,6 +62,7 @@ public class ChatLink {
     @ElementCollection
     @CollectionTable(name = "chat_link_tags", joinColumns = @JoinColumn(name = "chat_link_id"))
     @Column(name = "tag", nullable = false)
+    @BatchSize(size = 30)
     private Set<String> tags = new HashSet<>();
 
     public ChatLink(@NotNull Link link, @NotNull Chat chat) {
@@ -87,8 +89,18 @@ public class ChatLink {
         return chat.equals(that.chat) && link.equals(that.link);
     }
 
+    public void setChat(Chat chat) {
+        this.chat = chat;
+        chat.addLink(this);
+    }
+
+    public void setLink(Link link) {
+        this.link = link;
+        link.addChat(this);
+    }
+
     @Override
     public int hashCode() {
-        return Objects.hash(chatId, linkUrl);
+        return Objects.hash(chatId, linkId);
     }
 }

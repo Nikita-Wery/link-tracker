@@ -15,4 +15,6 @@ public interface ChatLinkRepository {
     List<ChatLink> findChatLinksByChatId(long chatId);
 
     Optional<ChatLink> deleteChatLinkReturningChatLink(ChatLink chatLink);
+
+    List<ChatLink> findChatLinksThatTrackLink(List<Long> linkIds);
 }

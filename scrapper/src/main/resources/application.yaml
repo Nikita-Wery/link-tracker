@@ -20,8 +20,17 @@ spring:
 
 app:
   db:
-    access-type: sql
+    workers:
+      link-update:
+        batch-size: 12 # задаётся гибко по нагрузке, но расчитывается дефолту как scheduler.batch-size / scheduler.thread-pool-size
+        flush-timeout: 200
+        core-pool-size: 2
+        max-pool-size: 4
+        queue-capacity: 0
+    access-type: orm
   scheduler:
+    batch-size: 50
+    thread-pool-size: 4 # пул потоков, занимющихся походом за API
     interval-update-ms: 60000
   client:
     stackoverflow:

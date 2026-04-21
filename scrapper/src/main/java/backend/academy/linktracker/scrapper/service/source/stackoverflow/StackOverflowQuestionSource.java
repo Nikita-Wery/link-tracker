@@ -9,13 +9,15 @@ import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowQuest
 import backend.academy.linktracker.scrapper.properties.StackoverflowProperties;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class StackOverflowQuestionSource implements UpdateSource {
+public class StackOverflowQuestionSource implements UpdateSource<LinkUpdate> {
 
     private final StackOverflowClient stackOverflowClient;
     private final StackoverflowProperties stackoverflowProperties;
@@ -33,7 +35,9 @@ public class StackOverflowQuestionSource implements UpdateSource {
     }
 
     @Override
-    public UpdateEvent getUpdates(Link link) {
+    public List<LinkUpdate> getUpdates(Link link) {
+
+        List<LinkUpdate> updates = new ArrayList<>();
 
         Long questionId = extractQuestionId(link);
 
@@ -43,18 +47,14 @@ public class StackOverflowQuestionSource implements UpdateSource {
                 stackoverflowProperties.getKey(),
                 stackoverflowProperties.getAccessToken());
 
-        return new LinkUpdate(
-                link.getLinkId(),
-                URI.create(link.getUrl()),
-                buildDescription(update, link),
-                link.getTrackingChats().stream()
-                        .map(chatLink -> chatLink.getChat().getChatId())
-                        .collect(Collectors.toSet()),
-                link.getResourceType(),
-                update.lastUpdate());
+        if (update.lastUpdate().isAfter(link.getLatestUpdateTime())) {
+            updates.add(toLinkUpdate(update, link));
+        }
+
+        return updates;
     }
 
-    protected Long extractQuestionId(Link link) {
+    private Long extractQuestionId(Link link) {
 
         if (!link.getResourceType().equals(ResourceType.STACKOVERFLOW_QUESTION)) {
             log.error("The URL format: {}, does not match with {}", link.getUrl(), ResourceType.STACKOVERFLOW_QUESTION);
@@ -64,8 +64,20 @@ public class StackOverflowQuestionSource implements UpdateSource {
         return (Long) link.getResourceType().parser().parse(URI.create(link.getUrl()));
     }
 
-    protected String buildDescription(StackOverflowQuestionUpdateTime updateTime, Link link) {
+    private String buildDescription(StackOverflowQuestionUpdateTime updateTime, Link link) {
         return "Вопрос с id %s, по ссылке %s, обновлён в %s, последний push %s"
                 .formatted(updateTime.questionId(), link.getUrl(), updateTime.lastUpdate(), updateTime.lastEdit());
+    }
+
+    private LinkUpdate toLinkUpdate(StackOverflowQuestionUpdateTime update, Link link) {
+        return new LinkUpdate(
+            link.getLinkId(),
+            URI.create(link.getUrl()),
+            buildDescription(update, link),
+            link.getTrackingChats().stream()
+                .map(chatLink -> chatLink.getChat().getChatId())
+                .collect(Collectors.toSet()),
+            link.getResourceType(),
+            update.lastUpdate());
     }
 }

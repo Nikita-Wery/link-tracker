@@ -3,7 +3,7 @@ package backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.re
 import backend.academy.linktracker.scrapper.client.inner.RestBotClient;
 import backend.academy.linktracker.scrapper.client.responsehandler.BotBadResponseHandler;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
-import backend.academy.linktracker.scrapper.properties.BotProperties;
+import backend.academy.linktracker.scrapper.properties.SchedulerProperties;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +25,7 @@ public class RestBotClientConfiguration {
     }
 
     @Bean
-    public RestBotClient botClient(BotBadResponseHandler handler, BotProperties properties) {
+    public RestBotClient botClient(BotBadResponseHandler handler, SchedulerProperties properties) {
 
         RestClient restClient = RestClient.builder()
                 .baseUrl(properties.getHost())
