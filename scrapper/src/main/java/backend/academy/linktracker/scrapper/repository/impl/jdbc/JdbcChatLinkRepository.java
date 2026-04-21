@@ -33,7 +33,7 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
 
     // language=sql
     private static final String INSERT_CHATLINK =
-            "INSERT INTO chat_link (chat_link_id, chat_id, link_url) VALUES (:chatLinkId, :chatId, :linkUrl)";
+            "INSERT INTO chat_link (chat_link_id, chat_id, link_id) VALUES (:chatLinkId, :chatId, :linkId)";
 
     // language=sql
     private static final String EXISTS_BY_ID =
@@ -48,10 +48,9 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
 
     // language=sql
     private static final String SELECT_FULL_CHATLINKS_BY_CHATID = """
-        SELECT cl.chat_link_id, cl.chat_id, cl.link_url, l.link_id, l.resource_type, l.latest_update_time, t.tag
-        FROM chat_link cl
-        JOIN links l ON cl.link_url = l.url
-        JOIN chats c ON cl.chat_id = c.chat_id
+        SELECT cl.chat_link_id, cl.chat_id, cl.link_id, l.link_url, l.resource_type, l.latest_update_time, t.tag
+        FROM links l
+        JOIN chat_link cl ON l.link_id = cl.link_id
         LEFT JOIN chat_link_tags t ON cl.chat_link_id = t.chat_link_id
         WHERE cl.chat_id = :chatId
         """;
@@ -63,7 +62,10 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
     private static final String DELETE_BY_CHATID_URL_RETURNING_CHATLINK = """
         WITH deleted_cl AS (
             DELETE FROM chat_link
-            WHERE chat_id = :chatId AND link_url = :linkUrl
+            WHERE chat_id = :chatId
+              AND link_id = (
+                  SELECT link_id FROM link WHERE url = :linkUrl
+              )
             RETURNING chat_link_id
         ),
         deleted_tags AS (
@@ -71,11 +73,18 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
             WHERE chat_link_id IN (SELECT chat_link_id FROM deleted_cl)
             RETURNING chat_link_id, tag
         )
-        SELECT
-            d.chat_link_id,
-            t.tag
+        SELECT d.chat_link_id, t.tag
         FROM deleted_cl d
         LEFT JOIN deleted_tags t ON d.chat_link_id = t.chat_link_id;
+        """;
+
+    // language=sql
+    private static final String SELECT_FULL_CHATLINKS_BY_LINK_IDS = """
+        SELECT cl.chat_link_id, cl.chat_id, cl.link_id, l.link_url, l.resource_type, l.latest_update_time, t.tag
+        FROM links l
+        JOIN chat_link cl ON l.link_id = cl.link_id
+        LEFT JOIN chat_link_tags t ON cl.chat_link_id = t.chat_link_id
+        WHERE cl.link_id IN (:ids);
         """;
 
     // language=sql
@@ -92,7 +101,7 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
                 .sql(INSERT_CHATLINK)
                 .param("chatLinkId", chatLinkId)
                 .param("chatId", chatLink.getChat().getChatId())
-                .param("linkUrl", chatLink.getLink().getUrl())
+                .param("linkId", chatLink.getLink().getLinkId())
                 .update();
 
         chatLink.setChatLinkId(chatLinkId);
@@ -185,6 +194,47 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
                 });
 
         return result;
+    }
+
+    @Override
+    public List<ChatLink> findChatLinksThatTrackLink(List<Long> linkIds) {
+        Map<Long, ChatLink> foundChatLinks = new LinkedHashMap<>();
+
+        return jdbcClient
+                .sql(SELECT_FULL_CHATLINKS_BY_LINK_IDS)
+                .param("ids", linkIds)
+                .query(rs -> {
+                    while (rs.next()) {
+
+                        Long chatLinkId = rs.getLong("chat_link_id");
+
+                        ChatLink chatLink = foundChatLinks.get(chatLinkId);
+
+                        if (chatLink == null) {
+
+                            Link link = new Link(
+                                    rs.getString("link_url"),
+                                    ResourceType.valueOf(rs.getString("resource_type")),
+                                    rs.getObject("latest_update_time", OffsetDateTime.class));
+
+                            link.setLinkId(rs.getLong("link_id"));
+
+                            Chat chat = new Chat(rs.getLong("chat_id"));
+
+                            chatLink = new ChatLink(link, chat);
+                            chatLink.setChatLinkId(chatLinkId);
+
+                            foundChatLinks.put(chatLinkId, chatLink);
+                        }
+
+                        String tag = rs.getString("tag");
+                        if (tag != null) {
+                            chatLink.getTags().add(tag);
+                        }
+                    }
+
+                    return new ArrayList<>(foundChatLinks.values());
+                });
     }
 
     @SuppressFBWarnings(

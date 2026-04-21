@@ -1,7 +1,7 @@
 CREATE TABLE chat_link (
     chat_link_id BIGINT PRIMARY KEY DEFAULT nextval('chat_link_sequence'),
     chat_id BIGINT NOT NULL,
-    link_url TEXT NOT NULL,
+    link_id BIGINT NOT NULL,
 
     CONSTRAINT fk_chat_link_chat
         FOREIGN KEY (chat_id)
@@ -9,8 +9,8 @@ CREATE TABLE chat_link (
         ON DELETE CASCADE,
 
     CONSTRAINT fk_chat_link_link
-        FOREIGN KEY (link_url)
-        REFERENCES links(url)
+        FOREIGN KEY (link_id)
+        REFERENCES links(link_id)
         ON DELETE CASCADE,
 
     CONSTRAINT unq_chatid_linkurl

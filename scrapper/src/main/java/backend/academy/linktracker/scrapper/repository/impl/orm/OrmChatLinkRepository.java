@@ -44,4 +44,9 @@ public class OrmChatLinkRepository implements ChatLinkRepository {
         result.ifPresent(jpaChatLinkRepository::delete);
         return result;
     }
+
+    @Override
+    public List<ChatLink> findChatLinksThatTrackLink(List<Long> linkIds) {
+        return jpaChatLinkRepository.findChatIdsThatTrackLinks(linkIds);
+    }
 }

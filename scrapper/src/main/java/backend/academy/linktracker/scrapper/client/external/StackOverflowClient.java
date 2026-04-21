@@ -1,6 +1,9 @@
 package backend.academy.linktracker.scrapper.client.external;
 
+import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowAnswerResponse;
+import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowCommentResponse;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowQuestionUpdateTime;
+import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowWrapper;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
@@ -15,4 +18,16 @@ public interface StackOverflowClient {
             @RequestParam("site") String site,
             @RequestParam("key") String key,
             @RequestParam("access_token") String accessToken);
+
+    @GetExchange("/questions/{id}/answers")
+    StackOverflowWrapper<StackOverflowAnswerResponse> getAnswerUpdates(
+            @PathVariable long id,
+            @RequestParam("site") String site
+    );
+
+    @GetExchange("/questions/{id}/comments")
+    StackOverflowWrapper<StackOverflowCommentResponse> getCommentUpdates(
+            @PathVariable long id,
+            @RequestParam("site") String site
+    );
 }

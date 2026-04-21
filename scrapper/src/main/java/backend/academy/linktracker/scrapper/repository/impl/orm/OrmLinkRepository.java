@@ -1,7 +1,9 @@
 package backend.academy.linktracker.scrapper.repository.impl.orm;
 
 import backend.academy.linktracker.scrapper.domain.Link;
+import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
+import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcHelper;
 import backend.academy.linktracker.scrapper.repository.impl.orm.jpa.JpaLinkRepository;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -11,6 +13,7 @@ import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
@@ -18,10 +21,11 @@ import org.springframework.stereotype.Repository;
 @AllArgsConstructor
 public class OrmLinkRepository implements LinkRepository {
 
-    private JpaLinkRepository jpaLinkRepository;
+    private final JpaLinkRepository jpaLinkRepository;
+    private final JdbcHelper jdbcHelper;
 
     @Override
-    public List<Link> findByLinkIdGreaterThan(long lastLinkId, int size) {
+    public Slice<Link> findByLinkIdGreaterThan(long lastLinkId, int size) {
         Pageable page = PageRequest.of(0, size, Sort.by("linkId").ascending());
         return jpaLinkRepository.findLinkByLinkIdGreaterThan(lastLinkId, page);
     }
@@ -29,6 +33,11 @@ public class OrmLinkRepository implements LinkRepository {
     @Override
     public void updateLastUpdate(Link link, OffsetDateTime newLatestUpdateTime) {
         jpaLinkRepository.updateLastUpdate(link.getLinkId(), newLatestUpdateTime);
+    }
+
+    @Override
+    public void updateLastUpdateBatch(List<UpdateLinkDto> batch, int batchSize) {
+        jdbcHelper.updateLastUpdateBatch(batch, batchSize);
     }
 
     @Override

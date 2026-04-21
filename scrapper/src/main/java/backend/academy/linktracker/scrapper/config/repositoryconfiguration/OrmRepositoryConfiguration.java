@@ -3,6 +3,7 @@ package backend.academy.linktracker.scrapper.config.repositoryconfiguration;
 import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
 import backend.academy.linktracker.scrapper.repository.ChatRepository;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
+import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcHelper;
 import backend.academy.linktracker.scrapper.repository.impl.orm.OrmChatLinkRepository;
 import backend.academy.linktracker.scrapper.repository.impl.orm.OrmChatRepository;
 import backend.academy.linktracker.scrapper.repository.impl.orm.OrmLinkRepository;
@@ -31,8 +32,8 @@ public class OrmRepositoryConfiguration {
     }
 
     @Bean
-    public LinkRepository linkRepository(JpaLinkRepository linkRepository) {
-        return new OrmLinkRepository(linkRepository);
+    public LinkRepository linkRepository(JpaLinkRepository linkRepository, JdbcHelper jdbcHelper) {
+        return new OrmLinkRepository(linkRepository, jdbcHelper);
     }
 
     @Bean

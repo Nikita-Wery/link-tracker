@@ -1,6 +1,7 @@
 package backend.academy.linktracker.scrapper.dto;
 
 import backend.academy.linktracker.scrapper.config.ResourceType;
+
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.Set;
