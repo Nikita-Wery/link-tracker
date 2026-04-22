@@ -56,7 +56,7 @@ public class GithubRepositoryIssueSource implements UpdateSource<LinkUpdate> {
                         response.title(),
                         response.user().login(),
                         link.getUrl(),
-                        TextMessageHandler.ShortenMessage(response.body()),
+                        TextMessageHandler.shortenMessage(response.body()),
                         response.updatedAt());
     }
 

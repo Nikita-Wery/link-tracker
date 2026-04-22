@@ -63,7 +63,7 @@ public class StackOverflowCommentsSource implements UpdateSource<LinkUpdate> {
                         link.getUrl(),
                         update.user().name(),
                         Instant.ofEpochSecond(update.createdAt()),
-                        TextMessageHandler.ShortenMessage(update.body()));
+                        TextMessageHandler.shortenMessage(update.body()));
     }
 
     private LinkUpdate toLinkUpdate(StackOverflowCommentResponse update, Link link) {
