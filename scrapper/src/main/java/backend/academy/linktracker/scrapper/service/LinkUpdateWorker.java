@@ -18,26 +18,43 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class LinkUpdateWorker {
 
-    private final BlockingQueue<UpdateLinkDto> queue = new LinkedBlockingQueue<>();
+    private final BlockingQueue<UpdateLinkDto> queue;
     private final LinkService linkService;
     private final ThreadPoolTaskExecutor executor;
-
-    private final int BATCH_SIZE;
-    private final long FLUSH_TIMEOUT_MS;
+    private final LinkUpdateWorkerProperties properties;
 
     public LinkUpdateWorker(
             LinkService linkService,
             @Qualifier("linkUpdateWorkerExecutor") ThreadPoolTaskExecutor executor,
             LinkUpdateWorkerProperties properties) {
 
+        this.queue = new LinkedBlockingQueue<>(properties.getMaximumNumberOfNotUpdatedLinks());
         this.executor = executor;
-        this.BATCH_SIZE = properties.getBatchSize();
-        this.FLUSH_TIMEOUT_MS = properties.getFlushTimeout();
+        this.properties = properties;
         this.linkService = linkService;
     }
 
     public void submit(UpdateLinkDto item) {
-        queue.offer(item);
+        long start = System.nanoTime();
+
+        try {
+            queue.put(item);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.info("Thread {} was interrupted", Thread.currentThread().getName());
+        }
+
+        long tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+
+        if (tookMs > 10) {
+            log.warn(
+                    "LinkUpdateWorkers are overloaded," + " the current time to add tasks is {},"
+                            + " total workers {}"
+                            + " flush timeout {}",
+                    tookMs,
+                    properties.getMaxPoolSize(),
+                    properties.getFlushTimeout());
+        }
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -55,26 +72,28 @@ public class LinkUpdateWorker {
                 "LinkUpdateWorker {} has started its work",
                 Thread.currentThread().getName());
 
-        List<UpdateLinkDto> buffer = new ArrayList<>(BATCH_SIZE);
+        List<UpdateLinkDto> buffer = new ArrayList<>(properties.getBatchSize());
 
-        while (!Thread.currentThread().isInterrupted() && !queue.isEmpty()) {
+        while (!Thread.currentThread().isInterrupted()) {
             try {
 
-                UpdateLinkDto first = queue.poll(FLUSH_TIMEOUT_MS, TimeUnit.MILLISECONDS);
+                UpdateLinkDto first = queue.poll(properties.getFlushTimeout(), TimeUnit.MILLISECONDS);
 
                 if (first != null) {
                     buffer.add(first);
                 }
 
-                queue.drainTo(buffer, BATCH_SIZE - buffer.size());
+                queue.drainTo(buffer, properties.getBatchSize() - buffer.size());
 
                 if (!buffer.isEmpty()) {
-                    linkService.updateLastUpdateBatch(buffer, BATCH_SIZE);
+                    linkService.updateLastUpdateBatch(buffer, properties.getBatchSize());
                     buffer.clear();
                 }
 
             } catch (InterruptedException e) {
-                log.info("LinkUpdateWorker: {}", Thread.currentThread().getName(), " interrupted.");
+                log.info(
+                        "LinkUpdateWorker: {} interrupted",
+                        Thread.currentThread().getName());
                 Thread.currentThread().interrupt();
             }
         }

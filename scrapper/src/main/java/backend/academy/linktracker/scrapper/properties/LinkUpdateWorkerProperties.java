@@ -17,6 +17,9 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 public class LinkUpdateWorkerProperties {
 
+    @Min(8000)
+    private int maximumNumberOfNotUpdatedLinks;
+
     @Min(1)
     private int batchSize;
 

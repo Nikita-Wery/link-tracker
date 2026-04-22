@@ -7,6 +7,7 @@ import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowCommentResponse;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowWrapper;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
+import backend.academy.linktracker.scrapper.utils.TextMessageHandler;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
@@ -56,8 +57,13 @@ public class StackOverflowCommentsSource implements UpdateSource<LinkUpdate> {
     }
 
     private String buildDescription(StackOverflowCommentResponse update, Link link) {
-        return "Добавлен комментарий с id: %s, по ссылке %s, пользователем %s, в %s"
-                .formatted(update.id(), link.getUrl(), update.user().name(), Instant.ofEpochSecond(update.createdAt()));
+        return "Добавлен комментарий с id: %s, по ссылке %s, в %s%nПользователь добавивший комментарий: %s%nТекст комментария: %s"
+                .formatted(
+                        update.id(),
+                        link.getUrl(),
+                        update.user().name(),
+                        Instant.ofEpochSecond(update.createdAt()),
+                        TextMessageHandler.ShortenMessage(update.body()));
     }
 
     private LinkUpdate toLinkUpdate(StackOverflowCommentResponse update, Link link) {
