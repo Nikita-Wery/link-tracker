@@ -36,6 +36,6 @@ public class APIBadResponseHandler {
                 kv("method", request.getMethod().name()),
                 kv("uri", request.getURI().toString()));
 
-        throw new ExternalApiException("External API error", statusCode, request.getURI());
+        throw new ExternalApiException("External API error", body, statusCode, request.getURI());
     }
 }
