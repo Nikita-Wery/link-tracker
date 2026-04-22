@@ -7,6 +7,7 @@ import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowAnswerResponse;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowWrapper;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
+import backend.academy.linktracker.scrapper.utils.TextMessageHandler;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Comparator;
@@ -57,12 +58,13 @@ public class StackOverflowAnswersSource implements UpdateSource<LinkUpdate> {
     }
 
     private String buildDescription(StackOverflowAnswerResponse update, Link link) {
-        return "Ответ с id %s, по ссылке %s, обновлён в %s, пользователь изменивший ответ: %s"
+        return "Ответ с id %s, по ссылке %s, обновлён в %s%nПользователь изменивший ответ: %s%nТекст ответа теперь:%s"
                 .formatted(
                         update.id(),
                         link.getUrl(),
                         Instant.ofEpochSecond(update.updatedAt()),
-                        update.user().name());
+                        update.user().name(),
+                        TextMessageHandler.ShortenMessage(update.body()));
     }
 
     private LinkUpdate toLinkUpdate(StackOverflowAnswerResponse update, Link link) {

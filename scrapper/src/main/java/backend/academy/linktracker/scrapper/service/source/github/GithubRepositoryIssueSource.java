@@ -6,6 +6,7 @@ import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.github.GithubIssueResponse;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
+import backend.academy.linktracker.scrapper.utils.TextMessageHandler;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,12 +51,12 @@ public class GithubRepositoryIssueSource implements UpdateSource<LinkUpdate> {
     }
 
     private String buildDescription(GithubIssueResponse response, Link link) {
-        return "Github issue: %s, с автором %s, по ссылке %s, был обновлён %s"
+        return "Github issue: %s, с автором %s, по ссылке %s%nТекст issue %s%nБыл обновлён %s"
                 .formatted(
                         response.title(),
                         response.user().login(),
                         link.getUrl(),
-                        response.updatedAt(),
+                        TextMessageHandler.ShortenMessage(response.body()),
                         response.updatedAt());
     }
 

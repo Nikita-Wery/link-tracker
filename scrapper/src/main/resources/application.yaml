@@ -30,6 +30,7 @@ app:
         core-pool-size: 2
         max-pool-size: 4
         queue-capacity: 0
+        maximum-number-of-not-updated-links: 10000
     access-type: orm
   scheduler:
     batch-size: 50
