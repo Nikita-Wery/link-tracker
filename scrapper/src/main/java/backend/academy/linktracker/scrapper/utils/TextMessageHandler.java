@@ -5,7 +5,6 @@ public class TextMessageHandler {
     private static final int MAX_MESSAGE_LENGTH = 200;
 
     private TextMessageHandler() {}
-    ;
 
     public static String shortenMessage(String message) {
 
