@@ -25,7 +25,7 @@ public class GithubRepositorySource implements UpdateSource<LinkUpdate> {
 
     @Override
     public ResourceType getResourceType() {
-        return ResourceType.GITHUB_REPOSITORY_ISSUE;
+        return ResourceType.GITHUB_REPOSITORY;
     }
 
     @Override
@@ -46,8 +46,8 @@ public class GithubRepositorySource implements UpdateSource<LinkUpdate> {
 
     private String[] extractOwnerAndRepo(Link link) {
 
-        if (!link.getResourceType().equals(ResourceType.GITHUB_REPOSITORY_ISSUE)) {
-            log.error("The URL format: {}, does not match with {}", link.getUrl(), ResourceType.GITHUB_REPOSITORY_ISSUE);
+        if (!link.getResourceType().equals(ResourceType.GITHUB_REPOSITORY)) {
+            log.error("The URL format: {}, does not match with {}", link.getUrl(), ResourceType.GITHUB_REPOSITORY);
             throw new IllegalArgumentException("Invalid GitHub URL: " + link.getUrl());
         }
 
@@ -61,13 +61,13 @@ public class GithubRepositorySource implements UpdateSource<LinkUpdate> {
 
     private LinkUpdate toLinkUpdate(GithubRepositoryUpdateTime update, Link link) {
         return new LinkUpdate(
-            link.getLinkId(),
-            URI.create(link.getUrl()),
-            buildDescription(update, link),
-            link.getTrackingChats().stream()
-                .map(chatLink -> chatLink.getChat().getChatId())
-                .collect(Collectors.toSet()),
-            link.getResourceType(),
-            update.updateAt());
+                link.getLinkId(),
+                URI.create(link.getUrl()),
+                buildDescription(update, link),
+                link.getTrackingChats().stream()
+                        .map(chatLink -> chatLink.getChat().getChatId())
+                        .collect(Collectors.toSet()),
+                link.getResourceType(),
+                update.updateAt());
     }
 }

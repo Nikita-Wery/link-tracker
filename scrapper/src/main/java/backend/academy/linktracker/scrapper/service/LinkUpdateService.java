@@ -7,7 +7,6 @@ import backend.academy.linktracker.scrapper.dto.UpdateEvent;
 import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiException;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -24,9 +23,10 @@ public class LinkUpdateService {
     private final ApplicationEventPublisher publisher;
     private final LinkUpdateWorker linkUpdateWorker;
 
-    public LinkUpdateService(List<UpdateSource<LinkUpdate>> sources,
-                            ApplicationEventPublisher publisher,
-                            LinkUpdateWorker linkUpdateWorker) {
+    public LinkUpdateService(
+            List<UpdateSource<LinkUpdate>> sources,
+            ApplicationEventPublisher publisher,
+            LinkUpdateWorker linkUpdateWorker) {
 
         this.linkUpdateWorker = linkUpdateWorker;
         this.publisher = publisher;
@@ -50,7 +50,8 @@ public class LinkUpdateService {
                 return;
             }
 
-            linkUpdateWorker.submit(new UpdateLinkDto(link.getLinkId(), updateEvents.getLast().getLastUpdate()));
+            linkUpdateWorker.submit(
+                    new UpdateLinkDto(link.getLinkId(), updateEvents.getLast().getLastUpdate()));
 
             for (UpdateEvent event : updateEvents) {
                 publisher.publishEvent(event);
@@ -60,6 +61,4 @@ public class LinkUpdateService {
             log.warn("API exception was catched in {}", Thread.currentThread().getName());
         }
     }
-
 }
-

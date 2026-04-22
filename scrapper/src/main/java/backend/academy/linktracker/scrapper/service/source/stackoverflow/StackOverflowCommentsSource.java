@@ -7,12 +7,12 @@ import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowCommentResponse;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowWrapper;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -35,15 +35,14 @@ public class StackOverflowCommentsSource implements UpdateSource<LinkUpdate> {
 
         Long questionId = extractQuestionId(link);
 
-        StackOverflowWrapper<StackOverflowCommentResponse> response = stackOverflowClient.getCommentUpdates(
-                questionId,
-                "stackoverflow"
-        );
+        StackOverflowWrapper<StackOverflowCommentResponse> response =
+                stackOverflowClient.getCommentUpdates(questionId, "stackoverflow");
 
         return response.items().stream()
-            .filter(comment -> Instant.ofEpochSecond(comment.createdAt()).isAfter(link.getLatestUpdateTime().toInstant()))
-            .map(comment -> toLinkUpdate(comment, link))
-            .toList();
+                .filter(comment -> Instant.ofEpochSecond(comment.createdAt())
+                        .isAfter(link.getLatestUpdateTime().toInstant()))
+                .map(comment -> toLinkUpdate(comment, link))
+                .toList();
     }
 
     private Long extractQuestionId(Link link) {
@@ -63,13 +62,14 @@ public class StackOverflowCommentsSource implements UpdateSource<LinkUpdate> {
 
     private LinkUpdate toLinkUpdate(StackOverflowCommentResponse update, Link link) {
         return new LinkUpdate(
-            link.getLinkId(),
-            URI.create(link.getUrl()),
-            buildDescription(update, link),
-            link.getTrackingChats().stream()
-                .map(chatLink -> chatLink.getChat().getChatId())
-                .collect(Collectors.toSet()),
-            link.getResourceType(),
-            Instant.ofEpochSecond(update.createdAt()).atOffset(link.getLatestUpdateTime().getOffset()));
+                link.getLinkId(),
+                URI.create(link.getUrl()),
+                buildDescription(update, link),
+                link.getTrackingChats().stream()
+                        .map(chatLink -> chatLink.getChat().getChatId())
+                        .collect(Collectors.toSet()),
+                link.getResourceType(),
+                Instant.ofEpochSecond(update.createdAt())
+                        .atOffset(link.getLatestUpdateTime().getOffset()));
     }
 }

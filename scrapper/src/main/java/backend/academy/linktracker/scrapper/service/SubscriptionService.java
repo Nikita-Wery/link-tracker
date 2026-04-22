@@ -90,8 +90,28 @@ public class SubscriptionService {
                 .toList();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ListLinksResponse getProtoListLinksResponseByChatId(long chatId) {
         return grpcMapper.listOfLinksToLinksResponse(getTrackedLinksByChatId(chatId));
+    }
+
+    @Transactional
+    public LinkResponse trackLinkReturnLinkResponse(ChatLink chatLink) {
+        return dtoEntityMapper.linkToLinkResponse(trackLink(chatLink));
+    }
+
+    @Transactional
+    public LinkResponse untrackLinkReturnLinkResponse(ChatLink chatLink) {
+        return dtoEntityMapper.linkToLinkResponse(untrackLink(chatLink));
+    }
+
+    @Transactional
+    public backend.academy.linktracker.proto.LinkResponse trackLinkReturnProtoLinkResponse(ChatLink chatLink) {
+        return grpcMapper.linkToGrpcLinkResponse(trackLink(chatLink));
+    }
+
+    @Transactional
+    public backend.academy.linktracker.proto.LinkResponse untrackLinkReturnProtoLinkResponse(ChatLink chatLink) {
+        return grpcMapper.linkToGrpcLinkResponse(untrackLink(chatLink));
     }
 }

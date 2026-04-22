@@ -42,7 +42,10 @@ public class OrmLinkRepository implements LinkRepository {
 
     @Override
     public Link save(Link link) {
-        return jpaLinkRepository.save(link);
+        long linkId = jpaLinkRepository.upsertAndGetId(
+                link.getUrl(), link.getResourceType().name(), link.getLatestUpdateTime());
+        link.setLinkId(linkId);
+        return link;
     }
 
     @Override

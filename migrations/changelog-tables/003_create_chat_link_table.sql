@@ -14,5 +14,5 @@ CREATE TABLE chat_link (
         ON DELETE CASCADE,
 
     CONSTRAINT unq_chatid_linkurl
-        UNIQUE (chat_id, link_url)
+        UNIQUE (chat_id, link_id)
 );

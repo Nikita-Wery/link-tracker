@@ -1,20 +1,21 @@
 package backend.academy.linktracker.scrapper.service;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiException;
+import backend.academy.linktracker.scrapper.properties.ApiWorkersProperties;
 import backend.academy.linktracker.scrapper.properties.SchedulerProperties;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Slice;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
-
-import static net.logstash.logback.argument.StructuredArguments.kv;
 
 @Slf4j
 @Service
@@ -22,16 +23,19 @@ public class LinkUpdateScheduler {
 
     private final LinkUpdateService linkUpdateService;
     private final LinkService linkService;
-    private final ExecutorService executorService;
+    private final ThreadPoolTaskExecutor executor;
     private final SchedulerProperties schedulerProperties;
+    private final ApiWorkersProperties apiWorkersProperties;
 
     public LinkUpdateScheduler(
             LinkUpdateService linkUpdateService,
             LinkService linkService,
-            @Qualifier("externalApiExecutor") ExecutorService executor,
-            SchedulerProperties schedulerProperties) {
+            @Qualifier("externalApiExecutor") ThreadPoolTaskExecutor executor,
+            SchedulerProperties schedulerProperties,
+            ApiWorkersProperties apiWorkerProperties) {
 
-        this.executorService = executor;
+        this.executor = executor;
+        this.apiWorkersProperties = apiWorkerProperties;
         this.schedulerProperties = schedulerProperties;
         this.linkUpdateService = linkUpdateService;
         this.linkService = linkService;
@@ -55,13 +59,13 @@ public class LinkUpdateScheduler {
             processMultithreadBatchLinks(linksLastBatch.getContent());
             lastId = linksLastBatch.getContent().getLast().getLinkId();
         } while (linksLastBatch.hasNext());
-
     }
 
     @SuppressFBWarnings(
-        value = "SLF4J_PLACE_HOLDER_MISMATCH",
-        justification = "Используем StructuredArguments для JSON, placeholders не нужны")
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public void processBatchLinks(List<Link> links) {
+        log.info("ApiWorker {} has started its work", Thread.currentThread().getName());
 
         for (Link link : links) {
             try {
@@ -82,14 +86,14 @@ public class LinkUpdateScheduler {
 
         for (List<Link> linksChunk : dividedBatch) {
 
-            executorService.submit(() -> processBatchLinks(linksChunk));
+            executor.submit(() -> processBatchLinks(linksChunk));
         }
     }
 
     private List<List<Link>> splitBatchIntoChunks(List<Link> batchLinks) {
 
-        int batchSize = Math.min(batchLinks.size(), 1) ;
-        int threadPoolSize = schedulerProperties.getThreadPoolSize();
+        int batchSize = Math.min(batchLinks.size(), 1);
+        int threadPoolSize = apiWorkersProperties.getThreadPoolSize();
 
         if (batchSize < threadPoolSize) return List.of(batchLinks);
 
@@ -102,5 +106,4 @@ public class LinkUpdateScheduler {
 
         return linkChunks;
     }
-
 }

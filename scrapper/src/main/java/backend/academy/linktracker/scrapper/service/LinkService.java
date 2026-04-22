@@ -65,35 +65,27 @@ public class LinkService {
 
         Slice<Link> slice = linkRepository.findByLinkIdGreaterThan(lastLinkId, size);
 
-        List<ChatLink> chatsThatTrackLinks = chatLinkRepository.findChatLinksThatTrackLink(
-            slice.getContent().stream().map(chatlink -> chatlink.getLinkId()).toList());
+        List<ChatLink> chatsThatTrackLinks = chatLinkRepository.findChatLinksThatTrackLink(slice.getContent().stream()
+                .map(chatlink -> chatlink.getLinkId())
+                .toList());
 
-        Map<Long, Link> futureLinkUpdates = slice.getContent()
-            .stream().collect(Collectors.toMap(l -> l.getLinkId(), l -> {
-
+        Map<Long, Link> futureLinkUpdates = slice.getContent().stream()
+                .collect(Collectors.toMap(l -> l.getLinkId(), l -> {
                     Link futureUpdatedLink = new Link(l.getUrl(), l.getResourceType(), l.getLatestUpdateTime());
                     futureUpdatedLink.setLinkId(l.getLinkId());
 
                     return futureUpdatedLink;
-                }
-            ));
+                }));
 
         for (ChatLink chatLink : chatsThatTrackLinks) {
-            futureLinkUpdates
-                .get(chatLink.getLinkId())
-                .getTrackingChats()
-                .add(chatLink);
+            futureLinkUpdates.get(chatLink.getLinkId()).getTrackingChats().add(chatLink);
         }
 
         List<Link> result = slice.getContent().stream()
-            .map(l -> futureLinkUpdates.get(l.getLinkId()))
-            .toList();
+                .map(l -> futureLinkUpdates.get(l.getLinkId()))
+                .toList();
 
-        return new SliceImpl<>(
-            result,
-            slice.getPageable(),
-            slice.hasNext()
-        );
+        return new SliceImpl<>(result, slice.getPageable(), slice.hasNext());
     }
 
     @Transactional

@@ -28,8 +28,8 @@ import org.hibernate.annotations.Immutable;
         name = "chat_link",
         uniqueConstraints =
                 @UniqueConstraint(
-                        name = "unq_chatid_linkurl",
-                        columnNames = {"chat_id", "link_url"}))
+                        name = "unq_chatid_linkid",
+                        columnNames = {"chat_id", "link_id"}))
 @Getter
 @Setter
 @NoArgsConstructor

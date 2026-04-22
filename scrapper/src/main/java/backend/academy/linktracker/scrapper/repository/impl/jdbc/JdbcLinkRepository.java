@@ -74,9 +74,7 @@ public class JdbcLinkRepository implements LinkRepository {
 
         boolean hasNext = result.size() > size;
 
-        List<Link> content = hasNext
-                ? result.subList(0, size)
-                : result;
+        List<Link> content = hasNext ? result.subList(0, size) : result;
 
         return new SliceImpl<>(content, PageRequest.of(0, size), hasNext);
     }

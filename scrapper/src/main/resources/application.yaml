@@ -14,9 +14,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+    open-in-view: false
+    show-sql: true
   grpc:
     server:
       port: 9091
+
 
 app:
   db:
@@ -30,9 +33,11 @@ app:
     access-type: orm
   scheduler:
     batch-size: 50
-    thread-pool-size: 4 # пул потоков, занимющихся походом за API
     interval-update-ms: 60000
   client:
+    api-workers:
+      thread-pool-size: 4 # пул потоков, занимющихся походом за API
+      queue-capacity: 10
     stackoverflow:
       host: https://api.stackexchange.com/2.3
       key: ${STACKOVERFLOW_KEY} # Use env variable. DO NOT KEEP TOKEN HERE
@@ -48,3 +53,6 @@ app:
           enabled: true
         grpc:
           enabled: false
+logging:
+  level:
+    org.hibernate.sql: DEBUG
