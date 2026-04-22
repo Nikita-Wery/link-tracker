@@ -11,6 +11,7 @@ import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -129,43 +130,11 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
 
     @Override
     public List<ChatLink> findChatLinksByChatId(long chatId) {
-        Map<Long, ChatLink> foundChatLinks = new LinkedHashMap<>();
 
         return jdbcClient
                 .sql(SELECT_FULL_CHATLINKS_BY_CHATID)
                 .param("chatId", chatId)
-                .query(rs -> {
-                    while (rs.next()) {
-
-                        Long chatLinkId = rs.getLong("chat_link_id");
-
-                        ChatLink chatLink = foundChatLinks.get(chatLinkId);
-
-                        if (chatLink == null) {
-
-                            Link link = new Link(
-                                    rs.getString("link_url"),
-                                    ResourceType.valueOf(rs.getString("resource_type")),
-                                    rs.getObject("latest_update_time", OffsetDateTime.class));
-
-                            link.setLinkId(rs.getLong("link_id"));
-
-                            Chat chat = new Chat(rs.getLong("chat_id"));
-
-                            chatLink = new ChatLink(link, chat);
-                            chatLink.setChatLinkId(chatLinkId);
-
-                            foundChatLinks.put(chatLinkId, chatLink);
-                        }
-
-                        String tag = rs.getString("tag");
-                        if (tag != null) {
-                            chatLink.getTags().add(tag);
-                        }
-                    }
-
-                    return new ArrayList<>(foundChatLinks.values());
-                });
+                .query(this::mapChatLinks);
     }
 
     @Override
@@ -198,43 +167,11 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
 
     @Override
     public List<ChatLink> findChatLinksThatTrackLink(List<Long> linkIds) {
-        Map<Long, ChatLink> foundChatLinks = new LinkedHashMap<>();
 
         return jdbcClient
                 .sql(SELECT_FULL_CHATLINKS_BY_LINK_IDS)
                 .param("ids", linkIds)
-                .query(rs -> {
-                    while (rs.next()) {
-
-                        Long chatLinkId = rs.getLong("chat_link_id");
-
-                        ChatLink chatLink = foundChatLinks.get(chatLinkId);
-
-                        if (chatLink == null) {
-
-                            Link link = new Link(
-                                    rs.getString("link_url"),
-                                    ResourceType.valueOf(rs.getString("resource_type")),
-                                    rs.getObject("latest_update_time", OffsetDateTime.class));
-
-                            link.setLinkId(rs.getLong("link_id"));
-
-                            Chat chat = new Chat(rs.getLong("chat_id"));
-
-                            chatLink = new ChatLink(link, chat);
-                            chatLink.setChatLinkId(chatLinkId);
-
-                            foundChatLinks.put(chatLinkId, chatLink);
-                        }
-
-                        String tag = rs.getString("tag");
-                        if (tag != null) {
-                            chatLink.getTags().add(tag);
-                        }
-                    }
-
-                    return new ArrayList<>(foundChatLinks.values());
-                });
+                .query(this::mapChatLinks);
     }
 
     @SuppressFBWarnings(
@@ -259,5 +196,41 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
         } finally {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
+    }
+
+    private List<ChatLink> mapChatLinks(ResultSet rs) throws SQLException {
+
+        Map<Long, ChatLink> foundChatLinks = new LinkedHashMap<>();
+
+        while (rs.next()) {
+
+            Long chatLinkId = rs.getLong("chat_link_id");
+
+            ChatLink chatLink = foundChatLinks.get(chatLinkId);
+
+            if (chatLink == null) {
+
+                Link link = new Link(
+                        rs.getString("link_url"),
+                        ResourceType.valueOf(rs.getString("resource_type")),
+                        rs.getObject("latest_update_time", OffsetDateTime.class));
+
+                link.setLinkId(rs.getLong("link_id"));
+
+                Chat chat = new Chat(rs.getLong("chat_id"));
+
+                chatLink = new ChatLink(link, chat);
+                chatLink.setChatLinkId(chatLinkId);
+
+                foundChatLinks.put(chatLinkId, chatLink);
+            }
+
+            String tag = rs.getString("tag");
+            if (tag != null) {
+                chatLink.getTags().add(tag);
+            }
+        }
+
+        return new ArrayList<>(foundChatLinks.values());
     }
 }
