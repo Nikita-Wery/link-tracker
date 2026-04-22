@@ -3,16 +3,10 @@ package backend.academy.linktracker.scrapper.dto.stackoverflow;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record StackOverflowCommentResponse(
+        @JsonProperty("comment_id") long id,
 
-    @JsonProperty("comment_id")
-    long id,
+        @JsonProperty("owner") StackOverflowUserResponse user,
 
-    @JsonProperty("owner")
-    StackOverflowUserResponse user,
+        @JsonProperty("creation_date") long createdAt,
 
-    @JsonProperty("creation_date")
-    long createdAt,
-
-    String body
-) {
-}
+        String body) {}

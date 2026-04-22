@@ -1,7 +1,6 @@
 package backend.academy.linktracker.scrapper.properties;
 
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,26 +8,17 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "app.db.workers.link-update")
+@ConfigurationProperties(prefix = "app.client.api-workers")
 @Validated
 @Getter
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-public class LinkUpdateWorkerProperties {
+public class ApiWorkersProperties {
 
     @Min(1)
-    private int batchSize;
-
-    @Min(50)
-    private long flushTimeout;
+    private int threadPoolSize;
 
     @Min(1)
-    private int corePoolSize;
-
-    @Min(1)
-    private int maxPoolSize;
-
-    @PositiveOrZero
     private int queueCapacity;
 }

@@ -7,14 +7,13 @@ import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowAnswerResponse;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowWrapper;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -36,16 +35,15 @@ public class StackOverflowAnswersSource implements UpdateSource<LinkUpdate> {
 
         Long questionId = extractQuestionId(link);
 
-        StackOverflowWrapper<StackOverflowAnswerResponse> response = stackOverflowClient.getAnswerUpdates(
-            questionId,
-            "stackoverflow"
-        );
+        StackOverflowWrapper<StackOverflowAnswerResponse> response =
+                stackOverflowClient.getAnswerUpdates(questionId, "stackoverflow");
 
         return response.items().stream()
-            .filter(answer -> Instant.ofEpochSecond(answer.updatedAt()).isAfter(link.getLatestUpdateTime().toInstant()))
-            .map(answer -> toLinkUpdate(answer, link))
-            .sorted(Comparator.comparing(LinkUpdate::getLastUpdate))
-            .toList();
+                .filter(answer -> Instant.ofEpochSecond(answer.updatedAt())
+                        .isAfter(link.getLatestUpdateTime().toInstant()))
+                .map(answer -> toLinkUpdate(answer, link))
+                .sorted(Comparator.comparing(LinkUpdate::getLastUpdate))
+                .toList();
     }
 
     private Long extractQuestionId(Link link) {
@@ -60,18 +58,23 @@ public class StackOverflowAnswersSource implements UpdateSource<LinkUpdate> {
 
     private String buildDescription(StackOverflowAnswerResponse update, Link link) {
         return "Ответ с id %s, по ссылке %s, обновлён в %s, пользователь изменивший ответ: %s"
-                .formatted(update.id(), link.getUrl(), Instant.ofEpochSecond(update.updatedAt()), update.user().name());
+                .formatted(
+                        update.id(),
+                        link.getUrl(),
+                        Instant.ofEpochSecond(update.updatedAt()),
+                        update.user().name());
     }
 
     private LinkUpdate toLinkUpdate(StackOverflowAnswerResponse update, Link link) {
         return new LinkUpdate(
-            link.getLinkId(),
-            URI.create(link.getUrl()),
-            buildDescription(update, link),
-            link.getTrackingChats().stream()
-                .map(chatLink -> chatLink.getChat().getChatId())
-                .collect(Collectors.toSet()),
-            link.getResourceType(),
-            Instant.ofEpochSecond(update.updatedAt()).atOffset(link.getLatestUpdateTime().getOffset()));
+                link.getLinkId(),
+                URI.create(link.getUrl()),
+                buildDescription(update, link),
+                link.getTrackingChats().stream()
+                        .map(chatLink -> chatLink.getChat().getChatId())
+                        .collect(Collectors.toSet()),
+                link.getResourceType(),
+                Instant.ofEpochSecond(update.updatedAt())
+                        .atOffset(link.getLatestUpdateTime().getOffset()));
     }
 }

@@ -1,11 +1,11 @@
 package backend.academy.linktracker.scrapper.config.executorsconfiguration;
 
+import backend.academy.linktracker.scrapper.properties.ApiWorkersProperties;
 import backend.academy.linktracker.scrapper.properties.LinkUpdateWorkerProperties;
-import backend.academy.linktracker.scrapper.properties.SchedulerProperties;
+import java.util.concurrent.ThreadPoolExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 public class ExecutorsConfiguration {
@@ -25,14 +25,14 @@ public class ExecutorsConfiguration {
     }
 
     @Bean(name = "externalApiExecutor")
-    public ThreadPoolTaskExecutor externalApiExecutor(SchedulerProperties schedulerProperties) {
+    public ThreadPoolTaskExecutor externalApiExecutor(ApiWorkersProperties apiWorkersProperties) {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
-        executor.setCorePoolSize(schedulerProperties.getThreadPoolSize());
-        executor.setMaxPoolSize(schedulerProperties.getThreadPoolSize());
-        executor.setQueueCapacity(schedulerProperties.getQueueCapacity());
+        executor.setCorePoolSize(apiWorkersProperties.getThreadPoolSize());
+        executor.setMaxPoolSize(apiWorkersProperties.getThreadPoolSize());
+        executor.setQueueCapacity(apiWorkersProperties.getQueueCapacity());
 
-        executor.setThreadNamePrefix("link-worker-");
+        executor.setThreadNamePrefix("link-api-worker-");
 
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 
@@ -40,5 +40,4 @@ public class ExecutorsConfiguration {
 
         return executor;
     }
-
 }

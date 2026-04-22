@@ -4,7 +4,6 @@ import backend.academy.linktracker.scrapper.client.external.StackOverflowClient;
 import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
-import backend.academy.linktracker.scrapper.dto.UpdateEvent;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowQuestionUpdateTime;
 import backend.academy.linktracker.scrapper.properties.StackoverflowProperties;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
@@ -71,13 +70,13 @@ public class StackOverflowQuestionSource implements UpdateSource<LinkUpdate> {
 
     private LinkUpdate toLinkUpdate(StackOverflowQuestionUpdateTime update, Link link) {
         return new LinkUpdate(
-            link.getLinkId(),
-            URI.create(link.getUrl()),
-            buildDescription(update, link),
-            link.getTrackingChats().stream()
-                .map(chatLink -> chatLink.getChat().getChatId())
-                .collect(Collectors.toSet()),
-            link.getResourceType(),
-            update.lastUpdate());
+                link.getLinkId(),
+                URI.create(link.getUrl()),
+                buildDescription(update, link),
+                link.getTrackingChats().stream()
+                        .map(chatLink -> chatLink.getChat().getChatId())
+                        .collect(Collectors.toSet()),
+                link.getResourceType(),
+                update.lastUpdate());
     }
 }

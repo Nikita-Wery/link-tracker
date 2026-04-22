@@ -2,18 +2,17 @@ package backend.academy.linktracker.scrapper.service;
 
 import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
 import backend.academy.linktracker.scrapper.properties.LinkUpdateWorkerProperties;
-import backend.academy.linktracker.scrapper.repository.LinkRepository;
-import jakarta.annotation.PreDestroy;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
@@ -26,10 +25,11 @@ public class LinkUpdateWorker {
     private final int BATCH_SIZE;
     private final long FLUSH_TIMEOUT_MS;
 
-    public LinkUpdateWorker(LinkRepository linkRepository,
-                            LinkUpdateWorkerProperties properties,
-                            ThreadPoolTaskExecutor executor,
-                            LinkService linkService) {
+    public LinkUpdateWorker(
+            LinkService linkService,
+            @Qualifier("linkUpdateWorkerExecutor") ThreadPoolTaskExecutor executor,
+            LinkUpdateWorkerProperties properties) {
+
         this.executor = executor;
         this.BATCH_SIZE = properties.getBatchSize();
         this.FLUSH_TIMEOUT_MS = properties.getFlushTimeout();
@@ -51,6 +51,9 @@ public class LinkUpdateWorker {
     }
 
     public void runWorker() {
+        log.info(
+                "LinkUpdateWorker {} has started its work",
+                Thread.currentThread().getName());
 
         List<UpdateLinkDto> buffer = new ArrayList<>(BATCH_SIZE);
 
@@ -71,11 +74,9 @@ public class LinkUpdateWorker {
                 }
 
             } catch (InterruptedException e) {
-                log.info("LinkUpdateWorker: " + Thread.currentThread().getName(), " interrupted.");
+                log.info("LinkUpdateWorker: {}", Thread.currentThread().getName(), " interrupted.");
                 Thread.currentThread().interrupt();
             }
         }
     }
-
 }
-

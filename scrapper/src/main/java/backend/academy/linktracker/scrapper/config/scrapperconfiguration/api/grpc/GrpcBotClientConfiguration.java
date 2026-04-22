@@ -4,7 +4,7 @@ import backend.academy.linktracker.proto.BotServiceGrpc;
 import backend.academy.linktracker.scrapper.client.inner.GrpcBotClient;
 import backend.academy.linktracker.scrapper.client.responsehandler.GrpcBotBadResponseHandler;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
-import backend.academy.linktracker.scrapper.properties.SchedulerProperties;
+import backend.academy.linktracker.scrapper.properties.BotProperties;
 import io.grpc.ManagedChannel;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -17,7 +17,7 @@ import org.springframework.grpc.client.GrpcChannelFactory;
 public class GrpcBotClientConfiguration {
 
     @Bean
-    ManagedChannel stub(SchedulerProperties properties, GrpcChannelFactory channels) {
+    ManagedChannel stub(BotProperties properties, GrpcChannelFactory channels) {
         return channels.createChannel(properties.getGrpcHost());
     }
 

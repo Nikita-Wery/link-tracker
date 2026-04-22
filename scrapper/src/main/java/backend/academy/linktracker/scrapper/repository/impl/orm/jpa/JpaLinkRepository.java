@@ -2,7 +2,6 @@ package backend.academy.linktracker.scrapper.repository.impl.orm.jpa;
 
 import backend.academy.linktracker.scrapper.domain.Link;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -22,6 +21,18 @@ public interface JpaLinkRepository extends JpaRepository<Link, Long> {
         UPDATE Link l SET l.latestUpdateTime = :newLatestUpdTime WHERE l.linkId = :linkId
     """)
     void updateLastUpdate(@Param("linkId") long linkId, @Param("newLatestUpdTime") OffsetDateTime newLatestUpdateTime);
+
+    @Query(value = """
+        INSERT INTO links (url, resource_type, latest_update_time)
+        VALUES (:url, :resourceType, :latestUpdateTime)
+        ON CONFLICT (url)
+        DO UPDATE SET url = links.url
+        RETURNING link_id
+        """, nativeQuery = true)
+    Long upsertAndGetId(
+            @Param("url") String url,
+            @Param("resourceType") String resourceType,
+            @Param("latestUpdateTime") OffsetDateTime latestUpdateTime);
 
     Slice<Link> findLinkByLinkIdGreaterThan(Long linkIdIsGreaterThan, Pageable pageable);
 }

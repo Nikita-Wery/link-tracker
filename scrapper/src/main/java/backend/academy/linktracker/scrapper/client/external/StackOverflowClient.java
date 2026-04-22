@@ -21,13 +21,9 @@ public interface StackOverflowClient {
 
     @GetExchange("/questions/{id}/answers")
     StackOverflowWrapper<StackOverflowAnswerResponse> getAnswerUpdates(
-            @PathVariable long id,
-            @RequestParam("site") String site
-    );
+            @PathVariable long id, @RequestParam("site") String site);
 
     @GetExchange("/questions/{id}/comments")
     StackOverflowWrapper<StackOverflowCommentResponse> getCommentUpdates(
-            @PathVariable long id,
-            @RequestParam("site") String site
-    );
+            @PathVariable long id, @RequestParam("site") String site);
 }

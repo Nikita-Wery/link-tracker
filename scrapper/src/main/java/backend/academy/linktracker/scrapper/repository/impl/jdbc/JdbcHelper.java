@@ -1,15 +1,15 @@
 package backend.academy.linktracker.scrapper.repository.impl.jdbc;
 
 import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.stereotype.Component;
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.stereotype.Component;
 
 /**
  * ДИСКЛЕЙМЕР
@@ -54,5 +54,4 @@ public class JdbcHelper {
             DataSourceUtils.releaseConnection(connection, dataSource);
         }
     }
-
 }

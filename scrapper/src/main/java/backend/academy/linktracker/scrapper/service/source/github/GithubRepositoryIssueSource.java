@@ -6,11 +6,11 @@ import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.github.GithubIssueResponse;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
@@ -51,18 +51,23 @@ public class GithubRepositoryIssueSource implements UpdateSource<LinkUpdate> {
 
     private String buildDescription(GithubIssueResponse response, Link link) {
         return "Github issue: %s, с автором %s, по ссылке %s, был обновлён %s"
-                .formatted(response.title(), response.user().login(), link.getUrl(), response.updatedAt(), response.updatedAt());
+                .formatted(
+                        response.title(),
+                        response.user().login(),
+                        link.getUrl(),
+                        response.updatedAt(),
+                        response.updatedAt());
     }
 
     private LinkUpdate toLinkUpdate(GithubIssueResponse response, Link link) {
         return new LinkUpdate(
-            link.getLinkId(),
-            URI.create(link.getUrl()),
-            buildDescription(response, link),
-            link.getTrackingChats().stream()
-                .map(chatLink -> chatLink.getChat().getChatId())
-                .collect(Collectors.toSet()),
-            link.getResourceType(),
-            response.updatedAt());
+                link.getLinkId(),
+                URI.create(link.getUrl()),
+                buildDescription(response, link),
+                link.getTrackingChats().stream()
+                        .map(chatLink -> chatLink.getChat().getChatId())
+                        .collect(Collectors.toSet()),
+                link.getResourceType(),
+                response.updatedAt());
     }
 }

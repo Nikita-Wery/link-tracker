@@ -40,7 +40,6 @@ public class ChatController {
             justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     @DeleteMapping("/{id}")
     public void deleteChat(@PathVariable("id") Long chatId) {
-
         log.info("deleting_chat", kv("chat_id", chatId));
 
         chatService.deleteChatById(chatId);

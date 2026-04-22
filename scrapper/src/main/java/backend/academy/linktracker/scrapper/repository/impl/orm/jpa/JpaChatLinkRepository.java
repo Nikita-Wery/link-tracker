@@ -3,7 +3,6 @@ package backend.academy.linktracker.scrapper.repository.impl.orm.jpa;
 import backend.academy.linktracker.scrapper.domain.ChatLink;
 import java.util.List;
 import java.util.Optional;
-import backend.academy.linktracker.scrapper.dto.entities.ChatLinkDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
