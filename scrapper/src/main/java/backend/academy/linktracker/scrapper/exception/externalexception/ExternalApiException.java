@@ -7,10 +7,12 @@ import lombok.Getter;
 public class ExternalApiException extends RuntimeException {
 
     private final int statusCode;
+    private final String body;
     private final URI url;
 
-    public ExternalApiException(String message, int statusCode, URI url) {
+    public ExternalApiException(String message, String body, int statusCode, URI url) {
         super(message);
+        this.body = body;
         this.url = url;
         this.statusCode = statusCode;
     }
