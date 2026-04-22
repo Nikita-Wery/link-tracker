@@ -64,7 +64,7 @@ public class StackOverflowAnswersSource implements UpdateSource<LinkUpdate> {
                         link.getUrl(),
                         Instant.ofEpochSecond(update.updatedAt()),
                         update.user().name(),
-                        TextMessageHandler.ShortenMessage(update.body()));
+                        TextMessageHandler.shortenMessage(update.body()));
     }
 
     private LinkUpdate toLinkUpdate(StackOverflowAnswerResponse update, Link link) {

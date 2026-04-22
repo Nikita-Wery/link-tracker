@@ -7,7 +7,7 @@ public class TextMessageHandler {
     private TextMessageHandler() {}
     ;
 
-    public static String ShortenMessage(String message) {
+    public static String shortenMessage(String message) {
 
         if (message.length() > MAX_MESSAGE_LENGTH) {
             return message.substring(0, MAX_MESSAGE_LENGTH - 3) + "...";
