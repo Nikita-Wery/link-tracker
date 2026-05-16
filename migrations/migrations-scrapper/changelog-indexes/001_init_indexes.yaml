@@ -6,3 +6,10 @@ databaseChangeLog:
         - sqlFile:
             path: 001_create_chat_link_chatid_index.sql
             relativeToChangelogFile: true
+  - changeSet:
+      id: 002_create_idx_outbox_polling
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: 002_create_idx_outbox_polling.sql
+            relativeToChangelogFile: true

@@ -1,14 +1,10 @@
 package backend.academy.linktracker.scrapper.repository.impl.jdbc;
 
-import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import backend.academy.linktracker.scrapper.dto.LinkUpdate;
+import backend.academy.linktracker.scrapper.dto.OutboxEventUpdateDto;
 import java.util.List;
-import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,35 +19,36 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class JdbcHelper {
 
-    private final DataSource dataSource;
+    private final JdbcTemplate jdbcTemplate;
 
     // language=sql
     private static final String UPDATE_LINK_LAST_UPD_BATCH = """
         UPDATE links SET latest_update_time = ? WHERE link_id = ?
         """;
 
-    public void updateLastUpdateBatch(List<UpdateLinkDto> batch, int batchSize) {
+    // language=sql
+    private static final String BATCH_UPDATE_MESSAGE_STATUSES = """
+            UPDATE outbox_event
+            SET status = ?
+            WHERE id = ?
+        """;
 
-        Connection connection = DataSourceUtils.getConnection(dataSource);
+    public void updateLastUpdateBatch(List<LinkUpdate> batch, int batchSize) {
 
-        try (PreparedStatement ps = connection.prepareStatement(UPDATE_LINK_LAST_UPD_BATCH)) {
-            int count = 0;
+        jdbcTemplate.batchUpdate(UPDATE_LINK_LAST_UPD_BATCH, batch, batchSize, (ps, linkUpdate) -> {
+            ps.setObject(1, linkUpdate.getLastUpdate());
+            ps.setLong(2, linkUpdate.id());
+        });
+    }
 
-            for (UpdateLinkDto dto : batch) {
-                ps.setObject(1, dto.updatedAt());
-                ps.setLong(2, dto.linkId());
-                ps.addBatch();
-
-                if (++count % batchSize == 0) {
-                    ps.executeBatch();
-                }
-            }
-
-            ps.executeBatch();
-        } catch (SQLException e) {
-            throw new DataAccessException("Unexpected SQL exception while updating batch of links", e) {};
-        } finally {
-            DataSourceUtils.releaseConnection(connection, dataSource);
-        }
+    public void updateMessageStatusBatch(List<OutboxEventUpdateDto> outboxEventUpdateDtos) {
+        jdbcTemplate.batchUpdate(
+                BATCH_UPDATE_MESSAGE_STATUSES,
+                outboxEventUpdateDtos,
+                outboxEventUpdateDtos.size(),
+                (ps, outboxEvent) -> {
+                    ps.setString(1, outboxEvent.futureMessageStatuses().name());
+                    ps.setLong(2, outboxEvent.outboxEventId());
+                });
     }
 }

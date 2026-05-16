@@ -5,9 +5,7 @@ import backend.academy.linktracker.scrapper.repository.ChatRepository;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @AllArgsConstructor
 public class JdbcChatRepository implements ChatRepository {
 

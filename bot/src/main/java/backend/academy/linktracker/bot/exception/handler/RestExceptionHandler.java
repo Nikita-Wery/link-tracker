@@ -3,7 +3,7 @@ package backend.academy.linktracker.bot.exception.handler;
 import backend.academy.linktracker.bot.dto.ApiErrorResponse;
 import backend.academy.linktracker.bot.exception.scrapperexception.requestexception.InvalidLinkUpdateException;
 import backend.academy.linktracker.bot.exception.scrapperexception.requestexception.InvalidPropertyInUpdateException;
-import backend.academy.linktracker.bot.utils.DtoEntityMapper;
+import backend.academy.linktracker.bot.utils.mappers.DtoEntityMapper;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

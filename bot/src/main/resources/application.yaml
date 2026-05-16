@@ -4,30 +4,56 @@ server:
 spring:
   application:
     name: bot
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  liquibase:
+    enabled: false
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/bot_db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
   grpc:
     server:
       port: 9090
+
+  devtools:
+    restart:
+      enabled: false
 
 app:
   telegram:
     enabled: true
     url: https://api.telegram.org/bot
-    token: ${TELEGRAM_TOKEN} # Use env variable. DO NOT KEEP TOKEN HERE
+    token: ${TELEGRAM_TOKEN}
     update-listener-sleep: 1s
     debug: false
+
+  db:
+    access-type: orm
+
   logger:
     path: ./logs
+
     console:
       enabled: true
+
     file:
       enabled: false
+
   client:
     scrapper:
       host: ${APP_CLIENT_SCRAPPER_HOST:http://localhost:8081}
       grpc-host: ${APP_CLIENT_SCRAPPER_GRPC_HOST:localhost:9091}
-#      host: http://localhost:8081
-#      grpc-host: localhost:9091
+
       api:
+        kafka:
+          enabled: true
         rest:
           enabled: true
         grpc:

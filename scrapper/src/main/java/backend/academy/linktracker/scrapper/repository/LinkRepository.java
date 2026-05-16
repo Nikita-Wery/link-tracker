@@ -1,7 +1,7 @@
 package backend.academy.linktracker.scrapper.repository;
 
 import backend.academy.linktracker.scrapper.domain.Link;
-import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
+import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +14,7 @@ public interface LinkRepository {
 
     void updateLastUpdate(Link link, OffsetDateTime newLatestUpdateTime);
 
-    void updateLastUpdateBatch(List<UpdateLinkDto> batch, int batchSize);
+    void updateLastUpdateBatch(List<LinkUpdate> batch, int batchSize);
 
     Link save(Link link);
 

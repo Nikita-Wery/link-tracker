@@ -1,0 +1,54 @@
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+  health:
+    readinessstate:
+      enabled: true
+
+spring:
+  config:
+    activate:
+      on-profile: kafka
+
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
+
+    producer:
+      properties:
+        acks: 1
+        batch.size: 1024
+        linger.ms: 10000
+        schema.registry.url: http://localhost:8087
+
+app:
+  scheduler:
+    outbox:
+      batch-size: 50
+      interval-update-ms: 60000
+
+  db:
+    workers:
+      outbox-update:
+        batch-size: 12
+        flush-timeout: 200
+        core-pool-size: 2
+        max-pool-size: 4
+        queue-capacity: 0
+        maximum-number-of-unprocessed-elements: 10000
+
+  client:
+    bot:
+      api:
+        kafka:
+          enabled: true
+
+  kafka:
+    serialization: json
+
+    topics:
+      link-update:
+        name: link-updates
+        partitions: 3
+        replicas: 3

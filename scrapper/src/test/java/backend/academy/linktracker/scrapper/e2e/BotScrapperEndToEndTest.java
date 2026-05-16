@@ -62,8 +62,17 @@ class BotScrapperEndToEndTest {
     final DockerImageName SCRAPPER_IMAGE = DockerImageName.parse("scrapper:0.0.1");
     final DockerImageName LIQUIBASE_IMAGE = DockerImageName.parse("liquibase/liquibase:latest-alpine");
 
-    final String MIGRATIONS_PATH =
-            Paths.get("").toAbsolutePath().getParent().resolve("migrations").toString();
+    final String SCRAPPER_MIGRATIONS_PATH = Paths.get("")
+            .toAbsolutePath()
+            .getParent()
+            .resolve("migrations/migrations-scrapper")
+            .toString();
+
+    final String BOT_MIGRATIONS_PATH = Paths.get("")
+            .toAbsolutePath()
+            .getParent()
+            .resolve("migrations/migrations-bot")
+            .toString();
 
     Network network = Network.newNetwork();
 
@@ -71,9 +80,13 @@ class BotScrapperEndToEndTest {
 
     GenericContainer<?> scrapper;
 
-    PostgreSQLContainer postgreSQLContainer;
+    PostgreSQLContainer scrapperPostgreSQLContainer;
 
-    GenericContainer<?> liquibaseContainer;
+    PostgreSQLContainer botPostgreSQLContainer;
+
+    GenericContainer<?> scrapperLiquibaseContainer;
+
+    GenericContainer<?> botLiquibaseContainer;
 
     ManagedChannel botChannel;
     ManagedChannel scrapperChannel;
@@ -81,37 +94,69 @@ class BotScrapperEndToEndTest {
     @BeforeAll
     void upContainers() {
 
-        postgreSQLContainer = new PostgreSQLContainer("postgres:18-alpine")
+        scrapperPostgreSQLContainer = new PostgreSQLContainer("postgres:18-alpine")
                 .withDatabaseName("linktracker_db")
                 .withUsername("test")
                 .withPassword("test")
                 .withNetwork(network)
-                .withNetworkAliases("postgres")
+                .withNetworkAliases("scrapper-postgres")
                 .waitingFor(Wait.forListeningPort());
 
-        postgreSQLContainer.start();
-
-        liquibaseContainer = new GenericContainer<>(LIQUIBASE_IMAGE)
+        botPostgreSQLContainer = new PostgreSQLContainer("postgres:18-alpine")
+                .withDatabaseName("bot_db")
+                .withUsername("test")
+                .withPassword("test")
                 .withNetwork(network)
-                .withFileSystemBind(MIGRATIONS_PATH, "/liquibase/changelog", BindMode.READ_ONLY)
+                .withNetworkAliases("bot-postgres")
+                .waitingFor(Wait.forListeningPort());
+
+        scrapperPostgreSQLContainer.start();
+
+        botPostgreSQLContainer.start();
+
+        scrapperLiquibaseContainer = new GenericContainer<>(LIQUIBASE_IMAGE)
+                .withNetwork(network)
+                .withFileSystemBind(SCRAPPER_MIGRATIONS_PATH, "/liquibase/changelog", BindMode.READ_ONLY)
+                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
                 .withCommand(
-                        "--url=jdbc:postgresql://postgres:5432/linktracker_db",
+                        "--url=jdbc:postgresql://scrapper-postgres:5432/linktracker_db",
                         "--username=test",
                         "--password=test",
                         "--changeLogFile=changelog-root.yaml",
                         "update")
                 .withStartupCheckStrategy(new OneShotStartupCheckStrategy());
 
-        liquibaseContainer.start();
+        scrapperLiquibaseContainer.start();
+
+        botLiquibaseContainer = new GenericContainer<>(LIQUIBASE_IMAGE)
+                .withNetwork(network)
+                .withFileSystemBind(BOT_MIGRATIONS_PATH, "/liquibase/changelog", BindMode.READ_ONLY)
+                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+                .withCommand(
+                        "--url=jdbc:postgresql://bot-postgres:5432/bot_db",
+                        "--username=test",
+                        "--password=test",
+                        "--changeLogFile=changelog-root.yaml",
+                        "update")
+                .withStartupCheckStrategy(new OneShotStartupCheckStrategy());
+
+        botLiquibaseContainer.start();
 
         bot = new GenericContainer<>(BOT_IMAGE)
                 .withExposedPorts(8080, 9090)
                 .withEnv("APP_LOGGER_FILE_ENABLED", "false")
                 .withEnv("APP_TELEGRAM_ENABLED", "false")
+                .withEnv("APP_CLIENT_SCRAPPER_API_KAFKA_ENABLED", "false")
                 .withEnv("APP_CLIENT_SCRAPPER_API_GRPC_ENABLED", "true")
                 .withEnv("APP_CLIENT_SCRAPPER_API_REST_ENABLED", "true")
                 .withEnv("APP_CLIENT_SCRAPPER_HOST", "http://scrapper:8081")
                 .withEnv("APP_CLIENT_SCRAPPER_GRPC_HOST", "scrapper:9091")
+                .withEnv("DB_HOST", "bot-postgres")
+                .withEnv("DB_PORT", "5432")
+                .withEnv("DB_NAME", "bot_db")
+                .withEnv("DB_USERNAME", "test")
+                .withEnv("DB_PASSWORD", "test")
+                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
                 .withNetwork(network)
                 .withNetworkAliases("bot")
                 .waitingFor(Wait.forHttp("/actuator/health").forPort(8080).withStartupTimeout(Duration.ofMinutes(2)));
@@ -123,10 +168,11 @@ class BotScrapperEndToEndTest {
                 .withEnv("SPRING_TASK_SCHEDULING_ENABLED", "false")
                 .withEnv("APP_CLIENT_BOT_API_REST_ENABLED", "true")
                 .withEnv("APP_CLIENT_BOT_API_GRPC_ENABLED", "true")
+                .withEnv("APP_CLIENT_BOT_API_KAFKA_ENABLED", "false")
                 .withEnv("APP_DB_ACCESS_TYPE", "orm")
                 .withEnv("APP_CLIENT_BOT_HOST", "http://bot:8080")
                 .withEnv("APP_CLIENT_BOT_GRPC_HOST", "bot:9090")
-                .withEnv("DB_HOST", "postgres")
+                .withEnv("DB_HOST", "scrapper-postgres")
                 .withEnv("DB_PORT", "5432")
                 .withEnv("DB_NAME", "linktracker_db")
                 .withEnv("DB_USERNAME", "test")

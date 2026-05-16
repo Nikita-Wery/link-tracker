@@ -1,7 +1,14 @@
 package backend.academy.linktracker.scrapper.repository;
 
-public interface LinkUpdateOutboxEventRepository {
+import backend.academy.linktracker.scrapper.domain.OutboxEvent;
+import backend.academy.linktracker.scrapper.dto.OutboxEventUpdateDto;
+import java.util.List;
 
-    void addAl
+public interface OutboxEventRepository {
 
+    void addAll(List<OutboxEvent> outboxEvents);
+
+    List<OutboxEvent> findBatchPendingMessagesAndSetProcessing(int batchSize, String topic);
+
+    void updateMessageStatusBatch(List<OutboxEventUpdateDto> outboxEventUpdateDtos);
 }

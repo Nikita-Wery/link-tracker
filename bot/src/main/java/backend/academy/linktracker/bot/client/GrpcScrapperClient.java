@@ -3,7 +3,7 @@ package backend.academy.linktracker.bot.client;
 import backend.academy.linktracker.bot.client.responsehandler.GrpcScrapperBadResponseHandler;
 import backend.academy.linktracker.bot.dto.LinkResponse;
 import backend.academy.linktracker.bot.dto.ListLinksResponse;
-import backend.academy.linktracker.bot.utils.GrpcMapper;
+import backend.academy.linktracker.bot.utils.mappers.GrpcMapper;
 import backend.academy.linktracker.proto.AddLinkRequest;
 import backend.academy.linktracker.proto.GetLinksRequest;
 import backend.academy.linktracker.proto.RegisterChatRequest;

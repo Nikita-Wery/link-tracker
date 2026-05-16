@@ -27,3 +27,10 @@ databaseChangeLog:
         - sqlFile:
             path: 004_create_tags_table.sql
             relativeToChangelogFile: true
+  - changeSet:
+      id: 005_create_outbox_event_table
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: 005_create_outbox_event_table.sql
+            relativeToChangelogFile: true

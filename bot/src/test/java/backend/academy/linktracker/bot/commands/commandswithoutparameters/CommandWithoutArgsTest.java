@@ -6,35 +6,39 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
+import backend.academy.linktracker.bot.application.command.Command;
 import backend.academy.linktracker.bot.application.command.impl.HelpCommand;
+import backend.academy.linktracker.bot.application.command.impl.StartCommand;
+import backend.academy.linktracker.bot.application.command.impl.UnknownCommand;
 import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispatcher;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
-import com.pengrad.telegrambot.TelegramBot;
+import backend.academy.linktracker.bot.utils.validator.CommandValidator;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.SendMessage;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = TrackCommandIntegrationTests.TestConfig.class)
-public class CommandWithoutArgsTest {
+@ExtendWith(MockitoExtension.class)
+class CommandWithoutArgsTest {
 
-    @MockitoBean
-    private TelegramBot telegramBot;
-
-    @MockitoBean
+    @Mock
     private DialogContextStorage contextStorage;
 
-    @Autowired
+    @Mock
+    private CommandValidator commandValidator;
+
+    @Mock
+    private TelegramMessageSender telegramMessageSender;
+
     private CommandDispatcher commandDispatcher;
 
     private Update update;
@@ -50,54 +54,59 @@ public class CommandWithoutArgsTest {
         when(chat.id()).thenReturn(200L);
         when(message.chat()).thenReturn(chat);
         when(update.message()).thenReturn(message);
+
+        // commands
+        StartCommand startCommand = new StartCommand(telegramMessageSender);
+        UnknownCommand unknownCommand = new UnknownCommand(telegramMessageSender);
+
+        List<Command<Update>> commands = new ArrayList<>();
+        commands.add(startCommand);
+
+        HelpCommand helpCommand = new HelpCommand(telegramMessageSender, commands);
+
+        commands.add(helpCommand);
+        commands.add(unknownCommand);
+
+        commandDispatcher = new CommandDispatcher(commands, commandValidator, contextStorage);
     }
 
-    @AfterEach()
-    public void verifyDialogDeletion() {
-        verify(contextStorage).clearDialog(eq(200L));
+    @AfterEach
+    void verifyDialogDeletion() {
+        verify(contextStorage).clearDialog(200L);
     }
 
     @Test
-    public void StartCommandTest() {
+    void StartCommandTest() {
         when(message.text()).thenReturn("/start");
 
         commandDispatcher.dispatch(update);
 
-        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(telegramBot).execute(argumentCaptor.capture());
-
-        SendMessage sentMessage = argumentCaptor.getValue();
-        assertEquals(200L, sentMessage.getChatId());
-        assertEquals("Готовы пообщаться?)", sentMessage.getText());
+        verify(telegramMessageSender).sendMessage(eq(200L), eq("Готовы пообщаться?)"));
     }
 
     @Test
-    public void HelpCommandTest() {
+    void HelpCommandTest() {
         when(message.text()).thenReturn("/help");
 
         commandDispatcher.dispatch(update);
 
-        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(telegramBot).execute(argumentCaptor.capture());
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 
-        SendMessage sentMessage = argumentCaptor.getValue();
-        assertEquals(200L, sentMessage.getChatId());
+        verify(telegramMessageSender).sendMessage(eq(200L), captor.capture());
+
+        String sentText = captor.getValue();
+
         assertTrue(commandDispatcher.getListOfCommands().stream()
-                .filter(command -> !command.getCommandName().equals(HelpCommand.COMMAND_NAME))
-                .allMatch(command -> sentMessage.getText().contains(command.getCommandName())));
+                .filter(c -> !c.getCommandName().equals(HelpCommand.COMMAND_NAME))
+                .allMatch(c -> sentText.contains(c.getCommandName())));
     }
 
     @Test
-    public void UnknownCommandTest() {
+    void UnknownCommandTest() {
         when(message.text()).thenReturn("kakoi to bred");
 
         commandDispatcher.dispatch(update);
 
-        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(telegramBot).execute(argumentCaptor.capture());
-
-        SendMessage sentMessage = argumentCaptor.getValue();
-        assertEquals(200L, sentMessage.getChatId());
-        assertEquals("Неизвестная команда. Используйте /help", sentMessage.getText());
+        verify(telegramMessageSender).sendMessage(eq(200L), eq("Неизвестная команда. Используйте /help"));
     }
 }

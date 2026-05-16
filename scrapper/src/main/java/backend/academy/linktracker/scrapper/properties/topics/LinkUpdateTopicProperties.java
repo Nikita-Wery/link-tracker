@@ -1,5 +1,7 @@
 package backend.academy.linktracker.scrapper.properties.topics;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -7,13 +9,16 @@ import org.springframework.context.annotation.Configuration;
 
 @Getter
 @Setter
-@ConfigurationProperties("app.kafka.link-updates")
 @Configuration
+@ConfigurationProperties("app.kafka.topics.link-update")
 public class LinkUpdateTopicProperties {
 
-    private String jsonTopic;
-    private String avroTopic;
-    private int partitions;
-    private short replicas;
+    @NotBlank
+    private String name;
 
+    @Min(1)
+    private int partitions;
+
+    @Min(1)
+    private short replicas;
 }

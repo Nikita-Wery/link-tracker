@@ -1,4 +1,4 @@
-package backend.academy.linktracker.bot.utils;
+package backend.academy.linktracker.bot.utils.mappers;
 
 import backend.academy.linktracker.bot.dto.ApiErrorResponse;
 import java.util.Arrays;

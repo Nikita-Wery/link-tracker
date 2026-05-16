@@ -1,4 +1,4 @@
-package backend.academy.linktracker.bot.configuration.telgramconfiguration;
+package backend.academy.linktracker.bot.configuration.telgram;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

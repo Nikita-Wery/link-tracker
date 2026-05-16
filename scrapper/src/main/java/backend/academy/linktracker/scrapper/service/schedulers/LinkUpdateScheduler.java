@@ -1,4 +1,4 @@
-package backend.academy.linktracker.scrapper.service;
+package backend.academy.linktracker.scrapper.service.schedulers;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
@@ -6,7 +6,9 @@ import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiException;
 import backend.academy.linktracker.scrapper.properties.ApiWorkersProperties;
-import backend.academy.linktracker.scrapper.properties.SchedulerProperties;
+import backend.academy.linktracker.scrapper.properties.LinkUpdateSchedulerProperties;
+import backend.academy.linktracker.scrapper.service.LinkService;
+import backend.academy.linktracker.scrapper.service.LinkUpdateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,14 +26,14 @@ public class LinkUpdateScheduler {
     private final LinkUpdateService linkUpdateService;
     private final LinkService linkService;
     private final ThreadPoolTaskExecutor executor;
-    private final SchedulerProperties schedulerProperties;
+    private final LinkUpdateSchedulerProperties schedulerProperties;
     private final ApiWorkersProperties apiWorkersProperties;
 
     public LinkUpdateScheduler(
             LinkUpdateService linkUpdateService,
             LinkService linkService,
             @Qualifier("externalApiExecutor") ThreadPoolTaskExecutor executor,
-            SchedulerProperties schedulerProperties,
+            LinkUpdateSchedulerProperties schedulerProperties,
             ApiWorkersProperties apiWorkerProperties) {
 
         this.executor = executor;
@@ -41,7 +43,7 @@ public class LinkUpdateScheduler {
         this.linkService = linkService;
     }
 
-    @Scheduled(fixedDelayString = "${app.scheduler.interval-update-ms}")
+    @Scheduled(fixedDelayString = "${app.scheduler.link-update.interval-update-ms}")
     public void checkLinks() {
 
         Slice<Link> linksLastBatch;

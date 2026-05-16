@@ -1,4 +1,6 @@
 package backend.academy.linktracker.bot.repository.impl.orm.jpa;
 
-public class JpaProcessedMessagesRepository {
-}
+import backend.academy.linktracker.bot.domain.ProcessedMessage;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface JpaProcessedMessagesRepository extends JpaRepository<ProcessedMessage, Long> {}

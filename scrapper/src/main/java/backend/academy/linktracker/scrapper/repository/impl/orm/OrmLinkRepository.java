@@ -1,7 +1,7 @@
 package backend.academy.linktracker.scrapper.repository.impl.orm;
 
 import backend.academy.linktracker.scrapper.domain.Link;
-import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
+import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcHelper;
 import backend.academy.linktracker.scrapper.repository.impl.orm.jpa.JpaLinkRepository;
@@ -15,9 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @AllArgsConstructor
 public class OrmLinkRepository implements LinkRepository {
 
@@ -36,7 +34,7 @@ public class OrmLinkRepository implements LinkRepository {
     }
 
     @Override
-    public void updateLastUpdateBatch(List<UpdateLinkDto> batch, int batchSize) {
+    public void updateLastUpdateBatch(List<LinkUpdate> batch, int batchSize) {
         jdbcHelper.updateLastUpdateBatch(batch, batchSize);
     }
 

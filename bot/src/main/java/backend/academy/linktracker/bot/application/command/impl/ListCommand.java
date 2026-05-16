@@ -51,6 +51,7 @@ public class ListCommand extends AbstractCommand<Update> {
                 update.message().text().split(wordSeparators.pattern()).length);
 
         try {
+
             ListLinksResponse listLinksResponse = client.getLinks(chatId);
 
             List<LinkResponse> linkResponses = listLinksResponse.links();
