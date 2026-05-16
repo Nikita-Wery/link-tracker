@@ -4,6 +4,8 @@ networks:
   backend:
     driver: bridge
 
+
+
 services:
 
   postgres:
@@ -43,9 +45,9 @@ services:
 
   scrapper:
     build:
-      context: ./scrapper
+      context: ../scrapper
     env_file:
-      - ./.env
+      - ../.env
     container_name: scrapper
     depends_on:
       postgres:
@@ -65,9 +67,9 @@ services:
 
   bot:
     build:
-      context: ./bot
+      context: ../bot
     env_file:
-      - ./.env
+      - ../.env
     container_name: bot
     depends_on:
       - scrapper
