@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import backend.academy.linktracker.bot.application.command.impl.HelpCommand;
 import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispatcher;
-import backend.academy.linktracker.bot.configuration.telgramconfiguration.TelegramTestConfiguration;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Chat;
@@ -21,13 +20,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = TelegramTestConfiguration.class)
-public class CommandWithoutArgsIntegrationTest {
+@ContextConfiguration(classes = TrackCommandIntegrationTests.TestConfig.class)
+public class CommandWithoutArgsTest {
 
     @MockitoBean
     private TelegramBot telegramBot;
