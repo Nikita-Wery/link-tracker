@@ -1,4 +1,4 @@
-package backend.academy.linktracker.bot.controller.rest;
+package backend.academy.linktracker.bot.controller.sync.rest;
 
 import backend.academy.linktracker.bot.dto.LinkUpdate;
 import backend.academy.linktracker.bot.service.LinkUpdateService;

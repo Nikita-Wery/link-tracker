@@ -2,7 +2,7 @@ package backend.academy.linktracker.scrapper.repository.impl.jdbc;
 
 import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
-import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
+import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -14,9 +14,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @AllArgsConstructor
 public class JdbcLinkRepository implements LinkRepository {
 
@@ -89,7 +87,7 @@ public class JdbcLinkRepository implements LinkRepository {
     }
 
     @Override
-    public void updateLastUpdateBatch(List<UpdateLinkDto> batch, int batchSize) {
+    public void updateLastUpdateBatch(List<LinkUpdate> batch, int batchSize) {
         jdbcHelper.updateLastUpdateBatch(batch, batchSize);
     }
 

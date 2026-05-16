@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: changelog-tables/001_init_tables.yaml
+      relativeToChangelogFile: true

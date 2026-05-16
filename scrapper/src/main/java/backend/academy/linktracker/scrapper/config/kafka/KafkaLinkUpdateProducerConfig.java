@@ -1,4 +1,4 @@
-package backend.academy.linktracker.scrapper.config.kafka.producers;
+package backend.academy.linktracker.scrapper.config.kafka;
 
 import backend.academy.linktracker.contract.avro.LinkUpdateEvent;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
@@ -16,15 +16,16 @@ import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.client.bot.api", havingValue = "kafka")
+@ConditionalOnProperty(name = "app.client.bot.api.kafka", havingValue = "true", matchIfMissing = true)
 public class KafkaLinkUpdateProducerConfig {
 
-    public static final String AVRO_KAFKA_CLIENT = "avroLinkUpdateKafkaTemplate";
-    public static final String DEFAULT_KAFKA_CLIENT = "defaultLinkUpdateKafkaTemplate";
+    public static final String AVRO_LINK_UPDATE_KAFKA_CLIENT = "avroLinkUpdateKafkaTemplate";
+    public static final String DEFAULT_LINK_UPDATE_KAFKA_CLIENT = "defaultLinkUpdateKafkaTemplate";
 
-    private KafkaProperties kafkaProperties;
+    private final KafkaProperties kafkaProperties;
 
-    @Bean(AVRO_KAFKA_CLIENT)
+    @Bean(AVRO_LINK_UPDATE_KAFKA_CLIENT)
+    @ConditionalOnProperty(name = "app.kafka.type", havingValue = "avro")
     public KafkaTemplate<Long, LinkUpdateEvent> avroKafkaTemplate() {
 
         var props = kafkaProperties.buildProducerProperties();
@@ -36,8 +37,8 @@ public class KafkaLinkUpdateProducerConfig {
         return new KafkaTemplate<>(factory);
     }
 
-
-    @Bean(DEFAULT_KAFKA_CLIENT)
+    @Bean(DEFAULT_LINK_UPDATE_KAFKA_CLIENT)
+    @ConditionalOnProperty(name = "app.kafka.type", havingValue = "json", matchIfMissing = true)
     public KafkaTemplate<Long, LinkUpdate> jsonKafkaTemplate() {
 
         var props = kafkaProperties.buildProducerProperties();
@@ -48,5 +49,4 @@ public class KafkaLinkUpdateProducerConfig {
         var factory = new DefaultKafkaProducerFactory<Long, LinkUpdate>(props);
         return new KafkaTemplate<>(factory);
     }
-
 }

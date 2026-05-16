@@ -1,7 +1,8 @@
 package backend.academy.linktracker.scrapper.domain;
 
-public enum OutboxEventStatus {
+public enum MessageStatus {
     PENDING,
+    PROCESSING,
     SENT,
     FAILED,
 }

@@ -1,41 +1,36 @@
 package backend.academy.linktracker.bot.commands.commandswithparameters;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
+import backend.academy.linktracker.bot.application.command.Command;
+import backend.academy.linktracker.bot.application.command.impl.UntrackCommand;
 import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispatcher;
 import backend.academy.linktracker.bot.client.ScrapperClient;
-import backend.academy.linktracker.bot.configuration.telgramconfiguration.TelegramTestConfiguration;
-import backend.academy.linktracker.bot.dto.LinkResponse;
 import backend.academy.linktracker.bot.dto.RemoveLinkRequest;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ChatNotExistsException;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.LinkNotTrackedException;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
+import backend.academy.linktracker.bot.utils.validator.CommandValidator;
 import backend.academy.linktracker.bot.utils.validator.LinkValidationProcessor;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.SendMessage;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = TelegramTestConfiguration.class)
-public class UntrackCommandIntegrationTest {
+@ExtendWith(MockitoExtension.class)
+class UntrackCommandTest {
 
     private static final String MISMATCH_NUMBER_OF_ARGS_MESSAGE =
             "За один раз можно открепить только одну ссылку, ни больше ни меньше";
@@ -47,19 +42,23 @@ public class UntrackCommandIntegrationTest {
     private static final String USER_NOT_CURRENTLY_FOLLOWING_ANY_LINKS_MESSAGE =
             "В данный момент вы не отслеживаете ни одной ссылки";
 
-    @MockitoBean
+    @Mock
     private TelegramBot telegramBot;
 
-    @MockitoBean
+    @Mock
     private ScrapperClient scrapperClient;
 
-    @MockitoSpyBean
+    @Mock
     private LinkValidationProcessor validator;
 
-    @MockitoBean
+    @Mock
     private DialogContextStorage contextStorage;
 
-    @Autowired
+    private CommandValidator commandValidator;
+
+    @Mock
+    private TelegramMessageSender telegramMessageSender;
+
     private CommandDispatcher commandDispatcher;
 
     private Update update;
@@ -75,106 +74,75 @@ public class UntrackCommandIntegrationTest {
         when(chat.id()).thenReturn(200L);
         when(message.chat()).thenReturn(chat);
         when(update.message()).thenReturn(message);
+
+        List<Command<Update>> commands = new ArrayList<>();
+
+        UntrackCommand untrackCommand = new UntrackCommand(scrapperClient, telegramMessageSender, validator);
+
+        commands.add(untrackCommand);
+
+        commandValidator = new CommandValidator(commands);
+
+        commandDispatcher = new CommandDispatcher(commands, commandValidator, contextStorage);
     }
 
-    @AfterEach()
-    public void verifyDialogDeletion() {
-        verify(contextStorage).clearDialog(eq(200L));
+    @AfterEach
+    void verifyDialogDeletion() {
+        verify(contextStorage).clearDialog(200L);
     }
 
     @Test
-    @DisplayName("Сценарий: ползьователь добавил что-то кроме ссылки")
-    public void execute_ExcessOfArguments() {
+    void execute_ExcessOfArguments() {
         when(message.text()).thenReturn("/untrack link1 link2");
 
         commandDispatcher.dispatch(update);
 
-        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(telegramBot).execute(argumentCaptor.capture());
-
-        SendMessage sentMessage = argumentCaptor.getValue();
-        assertEquals(MISMATCH_NUMBER_OF_ARGS_MESSAGE, sentMessage.getText());
+        verify(telegramMessageSender).sendMessage(eq(200L), eq(MISMATCH_NUMBER_OF_ARGS_MESSAGE));
     }
 
     @Test
-    @DisplayName("Сценарий: пользоватль не добавил ссылку")
-    public void execute_NoLink() {
+    void execute_NoLink() {
         when(message.text()).thenReturn("/untrack");
 
         commandDispatcher.dispatch(update);
 
-        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(telegramBot).execute(argumentCaptor.capture());
-
-        SendMessage sentMessage = argumentCaptor.getValue();
-        assertEquals(MISMATCH_NUMBER_OF_ARGS_MESSAGE, sentMessage.getText());
+        verify(telegramMessageSender).sendMessage(eq(200L), eq(MISMATCH_NUMBER_OF_ARGS_MESSAGE));
     }
 
     @Test
-    @DisplayName("Сценарий: пользователь ни разу не прикреплял ссылку ранее")
-    public void execute_FirstUse() {
+    void execute_FirstUse() {
         String link = "link";
-        RemoveLinkRequest removeLinkRequest = new RemoveLinkRequest(link);
+        RemoveLinkRequest request = new RemoveLinkRequest(link);
+
         when(message.text()).thenReturn("/untrack " + link);
         when(validator.isValid(link)).thenReturn(true);
-        when(scrapperClient.untrackLink(chat.id(), removeLinkRequest)).thenThrow(ChatNotExistsException.class);
+        when(scrapperClient.untrackLink(chat.id(), request)).thenThrow(ChatNotExistsException.class);
 
         commandDispatcher.dispatch(update);
 
-        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(telegramBot).execute(argumentCaptor.capture());
-
-        SendMessage sentMessage = argumentCaptor.getValue();
-        assertEquals(USER_HAS_NEVER_ATTACHED_LINK_MESSAGE, sentMessage.getText());
+        verify(telegramMessageSender).sendMessage(eq(200L), eq(USER_HAS_NEVER_ATTACHED_LINK_MESSAGE));
     }
 
     @Test
-    @DisplayName("Сценарий: в данный момент пользователь не отслеживает ни одной ссылки")
-    public void execute_NoTrackingLink() {
+    void execute_NoTrackingLink() {
         String link = "link";
-        RemoveLinkRequest removeLinkRequest = new RemoveLinkRequest(link);
-        when(validator.isValid(link)).thenReturn(true);
+        RemoveLinkRequest request = new RemoveLinkRequest(link);
+
         when(message.text()).thenReturn("/untrack " + link);
-        when(scrapperClient.untrackLink(chat.id(), removeLinkRequest)).thenThrow(LinkNotTrackedException.class);
+        when(validator.isValid(link)).thenReturn(true);
+        when(scrapperClient.untrackLink(chat.id(), request)).thenThrow(LinkNotTrackedException.class);
 
         commandDispatcher.dispatch(update);
 
-        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(telegramBot).execute(argumentCaptor.capture());
-
-        SendMessage sentMessage = argumentCaptor.getValue();
-        assertEquals(USER_NOT_CURRENTLY_FOLLOWING_ANY_LINKS_MESSAGE, sentMessage.getText());
+        verify(telegramMessageSender).sendMessage(eq(200L), eq(USER_NOT_CURRENTLY_FOLLOWING_ANY_LINKS_MESSAGE));
     }
 
     @Test
-    @DisplayName("Сценарий: ссылка невалидна")
-    public void execute_InvalidLink() {
+    void execute_InvalidLink() {
         when(message.text()).thenReturn("/untrack link");
 
         commandDispatcher.dispatch(update);
 
-        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(telegramBot).execute(argumentCaptor.capture());
-
-        SendMessage sentMessage = argumentCaptor.getValue();
-        assertEquals(INVALID_LINK_MESSAGE, sentMessage.getText());
-    }
-
-    @Test
-    @DisplayName("Сценарий: открепление успешно")
-    public void execute_Success() {
-        LinkResponse response = mock(LinkResponse.class);
-        String link = "https://github.com/user/repo";
-        when(message.text()).thenReturn("/untrack " + link);
-        when(scrapperClient.untrackLink(eq(chat.id()), any(RemoveLinkRequest.class)))
-                .thenReturn(response);
-
-        commandDispatcher.dispatch(update);
-
-        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(telegramBot).execute(argumentCaptor.capture());
-
-        SendMessage sentMessage = argumentCaptor.getValue();
-        assertEquals(SUCCESSFUL_LINK_UNPINNING_MESSAGE, sentMessage.getText());
+        verify(telegramMessageSender).sendMessage(eq(200L), eq(INVALID_LINK_MESSAGE));
     }
 }

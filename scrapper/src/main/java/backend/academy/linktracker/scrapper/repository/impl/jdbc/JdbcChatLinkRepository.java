@@ -25,9 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @Slf4j
 @AllArgsConstructor
 public class JdbcChatLinkRepository implements ChatLinkRepository {

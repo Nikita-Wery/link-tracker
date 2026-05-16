@@ -15,10 +15,10 @@ import org.springframework.validation.annotation.Validated;
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-public class LinkUpdateWorkerProperties {
+public class LinkUpdateWorkerProperties implements WorkerProperties {
 
     @Min(8000)
-    private int maximumNumberOfNotUpdatedLinks;
+    private int maximumNumberOfUnprocessedElements;
 
     @Min(1)
     private int batchSize;

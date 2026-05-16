@@ -1,6 +1,6 @@
 package backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.rest;
 
-import backend.academy.linktracker.scrapper.client.inner.RestBotClient;
+import backend.academy.linktracker.scrapper.client.inner.impl.RestBotClient;
 import backend.academy.linktracker.scrapper.client.responsehandler.BotBadResponseHandler;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.properties.BotProperties;

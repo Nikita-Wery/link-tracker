@@ -8,13 +8,13 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "app.scheduler")
+@ConfigurationProperties(prefix = "app.scheduler.link-update")
 @Validated
 @Getter
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-public class SchedulerProperties {
+public class LinkUpdateSchedulerProperties {
 
     @Min(2)
     private int batchSize;

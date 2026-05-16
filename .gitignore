@@ -32,6 +32,8 @@ bot/logs/*
 scrapper/src/main/java/backend/academy/linktracker/scrapper/exception/handler/ApiSchedulerExceptionHandlerRegistry.java
 scrapper/src/main/java/backend/academy/linktracker/scrapper/domain/LinkV2.java
 scrapper/src/main/java/backend/academy/linktracker/scrapper/repository/impl/inmemory
+scrapper/src/main/java/backend/academy/linktracker/scrapper/service/LinkUpdateWorker.java
+scrapper/src/main/java/backend/academy/linktracker/scrapper/service/OutboxEventUpdateWorker.java
 
 ### Eclipse ###
 .apt_generated

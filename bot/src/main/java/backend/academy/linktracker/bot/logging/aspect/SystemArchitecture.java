@@ -22,19 +22,9 @@ public class SystemArchitecture {
     @Pointcut("@annotation(backend.academy.linktracker.bot.utils.annotations.MethodLogging)")
     public void methodLoggingMethods() {}
 
-    /*
-       Возможно стоит вынести отдельный pointcut
-       target(..UpdateDispatcher), пока без надобности
-    */
     @Pointcut("execution(* backend..UpdateDispatcher.dispatch(com.pengrad.telegrambot.model.Update))")
     public void dispatchMethod() {}
 
-    /*
-       Возможно стоит вынести отдельный pointcut
-       target(..Command), пока без надобности
-
-       Подумать имеет ли смысл заменить аннотацией
-    */
     @Pointcut("execution(* backend..Command.handle(..))")
     public void commandHandleMethod() {}
 

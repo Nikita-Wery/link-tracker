@@ -1,55 +1,58 @@
-package backend.academy.linktracker.scrapper.client.inner.impl;
+package backend.academy.linktracker.scrapper.client.inner.kafka;
 
-import lombok.RequiredArgsConstructor;
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
+import backend.academy.linktracker.scrapper.domain.MessageStatus;
+import backend.academy.linktracker.scrapper.domain.OutboxEvent;
+import backend.academy.linktracker.scrapper.dto.OutboxEventUpdateDto;
+import backend.academy.linktracker.scrapper.service.BatchWorker;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 @Slf4j
-@Component
-@RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.client.scrapper.api.kafka.enabled", havingValue = "true", matchIfMissing = true)
-@ConditionalOnProperty(name = "app.kafka.serialization", havingValue = "json", matchIfMissing = true)
-public class JsonLinkUpdateMessageListener {
+public class KafkaBotClient<T> {
 
-    private final LinkUpdateService linkUpdateService;
-    private final ProcessedMessagesService processedMessagesService;
+    private final OutboxEventSender<T> sender;
+    private final BatchWorker<OutboxEventUpdateDto> batchWorker;
 
-    // TODO: подумать как обработать ошибку десериализации
-    @KafkaListener(containerFactory = "jsonConsumerFactory", topics = "${app.kafka.link-updates.json-topic}")
-    @RetryableTopic(
-        backOff = @BackOff(delay = 1000L, multiplier = 2.0),
-        attempts = "3",
-        autoCreateTopics = "true",
-        kafkaTemplate = "dlqJsonLinkUpdateKafkaTemplate",
-        topicSuffixingStrategy = SUFFIX_WITH_INDEX_VALUE,
-        include = RuntimeException.class
-    )
-    public void consumeAvroLinkUpdate(ConsumerRecord<Long, LinkUpdate> record, Acknowledgment ack) {
+    public KafkaBotClient(OutboxEventSender<T> sender, BatchWorker<OutboxEventUpdateDto> batchWorker) {
 
-        LinkUpdate linkUpdate = record.value();
-
-        log.info("Received event from topic: {}, linkUpdate id {}, updated url {}",
-            record.topic(),
-            linkUpdate.id(),
-            linkUpdate.url()
-        );
-
-        Optional<ProcessedMessage> processedMessageOpt = processedMessagesService.findProcessedMessageById(linkUpdate.id());
-
-        if (processedMessageOpt.isPresent()) {
-
-            log.warn("Found already processed message with id {}, the message will not be sent.",
-                linkUpdate.id(),
-                kv("link_url", linkUpdate.url()));
-
-            return;
-        }
-
-        linkUpdateService.sendUpdateMessage(linkUpdate);
-
-        processedMessagesService.save(new ProcessedMessage(record.key()));
-
-        ack.acknowledge();
+        this.sender = sender;
+        this.batchWorker = batchWorker;
     }
 
+    @SuppressFBWarnings(
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
+    public void sendOutboxEventTypeLinkUpdate(OutboxEvent outboxEvent) {
+
+        try {
+
+            T event = sender.deserialize(outboxEvent.getEventBody());
+
+            sender.send(outboxEvent.getKey(), event).whenComplete((sendResult, t) -> {
+                if (t != null) {
+
+                    log.error(
+                            "Error while sending linkUpdate",
+                            kv("link_update_id", sender.extractEventId(event)),
+                            kv("link_update_url", sender.extractUrl(event)),
+                            kv("exception_message", t.getMessage()),
+                            t);
+
+                    batchWorker.submit(new OutboxEventUpdateDto(outboxEvent.getId(), MessageStatus.FAILED));
+
+                    return;
+                }
+
+                batchWorker.submit(new OutboxEventUpdateDto(outboxEvent.getId(), MessageStatus.SENT));
+            });
+
+        } catch (Exception e) {
+
+            log.error("Failed to send LinkUpdateEvent", kv("outbox_event_id", outboxEvent.getId()), e);
+
+            batchWorker.submit(new OutboxEventUpdateDto(outboxEvent.getId(), MessageStatus.FAILED));
+        }
+    }
 }

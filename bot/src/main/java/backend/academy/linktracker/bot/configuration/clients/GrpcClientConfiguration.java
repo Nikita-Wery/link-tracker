@@ -1,10 +1,10 @@
-package backend.academy.linktracker.bot.configuration.clientconfiguration;
+package backend.academy.linktracker.bot.configuration.clients;
 
 import backend.academy.linktracker.bot.client.GrpcScrapperClient;
 import backend.academy.linktracker.bot.client.responsehandler.GrpcScrapperBadResponseHandler;
 import backend.academy.linktracker.bot.exception.ScrapperApiException;
 import backend.academy.linktracker.bot.properties.ScrapperProperties;
-import backend.academy.linktracker.bot.utils.GrpcMapper;
+import backend.academy.linktracker.bot.utils.mappers.GrpcMapper;
 import backend.academy.linktracker.proto.ScrapperServiceGrpc;
 import io.grpc.ManagedChannel;
 import java.util.List;

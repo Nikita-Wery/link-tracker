@@ -1,7 +1,7 @@
 package backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.grpc;
 
 import backend.academy.linktracker.proto.BotServiceGrpc;
-import backend.academy.linktracker.scrapper.client.inner.GrpcBotClient;
+import backend.academy.linktracker.scrapper.client.inner.impl.GrpcBotClient;
 import backend.academy.linktracker.scrapper.client.responsehandler.GrpcBotBadResponseHandler;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.properties.BotProperties;

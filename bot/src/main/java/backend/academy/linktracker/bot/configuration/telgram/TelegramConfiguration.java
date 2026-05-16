@@ -1,4 +1,4 @@
-package backend.academy.linktracker.bot.configuration.telgramconfiguration;
+package backend.academy.linktracker.bot.configuration.telgram;
 
 import backend.academy.linktracker.bot.properties.TelegramProperties;
 import com.pengrad.telegrambot.TelegramBot;

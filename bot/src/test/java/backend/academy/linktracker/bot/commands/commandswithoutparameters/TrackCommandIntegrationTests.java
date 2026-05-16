@@ -6,47 +6,44 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
+import backend.academy.linktracker.bot.application.command.Command;
 import backend.academy.linktracker.bot.application.command.impl.CancelCommand;
+import backend.academy.linktracker.bot.application.command.impl.TrackCommand;
 import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispatcher;
 import backend.academy.linktracker.bot.client.ScrapperClient;
-import backend.academy.linktracker.bot.configuration.telgramconfiguration.TelegramTestConfiguration;
 import backend.academy.linktracker.bot.dialog.DialogContext;
 import backend.academy.linktracker.bot.dialog.trackdialog.TrackingDialogStates;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
-import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.SendMessage;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = TelegramTestConfiguration.class)
-public class TrackCommandIntegrationTests {
+@ExtendWith(MockitoExtension.class)
+class TrackCommandTest {
 
     private static final String COMMAND_TEXT =
             "Отправьте ссылку на ресурс, который хотите отслеживать%n%n%s - чтобы прервать выполнение"
                     .formatted(CancelCommand.COMMAND_NAME);
 
-    @MockitoBean
-    private TelegramBot telegramBot;
+    @Mock
+    private TelegramMessageSender telegramMessageSender;
 
-    @MockitoBean
+    @Mock
     private ScrapperClient scrapperClient;
 
-    @MockitoBean
+    @Mock
     private DialogContextStorage contextStorage;
 
-    @Autowired
     private CommandDispatcher commandDispatcher;
 
     private Update update;
@@ -62,30 +59,36 @@ public class TrackCommandIntegrationTests {
         when(chat.id()).thenReturn(200L);
         when(message.chat()).thenReturn(chat);
         when(update.message()).thenReturn(message);
+
+        List<Command<Update>> commands = new ArrayList<>();
+
+        TrackCommand trackCommand = new TrackCommand(telegramMessageSender, contextStorage);
+
+        commands.add(trackCommand);
+
+        commandDispatcher = new CommandDispatcher(commands, null, contextStorage);
     }
 
-    @AfterEach()
-    public void verifyDialogDeletion() {
-        verify(contextStorage).clearDialog(eq(200L));
+    @AfterEach
+    void verifyDialogDeletion() {
+        verify(contextStorage).clearDialog(200L);
     }
 
     @Test
-    @DisplayName("Сценарий: после команд /track, пользователю предлагается ввести ссылку")
-    public void execute_FirstUse() {
+    void TrackCommandTest() {
         when(message.text()).thenReturn("/track");
 
         commandDispatcher.dispatch(update);
 
-        ArgumentCaptor<SendMessage> argumentCaptor = ArgumentCaptor.forClass(SendMessage.class);
-        verify(telegramBot).execute(argumentCaptor.capture());
+        ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
 
-        ArgumentCaptor<DialogContext> dialogContext = ArgumentCaptor.forClass(DialogContext.class);
-        verify(contextStorage).save(eq(200L), dialogContext.capture());
+        verify(telegramMessageSender).sendMessage(eq(200L), messageCaptor.capture());
 
-        SendMessage sentMessage = argumentCaptor.getValue();
-        DialogContext context = dialogContext.getValue();
-        assertEquals(TrackingDialogStates.WAITING_URL, context.getState());
+        ArgumentCaptor<DialogContext> contextCaptor = ArgumentCaptor.forClass(DialogContext.class);
 
-        assertEquals(COMMAND_TEXT, sentMessage.getText());
+        verify(contextStorage).save(eq(200L), contextCaptor.capture());
+
+        assertEquals(TrackingDialogStates.WAITING_URL, contextCaptor.getValue().getState());
+        assertEquals(COMMAND_TEXT, messageCaptor.getValue());
     }
 }

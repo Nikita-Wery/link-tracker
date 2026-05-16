@@ -1,10 +1,10 @@
-package backend.academy.linktracker.bot.utils;
+package backend.academy.linktracker.bot.utils.mappers;
 
 import backend.academy.linktracker.bot.dto.LinkResponse;
 import backend.academy.linktracker.bot.dto.LinkUpdate;
 import backend.academy.linktracker.bot.dto.ListLinksResponse;
 import java.net.URI;
-import java.util.HashSet;
+import java.util.ArrayList;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -13,9 +13,9 @@ public class GrpcMapper {
     public LinkUpdate mapLinkUpdateFromProto(backend.academy.linktracker.proto.LinkUpdate linkUpdateProto) {
         return new LinkUpdate(
                 linkUpdateProto.getId(),
-                URI.create(linkUpdateProto.getUrl()),
+                linkUpdateProto.getUrl(),
                 linkUpdateProto.getDescription(),
-                new HashSet<>(linkUpdateProto.getTgChatIdsList()));
+                new ArrayList<>(linkUpdateProto.getTgChatIdsList()));
     }
 
     public LinkResponse mapLinkResponseFromProto(backend.academy.linktracker.proto.LinkResponse linkResponseProto) {

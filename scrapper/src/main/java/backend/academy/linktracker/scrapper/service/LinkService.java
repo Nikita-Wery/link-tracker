@@ -4,7 +4,7 @@ import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import backend.academy.linktracker.scrapper.domain.ChatLink;
 import backend.academy.linktracker.scrapper.domain.Link;
-import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
+import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkAlreadyExistsException;
 import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -89,11 +88,7 @@ public class LinkService {
     }
 
     @Transactional
-    public void updateLastUpdateBatch(List<UpdateLinkDto> batch, int batchSize) {
-        try {
-            linkRepository.updateLastUpdateBatch(batch, batchSize);
-        } catch (DataAccessException e) {
-            log.error("Failed to update last update batch", e);
-        }
+    public void updateLastUpdateBatch(List<LinkUpdate> batch, int batchSize) {
+        linkRepository.updateLastUpdateBatch(batch, batchSize);
     }
 }
