@@ -17,6 +17,8 @@ stages:
 
 cache:
   key: "maven-cache-$CI_PROJECT_ID"
+  policy: pull-push
+  when: always
   paths:
     - .m2/repository/
 
