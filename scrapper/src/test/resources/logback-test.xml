@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+<!--    &lt;!&ndash; Kafka &ndash;&gt;-->
+<!--    <logger name="org.apache.kafka.clients" level="ERROR"/>-->
+<!--    <logger name="org.apache.kafka.common" level="ERROR"/>-->
+<!--    <logger name="org.apache.kafka.network" level="ERROR"/>-->
+
+<!--    &lt;!&ndash; Spring Kafka &ndash;&gt;-->
+<!--    <logger name="org.springframework.kafka" level="ERROR"/>-->
+
+<!--    &lt;!&ndash; Testcontainers &ndash;&gt;-->
+<!--    <logger name="org.testcontainers" level="WARN"/>-->
+<!--    <logger name="tc" level="WARN"/>-->
+
+<!--    <root level="INFO">-->
+<!--        <appender-ref ref="CONSOLE"/>-->
+<!--    </root>-->
+
+</configuration>

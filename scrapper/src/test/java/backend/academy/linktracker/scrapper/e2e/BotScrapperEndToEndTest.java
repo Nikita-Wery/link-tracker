@@ -23,7 +23,7 @@ import io.grpc.health.v1.HealthCheckRequest;
 import io.grpc.health.v1.HealthCheckResponse;
 import io.grpc.health.v1.HealthGrpc;
 import java.net.URI;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.util.Collections;
@@ -62,13 +62,13 @@ class BotScrapperEndToEndTest {
     final DockerImageName SCRAPPER_IMAGE = DockerImageName.parse("scrapper:0.0.1");
     final DockerImageName LIQUIBASE_IMAGE = DockerImageName.parse("liquibase/liquibase:latest-alpine");
 
-    final String SCRAPPER_MIGRATIONS_PATH = Paths.get("")
+    final String SCRAPPER_MIGRATIONS_PATH = Path.of("")
             .toAbsolutePath()
             .getParent()
             .resolve("migrations/migrations-scrapper")
             .toString();
 
-    final String BOT_MIGRATIONS_PATH = Paths.get("")
+    final String BOT_MIGRATIONS_PATH = Path.of("")
             .toAbsolutePath()
             .getParent()
             .resolve("migrations/migrations-bot")

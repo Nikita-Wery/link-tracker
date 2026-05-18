@@ -38,12 +38,6 @@ app:
         queue-capacity: 0
         maximum-number-of-unprocessed-elements: 10000
 
-  client:
-    bot:
-      api:
-        kafka:
-          enabled: true
-
   kafka:
     serialization: json
 

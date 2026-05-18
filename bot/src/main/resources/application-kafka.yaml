@@ -13,7 +13,7 @@ spring:
         max.poll.interval.ms: 300000
         max.poll.records: 50
         schema.registry.url: http://localhost:8087
-        spring.json.trusted.packages: "backend.academy.linktracker.bot"
+        spring.json.trusted.packages: "*"
 
     producer:
       acks: all

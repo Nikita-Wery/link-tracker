@@ -15,14 +15,6 @@ public class JsonKafkaTopicConfig {
     @Bean
     public KafkaAdmin.NewTopics jsonTopics(LinkUpdateTopicProperties props) {
 
-        return new KafkaAdmin.NewTopics(
-                new NewTopic(props.getName(), props.getPartitions(), props.getReplicas())
-                // TODO:
-                //            new NewTopic(
-                //                props.getJsonTopic() + "-dlt",
-                //                props.getPartitions(),
-                //                props.getReplicas()
-                //            )
-                );
+        return new KafkaAdmin.NewTopics(new NewTopic(props.getName(), props.getPartitions(), props.getReplicas()));
     }
 }

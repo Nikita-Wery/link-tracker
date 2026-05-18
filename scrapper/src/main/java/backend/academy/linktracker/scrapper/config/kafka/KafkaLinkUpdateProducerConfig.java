@@ -16,16 +16,13 @@ import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.client.bot.api.kafka", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.client.bot.api.kafka.enabled", havingValue = "true", matchIfMissing = true)
 public class KafkaLinkUpdateProducerConfig {
-
-    public static final String AVRO_LINK_UPDATE_KAFKA_CLIENT = "avroLinkUpdateKafkaTemplate";
-    public static final String DEFAULT_LINK_UPDATE_KAFKA_CLIENT = "defaultLinkUpdateKafkaTemplate";
 
     private final KafkaProperties kafkaProperties;
 
-    @Bean(AVRO_LINK_UPDATE_KAFKA_CLIENT)
-    @ConditionalOnProperty(name = "app.kafka.type", havingValue = "avro")
+    @Bean
+    @ConditionalOnProperty(name = "app.kafka.serialization", havingValue = "avro")
     public KafkaTemplate<Long, LinkUpdateEvent> avroKafkaTemplate() {
 
         var props = kafkaProperties.buildProducerProperties();
@@ -37,8 +34,8 @@ public class KafkaLinkUpdateProducerConfig {
         return new KafkaTemplate<>(factory);
     }
 
-    @Bean(DEFAULT_LINK_UPDATE_KAFKA_CLIENT)
-    @ConditionalOnProperty(name = "app.kafka.type", havingValue = "json", matchIfMissing = true)
+    @Bean
+    @ConditionalOnProperty(name = "app.kafka.serialization", havingValue = "json", matchIfMissing = true)
     public KafkaTemplate<Long, LinkUpdate> jsonKafkaTemplate() {
 
         var props = kafkaProperties.buildProducerProperties();

@@ -24,6 +24,6 @@ public interface JpaOutboxEventRepository extends JpaRepository<OutboxEvent, Lon
         WHERE oe.id = s.id
         RETURNING oe.*;
         """, nativeQuery = true)
-    List<OutboxEvent> findBatchPendingMessagesAndGetLock(
+    List<OutboxEvent> findBatchPendingMessagesAndChangeStatus(
             @Param("batchSize") int batchSize, @Param("topic") String topic);
 }
