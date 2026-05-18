@@ -2,7 +2,14 @@ package backend.academy.linktracker.scrapper.controller.grpc;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import backend.academy.linktracker.proto.*;
+import backend.academy.linktracker.proto.AddLinkRequest;
+import backend.academy.linktracker.proto.GetLinksRequest;
+import backend.academy.linktracker.proto.LinkResponse;
+import backend.academy.linktracker.proto.ListLinksResponse;
+import backend.academy.linktracker.proto.RegisterChatRequest;
+import backend.academy.linktracker.proto.RemoveChatRequest;
+import backend.academy.linktracker.proto.RemoveLinkRequest;
+import backend.academy.linktracker.proto.ScrapperServiceGrpc;
 import backend.academy.linktracker.scrapper.domain.Chat;
 import backend.academy.linktracker.scrapper.domain.ChatLink;
 import backend.academy.linktracker.scrapper.domain.Link;

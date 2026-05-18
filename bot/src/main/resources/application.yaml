@@ -26,6 +26,7 @@ spring:
     restart:
       enabled: false
 
+
 app:
   telegram:
     enabled: true
@@ -58,3 +59,9 @@ app:
           enabled: true
         grpc:
           enabled: false
+
+logging:
+  level:
+    org.apache.kafka: TRACE
+    org.springframework.kafka: DEBUG
+    org.springframework.kafka.support.serializer: TRACE

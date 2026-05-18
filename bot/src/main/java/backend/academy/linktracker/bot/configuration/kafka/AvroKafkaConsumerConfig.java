@@ -17,7 +17,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -28,7 +27,6 @@ import org.springframework.kafka.listener.ContainerProperties;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableKafka
 @ConditionalOnProperty(name = "app.client.scrapper.api.kafka.enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnProperty(name = "app.kafka.serialization", havingValue = "avro")
 public class AvroKafkaConsumerConfig {
@@ -48,7 +46,6 @@ public class AvroKafkaConsumerConfig {
         }));
 
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
-        // TODO: add custom error handler
         factory.setCommonErrorHandler(new CommonLoggingErrorHandler());
         factory.setAutoStartup(true);
         factory.setConcurrency(DEFAULT_CONCURRENCY);

@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - include:
+      file: scrapper/changelog-root.yaml
+
+  - changeSet:
+      id: insert-test-outbox
+      author: test
+      changes:
+        - sqlFile:
+            path: 002_insert_outbox_event.sql

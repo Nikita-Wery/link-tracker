@@ -13,7 +13,7 @@ public class JsonToEntityDeserializer {
     private final ObjectMapper objectMapper;
 
     public LinkUpdateEvent deserializeLinkUpdateEvent(String json) {
-        LinkUpdate linkUpdate = objectMapper.convertValue(json, LinkUpdate.class);
+        LinkUpdate linkUpdate = objectMapper.readValue(json, LinkUpdate.class);
 
         return LinkUpdateEvent.newBuilder()
                 .setId(linkUpdate.id())
@@ -24,6 +24,6 @@ public class JsonToEntityDeserializer {
     }
 
     public LinkUpdate deserializeLinkUpdate(String json) {
-        return objectMapper.convertValue(json, LinkUpdate.class);
+        return objectMapper.readValue(json, LinkUpdate.class);
     }
 }

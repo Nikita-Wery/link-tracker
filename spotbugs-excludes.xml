@@ -73,4 +73,9 @@
     <Match>
         <Package name="backend.academy.linktracker.proto"/>
     </Match>
+
+    <!-- Avro generated classes -->
+    <Match>
+        <Package name="backend.academy.linktracker.contract.avro.*"/>
+    </Match>
 </FindBugsFilter>

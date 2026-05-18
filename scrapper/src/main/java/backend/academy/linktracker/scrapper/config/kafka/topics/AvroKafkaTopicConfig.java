@@ -15,14 +15,6 @@ public class AvroKafkaTopicConfig {
     @Bean
     public KafkaAdmin.NewTopics avroTopics(LinkUpdateTopicProperties props) {
 
-        return new KafkaAdmin.NewTopics(
-                new NewTopic(props.getName(), props.getPartitions(), props.getReplicas())
-                // TODO: подумать где лучше убарать
-                //            new NewTopic(
-                //                props.getAvroTopic() + "-dlt",
-                //                props.getPartitions(),
-                //                props.getReplicas()
-                //            )
-                );
+        return new KafkaAdmin.NewTopics(new NewTopic(props.getName(), props.getPartitions(), props.getReplicas()));
     }
 }

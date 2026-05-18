@@ -21,7 +21,7 @@ public class OrmOutboxEventRepository implements OutboxEventRepository {
 
     @Override
     public List<OutboxEvent> findBatchPendingMessagesAndSetProcessing(int batchSize, String topic) {
-        return List.of();
+        return jpaOutboxEventRepository.findBatchPendingMessagesAndChangeStatus(batchSize, topic);
     }
 
     @Override

@@ -6,9 +6,14 @@ import backend.academy.linktracker.scrapper.properties.topics.LinkUpdateTopicPro
 import backend.academy.linktracker.scrapper.utils.JsonToEntityDeserializer;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 
+@Slf4j
+@ConditionalOnProperty(name = "app.client.bot.api.kafka.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.kafka.serialization", havingValue = "json")
 @RequiredArgsConstructor
 public class JsonOutboxEventSender implements OutboxEventSender<LinkUpdate> {
 
@@ -33,6 +38,8 @@ public class JsonOutboxEventSender implements OutboxEventSender<LinkUpdate> {
 
     @Override
     public CompletableFuture<SendResult<Long, LinkUpdate>> send(Long key, LinkUpdate event) {
+
+        log.info("SEND topic={}, key={}", properties.getName(), key);
 
         return kafkaTemplate.send(properties.getName(), key, event);
     }

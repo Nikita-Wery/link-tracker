@@ -25,10 +25,14 @@ public class OutboxScheduler {
 
     @Scheduled(fixedDelayString = "${app.scheduler.outbox.interval-update-ms}")
     public void publishLinkUpdateEvents() {
+        log.info("OutboxScheduler starts task");
+
         List<OutboxEvent> outboxEvents = outboxEventService.findBatchPendingMessagesByTopic(
                 outboxSchedulerProperties.getBatchSize(), linkUpdateTopicProperties.getName());
 
         for (OutboxEvent event : outboxEvents) {
+            log.info("Outbox event {} preparing for shipment", event.getId());
+
             kafkaBotClient.sendOutboxEventTypeLinkUpdate(event);
         }
     }
