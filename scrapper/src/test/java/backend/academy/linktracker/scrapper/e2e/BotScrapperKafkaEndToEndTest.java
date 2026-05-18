@@ -109,7 +109,7 @@ public class BotScrapperKafkaEndToEndTest {
                     "--password=test",
                     "--changeLogFile=changelog-root.yaml",
                     "update")
-//            .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+            //            .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
             .withStartupCheckStrategy(new OneShotStartupCheckStrategy())
             .dependsOn(scrapperPostgres);
 
@@ -155,7 +155,7 @@ public class BotScrapperKafkaEndToEndTest {
             .withEnv("DB_USERNAME", "test")
             .withEnv("DB_PASSWORD", "test")
             .withNetwork(network)
-//            .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+            //            .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
             .withNetworkAliases("bot")
             .dependsOn(botLiquibase, schemaRegistry)
             .waitingFor(Wait.forHttp("/actuator/health").forPort(8080));
@@ -185,7 +185,7 @@ public class BotScrapperKafkaEndToEndTest {
             .withEnv("DB_PASSWORD", "test")
             .withEnv("SPRING_LIQUIBASE_ENABLED", "false")
             .withNetwork(network)
-//            .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+            //            .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
             .withNetworkAliases("scrapper")
             .dependsOn(schemaRegistry, scrapperLiquibase)
             .waitingFor(Wait.forHttp("/actuator/health").forPort(8081));
