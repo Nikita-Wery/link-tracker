@@ -156,7 +156,7 @@ class BotScrapperEndToEndTest {
                 .withEnv("DB_NAME", "bot_db")
                 .withEnv("DB_USERNAME", "test")
                 .withEnv("DB_PASSWORD", "test")
-//                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+                //                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
                 .withNetwork(network)
                 .withNetworkAliases("bot")
                 .waitingFor(Wait.forHttp("/actuator/health").forPort(8080).withStartupTimeout(Duration.ofMinutes(2)));
@@ -178,7 +178,7 @@ class BotScrapperEndToEndTest {
                 .withEnv("DB_USERNAME", "test")
                 .withEnv("DB_PASSWORD", "test")
                 .withEnv("SPRING_LIQUIBASE_ENABLED", "false")
-//                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+                //                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
                 .withNetwork(network)
                 .withNetworkAliases("scrapper")
                 .waitingFor(Wait.forHttp("/actuator/health").forPort(8081).withStartupTimeout(Duration.ofMinutes(2)));
