@@ -21,7 +21,6 @@ import backend.academy.linktracker.scrapper.service.ChatService;
 import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
