@@ -16,8 +16,10 @@ import backend.academy.linktracker.scrapper.properties.StackoverflowProperties;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Tag("integration")
 @WireMockTest
 class StackOverflowIntegrationTest {
 

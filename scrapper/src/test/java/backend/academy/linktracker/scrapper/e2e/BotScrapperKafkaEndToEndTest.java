@@ -21,6 +21,7 @@ import org.apache.kafka.common.serialization.LongDeserializer;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
@@ -39,6 +40,7 @@ import org.testcontainers.kafka.ConfluentKafkaContainer;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
+@Tag("integration")
 @Slf4j
 @Testcontainers
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
