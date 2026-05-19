@@ -35,5 +35,5 @@ public interface JpaChatLinkRepository extends JpaRepository<ChatLink, Long> {
         JOIN FETCH cl.tags
         WHERE cl.link.linkId IN :ids
     """)
-    List<ChatLink> findChatIdsThatTrackLinks(@Param("ids") List<Long> linkIds);
+    List<ChatLink> findChatLinksThatTrackLinks(@Param("ids") List<Long> linkIds);
 }

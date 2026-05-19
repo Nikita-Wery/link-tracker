@@ -1,8 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: 001_create_chat_link_chatid_index
-      author: LuzinNikita
-      changes:
-        - sqlFile:
-            path: 001_create_chat_link_chatid_index.sql
-            relativeToChangelogFile: true

@@ -5,7 +5,6 @@ import backend.academy.linktracker.scrapper.dto.UpdateLinkDto;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import org.springframework.data.domain.Slice;
 
 public interface LinkRepository {
@@ -21,8 +20,4 @@ public interface LinkRepository {
     Link saveAndFlush(Link link);
 
     Optional<Link> findLinkByURI(String uri);
-
-    boolean existsById(long linkId);
-
-    Set<Link> findAll();
 }

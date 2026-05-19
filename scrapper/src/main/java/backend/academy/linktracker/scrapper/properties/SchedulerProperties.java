@@ -16,9 +16,9 @@ import org.springframework.validation.annotation.Validated;
 @NoArgsConstructor
 public class SchedulerProperties {
 
-    @Min(2)
+    @Min(50)
     private int batchSize;
 
-    @Min(3000)
+    @Min(500)
     private long intervalUpdateMs;
 }

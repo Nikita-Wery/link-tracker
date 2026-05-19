@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -35,7 +36,7 @@ public class JdbcRepositoryConfiguration {
     }
 
     @Bean
-    public ChatLinkRepository chatLinkRepository(JdbcClient jdbcClient, DataSource dataSource) {
-        return new JdbcChatLinkRepository(jdbcClient, dataSource);
+    public ChatLinkRepository chatLinkRepository(JdbcClient jdbcClient, JdbcTemplate jdbcTemplate) {
+        return new JdbcChatLinkRepository(jdbcClient, jdbcTemplate);
     }
 }

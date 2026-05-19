@@ -5,6 +5,3 @@ databaseChangeLog:
   - include:
       file: ./changelog-tables/001_init_tables.yaml
       relativeToChangelogFile: true
-  - include:
-      file: ./changelog-indexes/001_init_indexes.yaml
-      relativeToChangelogFile: true
