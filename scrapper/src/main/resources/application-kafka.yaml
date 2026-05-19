@@ -27,6 +27,8 @@ app:
     outbox:
       batch-size: 50
       interval-update-ms: 60000
+    old-event:
+      interval-timeout-min: 10
 
   db:
     workers:

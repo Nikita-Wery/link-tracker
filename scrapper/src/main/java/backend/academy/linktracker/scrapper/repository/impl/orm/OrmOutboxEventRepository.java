@@ -28,4 +28,7 @@ public class OrmOutboxEventRepository implements OutboxEventRepository {
     public void updateMessageStatusBatch(List<OutboxEventUpdateDto> outboxEventUpdateDtos) {
         jdbcHelper.updateMessageStatusBatch(outboxEventUpdateDtos);
     }
+
+    @Override
+    public void markStuckPendingAsFail(int minutes) {}
 }

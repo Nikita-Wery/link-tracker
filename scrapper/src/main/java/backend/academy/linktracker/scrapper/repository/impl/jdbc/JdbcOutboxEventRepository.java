@@ -32,6 +32,15 @@ public class JdbcOutboxEventRepository implements OutboxEventRepository {
     """;
 
     // language=sql
+    private static final String UPDATE_STUCK_OUTBOX_EVENTS = """
+       UPDATE outbox_event
+        SET status = 'FAILED',
+            updated_at = now()
+        WHERE status = 'PENDING'
+          AND created_at < now() - (:minutes * interval '1 minute')
+    """;
+
+    // language=sql
     private static final String INSERT_BATCH_OUTBOX_EVENTS =
             "INSERT INTO outbox_event (key, topic, event_body, status, updated_at) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)";
 
@@ -63,5 +72,10 @@ public class JdbcOutboxEventRepository implements OutboxEventRepository {
     @Override
     public void updateMessageStatusBatch(List<OutboxEventUpdateDto> outboxEventUpdateDtos) {
         jdbcHelper.updateMessageStatusBatch(outboxEventUpdateDtos);
+    }
+
+    @Override
+    public void markStuckPendingAsFail(int minutes) {
+        jdbcClient.sql(UPDATE_STUCK_OUTBOX_EVENTS).param("minutes", minutes).update();
     }
 }

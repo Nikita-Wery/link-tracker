@@ -23,8 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.stereotype.Repository;
 
 @Slf4j
 @AllArgsConstructor

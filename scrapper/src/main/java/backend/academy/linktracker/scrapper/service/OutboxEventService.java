@@ -30,4 +30,9 @@ public class OutboxEventService {
     public void batchUpdateOutboxEventStatuses(List<OutboxEventUpdateDto> outboxEvents) {
         outboxEventRepository.updateMessageStatusBatch(outboxEvents);
     }
+
+    @Transactional
+    public void markPendingEventsAsFailByTimeout(int timeout) {
+        outboxEventRepository.markStuckPendingAsFail(timeout);
+    }
 }

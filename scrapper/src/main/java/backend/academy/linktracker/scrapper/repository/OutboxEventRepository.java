@@ -11,4 +11,6 @@ public interface OutboxEventRepository {
     List<OutboxEvent> findBatchPendingMessagesAndSetProcessing(int batchSize, String topic);
 
     void updateMessageStatusBatch(List<OutboxEventUpdateDto> outboxEventUpdateDtos);
+
+    void markStuckPendingAsFail(int minutes);
 }
