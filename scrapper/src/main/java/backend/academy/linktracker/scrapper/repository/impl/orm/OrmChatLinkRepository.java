@@ -45,6 +45,6 @@ public class OrmChatLinkRepository implements ChatLinkRepository {
 
     @Override
     public List<ChatLink> findChatLinksThatTrackLink(List<Long> linkIds) {
-        return jpaChatLinkRepository.findChatIdsThatTrackLinks(linkIds);
+        return jpaChatLinkRepository.findChatLinksThatTrackLinks(linkIds);
     }
 }

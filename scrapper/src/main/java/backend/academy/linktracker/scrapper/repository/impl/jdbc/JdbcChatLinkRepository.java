@@ -9,8 +9,6 @@ import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.exception.botexception.ScrapperApiException;
 import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
@@ -20,11 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import javax.sql.DataSource;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.stereotype.Repository;
 
 @Slf4j
 @AllArgsConstructor
@@ -39,10 +39,6 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
             "SELECT EXISTS (SELECT 1 FROM chat_link WHERE chat_link_id = :chatLinkId)";
 
     // language=sql
-    private static final String SELECT_CHATLINKS_BY_CHATID =
-            "SELECT chat_link_id, chat_id, link_url FROM chat_link WHERE chat_id = :chatId";
-
-    // language=sql
     private static final String INSERT_TAGS = "INSERT INTO chat_link_tags (chat_link_id, tag) VALUES (?, ?)";
 
     // language=sql
@@ -53,9 +49,6 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
         LEFT JOIN chat_link_tags t ON cl.chat_link_id = t.chat_link_id
         WHERE cl.chat_id = :chatId
         """;
-
-    // language=sql
-    private static final String SELECT_COUNT_ALL_CHATLINKS = "SELECT count(*) FROM chat_link";
 
     // language=sql
     private static final String DELETE_BY_CHATID_URL_RETURNING_CHATLINK = """
@@ -90,7 +83,7 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
     private static final String SELECT_NEXT_ID = "SELECT nextval('CHAT_LINK_SEQUENCE')";
 
     private final JdbcClient jdbcClient;
-    private final DataSource dataSource;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public ChatLink save(ChatLink chatLink) {
@@ -176,23 +169,14 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
             value = "SLF4J_PLACE_HOLDER_MISMATCH",
             justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public void addTagsToChatLink(long chatLinkId, Set<String> tags) {
-        Connection connection = DataSourceUtils.getConnection(dataSource);
-
-        try (PreparedStatement ps = connection.prepareStatement(INSERT_TAGS)) {
-
-            for (String tag : tags) {
+        try {
+            jdbcTemplate.batchUpdate(INSERT_TAGS, tags, tags.size(), (ps, tag) -> {
                 ps.setLong(1, chatLinkId);
                 ps.setString(2, tag);
-                ps.addBatch();
-            }
-            ps.executeBatch();
-
-        } catch (SQLException ex) {
+            });
+        } catch (DataAccessException ex) {
             log.error("SQL error when adding tags", kv("insert_query", INSERT_TAGS));
-
             throw new ScrapperApiException(ex.getMessage(), "Error when adding tags");
-        } finally {
-            DataSourceUtils.releaseConnection(connection, dataSource);
         }
     }
 

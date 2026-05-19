@@ -94,7 +94,7 @@ public class LinkUpdateScheduler {
 
     private List<List<Link>> splitBatchIntoChunks(List<Link> batchLinks) {
 
-        int batchSize = Math.min(batchLinks.size(), 1);
+        int batchSize = Math.max(batchLinks.size(), 1);
         int threadPoolSize = apiWorkersProperties.getThreadPoolSize();
 
         if (batchSize < threadPoolSize) return List.of(batchLinks);
