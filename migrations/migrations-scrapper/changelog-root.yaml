@@ -1,10 +1,7 @@
 databaseChangeLog:
   - include:
-      file: changelog-sequencies/001_init_sequencies.yaml
+      file: ./changelog-sequencies/001_init_sequencies.yaml
       relativeToChangelogFile: true
   - include:
-      file: changelog-tables/001_init_tables.yaml
-      relativeToChangelogFile: true
-  - include:
-      file: changelog-indexes/001_init_indexes.yaml
+      file: ./changelog-tables/001_init_tables.yaml
       relativeToChangelogFile: true

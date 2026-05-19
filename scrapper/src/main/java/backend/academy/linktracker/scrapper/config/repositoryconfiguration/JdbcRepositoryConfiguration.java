@@ -38,8 +38,8 @@ public class JdbcRepositoryConfiguration {
     }
 
     @Bean
-    public ChatLinkRepository chatLinkRepository(JdbcClient jdbcClient, DataSource dataSource) {
-        return new JdbcChatLinkRepository(jdbcClient, dataSource);
+    public ChatLinkRepository chatLinkRepository(JdbcClient jdbcClient, JdbcTemplate jdbcTemplate) {
+        return new JdbcChatLinkRepository(jdbcClient, jdbcTemplate);
     }
 
     @Bean

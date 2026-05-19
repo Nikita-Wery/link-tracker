@@ -16,3 +16,5 @@ CREATE TABLE chat_link (
     CONSTRAINT unq_chatid_linkurl
         UNIQUE (chat_id, link_id)
 );
+CREATE INDEX idx_chat_link_chat_id
+    ON chat_link(chat_id);

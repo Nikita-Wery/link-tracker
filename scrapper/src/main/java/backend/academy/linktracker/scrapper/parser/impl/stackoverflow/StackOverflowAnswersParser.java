@@ -18,7 +18,7 @@ public class StackOverflowAnswersParser implements LinkParser<Long> {
 
             String[] segments = uri.getPath().split("/");
 
-            return segments.length == 3
+            return segments.length == 4
                     && "questions".equals(segments[1])
                     && segments[2].matches("\\d+")
                     && "answers".equals(segments[3]);

@@ -1,8 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: 001_create_processed_messages
-      author: LuzinNikita
-      changes:
-        - sqlFile:
-            path: 001_create_processed_messages.sql
-            relativeToChangelogFile: true

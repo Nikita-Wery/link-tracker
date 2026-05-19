@@ -16,12 +16,18 @@ public class StackOverflowCommentsParser implements LinkParser<Long> {
                 return false;
             }
 
-            String[] segments = uri.getPath().split("/");
+            String path = uri.getPath();
+
+            if (path == null || path.isBlank()) {
+                return false;
+            }
+
+            String[] segments = path.substring(1).split("/");
 
             return segments.length == 3
-                    && "questions".equals(segments[1])
-                    && segments[2].matches("\\d+")
-                    && "comments".equals(segments[3]);
+                    && "questions".equals(segments[0])
+                    && segments[1].matches("\\d+")
+                    && "comments".equals(segments[2]);
 
         } catch (Exception e) {
             return false;

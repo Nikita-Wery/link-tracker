@@ -6,10 +6,8 @@ import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import backend.academy.linktracker.scrapper.repository.impl.jdbc.JdbcHelper;
 import backend.academy.linktracker.scrapper.repository.impl.orm.jpa.JpaLinkRepository;
 import java.time.OffsetDateTime;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -56,15 +54,5 @@ public class OrmLinkRepository implements LinkRepository {
     @Override
     public Optional<Link> findLinkByURI(String uri) {
         return jpaLinkRepository.findLinkByUrl(uri);
-    }
-
-    @Override
-    public boolean existsById(long linkId) {
-        return jpaLinkRepository.existsById(linkId);
-    }
-
-    @Override
-    public Set<Link> findAll() {
-        return new HashSet(jpaLinkRepository.findAll());
     }
 }

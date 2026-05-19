@@ -7,7 +7,6 @@ import backend.academy.linktracker.scrapper.repository.LinkRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
@@ -17,10 +16,6 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 
 @AllArgsConstructor
 public class JdbcLinkRepository implements LinkRepository {
-
-    // language=sql
-    private static final String SELECT_LINK_BY_ID =
-            "SELECT link_id, url, resource_type, latest_update_time FROM links WHERE link_id = :linkId";
 
     // language=sql
     private static final String INSERT_LINK =
@@ -39,13 +34,7 @@ public class JdbcLinkRepository implements LinkRepository {
             "SELECT link_id, url, resource_type, latest_update_time FROM links WHERE url = :linkUrl";
 
     // language=sql
-    private static final String SELECT_ALL_LINKS = "SELECT link_id, url, resource_type, latest_update_time FROM links";
-
-    // language=sql
     private static final String SELECT_NEXT_ID = "SELECT nextval('LINK_SEQUENCE')";
-
-    // language=sql
-    private static final String EXISTS_BY_ID = "SELECT EXISTS (SELECT 1 FROM links WHERE link_id = :linkId)";
 
     private static final RowMapper<Link> rsLinkMapper = (rs, rowNum) -> {
         Link link = new Link(
@@ -120,19 +109,5 @@ public class JdbcLinkRepository implements LinkRepository {
                 .param("linkUrl", uri.toString())
                 .query(rsLinkMapper)
                 .optional();
-    }
-
-    @Override
-    public boolean existsById(long linkId) {
-        return jdbcClient
-                .sql(EXISTS_BY_ID)
-                .param("linkId", linkId)
-                .query(Boolean.class)
-                .single();
-    }
-
-    @Override
-    public Set<Link> findAll() {
-        return jdbcClient.sql(SELECT_ALL_LINKS).query(rsLinkMapper).set();
     }
 }
