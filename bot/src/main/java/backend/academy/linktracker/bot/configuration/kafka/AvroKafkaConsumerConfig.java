@@ -34,6 +34,7 @@ public class AvroKafkaConsumerConfig {
     private final KafkaProperties kafkaProperties;
     public static final String DEFAULT_GROUP_ID = "bot-notification-service";
     public static final int DEFAULT_CONCURRENCY = 3;
+    public static final int DEFAULT_DLQ_ACKS = 1;
 
     @Bean("avroConsumerFactory")
     public ConcurrentKafkaListenerContainerFactory<Long, LinkUpdateEvent> defaultConsumerFactory() {
@@ -59,7 +60,7 @@ public class AvroKafkaConsumerConfig {
 
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
-        props.put(ProducerConfig.ACKS_CONFIG, "all");
+        props.put(ProducerConfig.ACKS_CONFIG, DEFAULT_DLQ_ACKS);
 
         var factory = new DefaultKafkaProducerFactory<Long, LinkUpdateEvent>(props);
         return new KafkaTemplate<>(factory);
