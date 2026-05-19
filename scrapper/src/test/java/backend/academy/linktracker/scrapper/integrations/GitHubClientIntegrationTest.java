@@ -19,8 +19,10 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Tag("integration")
 @WireMockTest
 class GitHubClientIntegrationTest {
 
