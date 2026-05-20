@@ -1,0 +1,122 @@
+package backend.academy.linktracker.scrapper.service.subscriptionimpl;
+
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
+import backend.academy.linktracker.proto.ListLinksResponse;
+import backend.academy.linktracker.scrapper.domain.Chat;
+import backend.academy.linktracker.scrapper.domain.ChatLink;
+import backend.academy.linktracker.scrapper.domain.Link;
+import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
+import backend.academy.linktracker.scrapper.exception.botexception.requestexception.ChatAlreadyExistsException;
+import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkAlreadyExistsException;
+import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkAlreadyTrackedException;
+import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkNotTrackedException;
+import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
+import backend.academy.linktracker.scrapper.service.ChatService;
+import backend.academy.linktracker.scrapper.service.LinkService;
+import backend.academy.linktracker.scrapper.service.SubscriptionService;
+import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
+import backend.academy.linktracker.scrapper.utils.GrpcMapper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@Service
+@AllArgsConstructor
+@ConditionalOnProperty(name = "app.cache.enabled", havingValue = "false", matchIfMissing = true)
+public class SubscriptionServiceBase implements SubscriptionService {
+
+    private final ChatLinkRepository chatLinkRepository;
+    private final ChatService chatService;
+    private final LinkService linkService;
+    private final GrpcMapper grpcMapper;
+    private final DtoEntityMapper dtoEntityMapper;
+
+    @Transactional
+    @SuppressFBWarnings(
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
+    public ChatLink trackLink(ChatLink chatLink) {
+
+        try {
+
+            Chat savedChat = chatService.addChat(chatLink.getChat());
+            chatLink.setChat(savedChat);
+        } catch (ChatAlreadyExistsException e) {
+            log.info("When adding a chatlink, either the chat already existed");
+        }
+
+        try {
+
+            Link savedLink = linkService.addLink(chatLink.getLink());
+            chatLink.setLink(savedLink);
+        } catch (LinkAlreadyExistsException e) {
+            log.info("When adding a chatlink, either the link already existed");
+        }
+
+        try {
+
+            return chatLinkRepository.saveAndFlush(chatLink);
+        } catch (DataIntegrityViolationException ex) {
+            log.warn(
+                    "Link already tracked",
+                    kv("chat_id", chatLink.getChat().getChatId()),
+                    kv("chat_link_id", chatLink.getChatLinkId()),
+                    ex);
+            throw new LinkAlreadyTrackedException("The link is already being tracked by the chat");
+        }
+    }
+
+    @Transactional
+    public ChatLink untrackLink(ChatLink chatLink) {
+
+        return chatLinkRepository
+                .deleteChatLinkReturningChatLink(chatLink)
+                .orElseThrow(() -> new LinkNotTrackedException("The link was not tracked from the chat side"));
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatLink> getTrackedLinksByChatId(Long chatId) {
+
+        return chatLinkRepository.findChatLinksByChatId(chatId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LinkResponse> getLinkResponsesByChatId(Long chatId) {
+
+        return getTrackedLinksByChatId(chatId).stream()
+                .map(dtoEntityMapper::linkToLinkResponse)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public ListLinksResponse getProtoListLinksResponseByChatId(long chatId) {
+        return grpcMapper.listOfLinksToLinksResponse(getTrackedLinksByChatId(chatId));
+    }
+
+    @Transactional
+    public LinkResponse trackLinkReturnLinkResponse(ChatLink chatLink) {
+        return dtoEntityMapper.linkToLinkResponse(trackLink(chatLink));
+    }
+
+    @Transactional
+    public LinkResponse untrackLinkReturnLinkResponse(ChatLink chatLink) {
+        return dtoEntityMapper.linkToLinkResponse(untrackLink(chatLink));
+    }
+
+    @Transactional
+    public backend.academy.linktracker.proto.LinkResponse trackLinkReturnProtoLinkResponse(ChatLink chatLink) {
+        return grpcMapper.linkToGrpcLinkResponse(trackLink(chatLink));
+    }
+
+    @Transactional
+    public backend.academy.linktracker.proto.LinkResponse untrackLinkReturnProtoLinkResponse(ChatLink chatLink) {
+        return grpcMapper.linkToGrpcLinkResponse(untrackLink(chatLink));
+    }
+}

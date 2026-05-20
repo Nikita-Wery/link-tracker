@@ -148,7 +148,7 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
                         }
                     } while (rs.next());
 
-                    return Optional.of(chatLink);
+                    return Optional.ofNullable(chatLink);
                 });
 
         return result;

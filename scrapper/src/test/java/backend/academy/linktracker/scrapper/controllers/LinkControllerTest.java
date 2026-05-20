@@ -19,7 +19,7 @@ import backend.academy.linktracker.scrapper.dto.bot.AddLinkRequest;
 import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
 import backend.academy.linktracker.scrapper.dto.bot.RemoveLinkRequest;
 import backend.academy.linktracker.scrapper.service.ChatService;
-import backend.academy.linktracker.scrapper.service.SubscriptionService;
+import backend.academy.linktracker.scrapper.service.subscriptionimpl.SubscriptionServiceBase;
 import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
@@ -45,7 +45,7 @@ class LinkControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private SubscriptionService subscriptionService;
+    private SubscriptionServiceBase subscriptionServiceBase;
 
     @Autowired
     private DtoEntityMapper dtoEntityMapper;
@@ -56,8 +56,8 @@ class LinkControllerTest {
     static class TestConfig {
 
         @Bean
-        public SubscriptionService subscriptionService() {
-            return mock(SubscriptionService.class);
+        public SubscriptionServiceBase subscriptionService() {
+            return mock(SubscriptionServiceBase.class);
         }
 
         @Bean
@@ -73,7 +73,7 @@ class LinkControllerTest {
 
     @BeforeEach
     void setUp() {
-        reset(subscriptionService, dtoEntityMapper);
+        reset(subscriptionServiceBase, dtoEntityMapper);
     }
 
     @Test
@@ -83,7 +83,7 @@ class LinkControllerTest {
 
         List<LinkResponse> responses = List.of(new LinkResponse(1L, "https://example.com", List.of()));
 
-        given(subscriptionService.getLinkResponsesByChatId(chatId)).willReturn(responses);
+        given(subscriptionServiceBase.getLinkResponsesByChatId(chatId)).willReturn(responses);
 
         mockMvc.perform(get("/links").header("Tg-Chat-Id", chatId))
                 .andExpect(status().isOk())
@@ -106,8 +106,8 @@ class LinkControllerTest {
 
         given(dtoEntityMapper.linkFromAddLinkRequest(any())).willReturn(link);
         given(dtoEntityMapper.getChatFromChatId(chatId)).willReturn(chat);
-        given(subscriptionService.trackLink(any())).willReturn(chatLink);
-        given(subscriptionService.trackLinkReturnLinkResponse(any())).willReturn(response);
+        given(subscriptionServiceBase.trackLink(any())).willReturn(chatLink);
+        given(subscriptionServiceBase.trackLinkReturnLinkResponse(any())).willReturn(response);
 
         mockMvc.perform(post("/links")
                         .header("Tg-Chat-Id", chatId)
@@ -133,8 +133,8 @@ class LinkControllerTest {
 
         given(dtoEntityMapper.linkFromRemoveLinkRequest(any())).willReturn(link);
         given(dtoEntityMapper.getChatFromChatId(chatId)).willReturn(chat);
-        given(subscriptionService.untrackLink(any())).willReturn(chatLink);
-        given(subscriptionService.untrackLinkReturnLinkResponse(any())).willReturn(response);
+        given(subscriptionServiceBase.untrackLink(any())).willReturn(chatLink);
+        given(subscriptionServiceBase.untrackLinkReturnLinkResponse(any())).willReturn(response);
 
         mockMvc.perform(delete("/links")
                         .header("Tg-Chat-Id", chatId)
