@@ -59,4 +59,17 @@ public class OutboxEvent {
         this.topic = topic;
         this.eventBody = eventBody;
     }
+
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (o != null && o instanceof OutboxEvent) {
+            OutboxEvent that = (OutboxEvent) o;
+            return this.id != null && this.id.equals(that.id);
+        }
+        return false;
+    }
+
+    public int hashCode() {
+        return id == null ? 0 : id.hashCode();
+    }
 }
