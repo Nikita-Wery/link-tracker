@@ -50,6 +50,14 @@ app:
       batch-size: 50
       interval-update-ms: 60000
 
+  cache:
+    enabled: true
+    local:
+      ttl: 10m
+      max-size: 10000
+    redis:
+      ttl: 10m
+
   client:
     api-workers:
       thread-pool-size: 4

@@ -14,7 +14,7 @@ import backend.academy.linktracker.scrapper.domain.Chat;
 import backend.academy.linktracker.scrapper.domain.ChatLink;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.service.ChatService;
-import backend.academy.linktracker.scrapper.service.SubscriptionService;
+import backend.academy.linktracker.scrapper.service.subscriptionimpl.SubscriptionServiceBase;
 import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import backend.academy.linktracker.scrapper.utils.GrpcMapper;
 import com.google.protobuf.Empty;
@@ -31,7 +31,8 @@ import org.springframework.grpc.server.service.GrpcService;
 public class ScrapperGrpcEndpoint extends ScrapperServiceGrpc.ScrapperServiceImplBase {
 
     private final ChatService chatService;
-    private final SubscriptionService subscriptionService;
+    // TODO: заменить на interface
+    private final SubscriptionServiceBase subscriptionServiceBase;
     private final DtoEntityMapper dtoEntityMapper;
     private final GrpcMapper grpcMapper;
 
@@ -69,7 +70,7 @@ public class ScrapperGrpcEndpoint extends ScrapperServiceGrpc.ScrapperServiceImp
     public void getLinks(GetLinksRequest req, StreamObserver<ListLinksResponse> responseObserver) {
         log.info("get_links", kv("chat_id", req.getChatId()));
 
-        ListLinksResponse linksResponse = subscriptionService.getProtoListLinksResponseByChatId(req.getChatId());
+        ListLinksResponse linksResponse = subscriptionServiceBase.getProtoListLinksResponseByChatId(req.getChatId());
 
         responseObserver.onNext(linksResponse);
         responseObserver.onCompleted();
@@ -88,7 +89,7 @@ public class ScrapperGrpcEndpoint extends ScrapperServiceGrpc.ScrapperServiceImp
         Link link = dtoEntityMapper.linkFromAddLinkRequest(request);
         ChatLink chatLink = new ChatLink(link, chat, new HashSet<>(request.tags()));
 
-        LinkResponse linkResponse = subscriptionService.trackLinkReturnProtoLinkResponse(chatLink);
+        LinkResponse linkResponse = subscriptionServiceBase.trackLinkReturnProtoLinkResponse(chatLink);
 
         responseObserver.onNext(linkResponse);
         responseObserver.onCompleted();
@@ -108,7 +109,7 @@ public class ScrapperGrpcEndpoint extends ScrapperServiceGrpc.ScrapperServiceImp
         Link link = dtoEntityMapper.linkFromRemoveLinkRequest(request);
         ChatLink chatLink = new ChatLink(link, chat);
 
-        LinkResponse linkResponse = subscriptionService.untrackLinkReturnProtoLinkResponse(chatLink);
+        LinkResponse linkResponse = subscriptionServiceBase.untrackLinkReturnProtoLinkResponse(chatLink);
 
         responseObserver.onNext(linkResponse);
         responseObserver.onCompleted();

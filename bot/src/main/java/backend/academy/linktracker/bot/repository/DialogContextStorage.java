@@ -16,7 +16,7 @@ public class DialogContextStorage {
     }
 
     public Optional<DialogContext> findDialogContext(Long chatId) {
-        return Optional.of(dialogState.get(chatId));
+        return Optional.ofNullable(dialogState.get(chatId));
     }
 
     public void save(Long chatId, DialogContext dialogContext) {

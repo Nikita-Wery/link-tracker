@@ -9,7 +9,7 @@ import backend.academy.linktracker.scrapper.dto.bot.AddLinkRequest;
 import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
 import backend.academy.linktracker.scrapper.dto.bot.ListLinksResponse;
 import backend.academy.linktracker.scrapper.dto.bot.RemoveLinkRequest;
-import backend.academy.linktracker.scrapper.service.SubscriptionService;
+import backend.academy.linktracker.scrapper.service.subscriptionimpl.SubscriptionServiceBase;
 import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
@@ -29,12 +29,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/links")
 public class LinkController {
 
-    private final SubscriptionService subscriptionService;
+    private final SubscriptionServiceBase subscriptionServiceBase;
     private final DtoEntityMapper dtoEntityMapper;
 
-    public LinkController(SubscriptionService subscriptionService, DtoEntityMapper dtoEntityMapper) {
+    public LinkController(SubscriptionServiceBase subscriptionServiceBase, DtoEntityMapper dtoEntityMapper) {
 
-        this.subscriptionService = subscriptionService;
+        this.subscriptionServiceBase = subscriptionServiceBase;
         this.dtoEntityMapper = dtoEntityMapper;
     }
 
@@ -45,7 +45,7 @@ public class LinkController {
     public ListLinksResponse getLinks(@RequestHeader("Tg-Chat-Id") Long chatId) {
         log.info("get_links", kv("chat_id", chatId));
 
-        List<LinkResponse> linkResponses = subscriptionService.getLinkResponsesByChatId(chatId);
+        List<LinkResponse> linkResponses = subscriptionServiceBase.getLinkResponsesByChatId(chatId);
 
         return new ListLinksResponse(linkResponses, linkResponses.size());
     }
@@ -62,7 +62,7 @@ public class LinkController {
         Chat chat = dtoEntityMapper.getChatFromChatId(chatId);
         ChatLink chatLink = new ChatLink(link, chat, new HashSet<>(request.tags()));
 
-        return subscriptionService.trackLinkReturnLinkResponse(chatLink);
+        return subscriptionServiceBase.trackLinkReturnLinkResponse(chatLink);
     }
 
     @SuppressFBWarnings(
@@ -77,6 +77,6 @@ public class LinkController {
         Chat chat = dtoEntityMapper.getChatFromChatId(chatId);
         ChatLink chatLink = new ChatLink(link, chat);
 
-        return subscriptionService.untrackLinkReturnLinkResponse(chatLink);
+        return subscriptionServiceBase.untrackLinkReturnLinkResponse(chatLink);
     }
 }
