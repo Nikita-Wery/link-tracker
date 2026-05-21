@@ -4,19 +4,19 @@ import backend.academy.linktracker.scrapper.dto.bot.ListLinksResponse;
 import backend.academy.linktracker.scrapper.properties.LocalCacheProperties;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import lombok.RequiredArgsConstructor;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 public class ChatLinkLocalCache {
 
-    private final LocalCacheProperties properties;
+    private final Cache<Long, ListLinksResponse> cache;
 
-    private final Cache<Long, ListLinksResponse> cache =
-            Caffeine.newBuilder()
-                    .maximumSize(properties.getMaxSize())
-                    .expireAfterWrite(properties.getTtl())
-                    .build();
+    public ChatLinkLocalCache(LocalCacheProperties properties) {
+
+        this.cache = Caffeine.newBuilder()
+                .maximumSize(properties.getMaxSize())
+                .expireAfterWrite(properties.getTtl())
+                .build();
+    }
 
     public Optional<ListLinksResponse> get(Long chatId) {
         return Optional.ofNullable(cache.getIfPresent(chatId));

@@ -1,18 +1,16 @@
-package backend.academy.linktracker.scrapper.config.cache;
+package backend.academy.linktracker.scrapper.configuration;
 
 import backend.academy.linktracker.scrapper.dto.bot.LinkResponse;
 import backend.academy.linktracker.scrapper.properties.LocalCacheProperties;
 import backend.academy.linktracker.scrapper.properties.RedisCacheProperties;
-import backend.academy.linktracker.scrapper.properties.ValkeyClusterProperties;
 import backend.academy.linktracker.scrapper.repository.cache.ChatLinkLocalCache;
 import backend.academy.linktracker.scrapper.repository.cache.ChatLinkRedisCache;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,23 +19,21 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
-@Configuration
+@TestConfiguration
+@Profile("test-cache")
 @EnableCaching
-@Profile("!test-cache")
-@ConditionalOnProperty(value = "app.cache.enabled", havingValue = "true", matchIfMissing = true)
-public class CacheConfiguration {
+public class TestCacheConfiguration {
+
+    @Value("${spring.data.redis.host}")
+    public String valkeyHost;
+
+    @Value("${spring.data.redis.port}")
+    public int valkeyPort;
 
     @Bean
-    RedisConnectionFactory lettuceConnectionFactory(ValkeyClusterProperties valkeyClusterProperties) {
+    RedisConnectionFactory lettuceConnectionFactory() {
 
-        valkeyClusterProperties.getCluster().getNodes().stream().peek(node -> {
-            log.info("REDIS NODE: {}", node);
-        });
-
-        RedisClusterConfiguration clusterConfig = new RedisClusterConfiguration(
-                valkeyClusterProperties.getCluster().getNodes());
-
-        return new LettuceConnectionFactory(clusterConfig);
+        return new LettuceConnectionFactory(valkeyHost, valkeyPort);
     }
 
     @Bean

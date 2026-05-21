@@ -2,6 +2,7 @@ package backend.academy.linktracker.scrapper.properties;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import java.time.Duration;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,6 @@ import lombok.Setter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
-import java.time.Duration;
 
 @ConditionalOnProperty(name = "app.cache.enabled", havingValue = "true")
 @ConfigurationProperties(prefix = "app.cache.local")
@@ -25,5 +25,4 @@ public class LocalCacheProperties {
 
     @Min(100)
     int maxSize;
-
 }

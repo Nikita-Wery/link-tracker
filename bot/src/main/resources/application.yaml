@@ -26,7 +26,6 @@ spring:
     restart:
       enabled: false
 
-
 app:
   telegram:
     enabled: true

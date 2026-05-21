@@ -21,7 +21,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @AllArgsConstructor
-@ConditionalOnProperty(name = "app.cache.enabled", havingValue = "false", matchIfMissing = true)
 public class SubscriptionServiceBase implements SubscriptionService {
 
     private final ChatLinkRepository chatLinkRepository;

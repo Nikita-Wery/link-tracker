@@ -1,0 +1,33 @@
+spring:
+  liquibase:
+    enabled: true
+    change-log: classpath:test-migrations/scrapper/changelog-root.yaml
+
+app:
+  scheduler:
+    enabled: false
+
+  cache:
+    enabled: true
+    local:
+      ttl: 10m
+      max-size: 10000
+    redis:
+      ttl: 10m
+  client:
+    bot:
+      api:
+        kafka:
+          enabled: false
+        rest:
+          enabled: true
+        grpc:
+          enabled: false
+logging:
+  level:
+    root: INFO
+    backend.academy.linktracker: DEBUG
+    org.springframework.data.redis: TRACE
+    org.springframework.cache: TRACE
+    liquibase: DEBUG
+    com.github.dockerjava: WARN

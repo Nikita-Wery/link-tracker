@@ -6,3 +6,6 @@ spring:
           - valkey-0:6379
           - valkey-1:6379
           - valkey-2:6379
+      client-type: lettuce
+      host: valkey-0
+      port: 6379

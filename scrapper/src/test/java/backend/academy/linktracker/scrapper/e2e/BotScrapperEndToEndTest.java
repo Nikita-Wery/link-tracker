@@ -168,6 +168,7 @@ class BotScrapperEndToEndTest {
         scrapper = new GenericContainer<>(SCRAPPER_IMAGE)
                 .withExposedPorts(8081, 9091)
                 .withEnv("SPRING_TASK_SCHEDULING_ENABLED", "false")
+                .withEnv("APP_CACHE_ENABLED", "false")
                 .withEnv("APP_CLIENT_BOT_API_REST_ENABLED", "true")
                 .withEnv("APP_CLIENT_BOT_API_GRPC_ENABLED", "true")
                 .withEnv("APP_CLIENT_BOT_API_KAFKA_ENABLED", "false")
@@ -182,7 +183,7 @@ class BotScrapperEndToEndTest {
                 .withEnv("SPRING_LIQUIBASE_ENABLED", "false")
                 //                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
                 .withNetwork(network)
-                .withNetworkAliases("scrapper")
+                .withNetworkAliases("test-migrations/scrapper")
                 .waitingFor(Wait.forHttp("/actuator/health").forPort(8081).withStartupTimeout(Duration.ofMinutes(2)));
 
         scrapper.start();
