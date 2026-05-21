@@ -37,17 +37,17 @@ public class GrpcMapper {
         return new RemoveLinkRequest(req.getLink());
     }
 
-    public ListLinksResponse listOfLinkResponsesToProto(List<backend.academy.linktracker.scrapper.dto.bot.LinkResponse> linkResponses) {
+    public ListLinksResponse listOfLinkResponsesToProto(
+            List<backend.academy.linktracker.scrapper.dto.bot.LinkResponse> linkResponses) {
         return ListLinksResponse.newBuilder()
-            .addAllLinks(linkResponses.stream()
-                .map(l
-                    -> LinkResponse.newBuilder()
-                            .addAllTags(l.tags())
-                            .setUrl(l.url())
-                            .setId(l.id())
-                            .build()
-                ).toList())
-            .setSize(linkResponses.size())
-            .build();
+                .addAllLinks(linkResponses.stream()
+                        .map(l -> LinkResponse.newBuilder()
+                                .addAllTags(l.tags())
+                                .setUrl(l.url())
+                                .setId(l.id())
+                                .build())
+                        .toList())
+                .setSize(linkResponses.size())
+                .build();
     }
 }

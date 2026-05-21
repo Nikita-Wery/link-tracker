@@ -51,7 +51,7 @@ app:
       interval-update-ms: 60000
 
   cache:
-    enabled: true
+    enabled: false
     local:
       ttl: 10m
       max-size: 10000
@@ -87,3 +87,4 @@ app:
 logging:
   level:
     org.hibernate.sql: DEBUG
+    org.springframework.data.redis: DEBUG

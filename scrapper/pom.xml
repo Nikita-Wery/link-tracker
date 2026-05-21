@@ -113,9 +113,15 @@
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.7.10</version>
             <scope>compile</scope>
         </dependency>
+
+        <!--        <dependency>-->
+        <!--            <groupId>org.postgresql</groupId>-->
+        <!--            <artifactId>postgresql</artifactId>-->
+        <!--            <version>42.7.10</version>-->
+        <!--            <scope>compile</scope>-->
+        <!--        </dependency>-->
         <!-- GraphQL: -->
         <!-- <dependency> -->
         <!--     <groupId>org.springframework.boot</groupId> -->
@@ -123,10 +129,10 @@
         <!-- </dependency> -->
 
         <!-- Redis: -->
-         <dependency>
-             <groupId>org.springframework.boot</groupId>
-             <artifactId>spring-boot-starter-data-redis</artifactId>
-         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
 
         <!-- Source: https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
         <dependency>

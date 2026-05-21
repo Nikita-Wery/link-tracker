@@ -80,6 +80,7 @@
         <spotbugs-slf4j-plugin.version>1.5.0</spotbugs-slf4j-plugin.version>
         <spotless-maven-plugin.version>3.2.1</spotless-maven-plugin.version>
         <errorprone.annotations.version>2.41.0</errorprone.annotations.version>
+        <postgresql.version>42.7.10</postgresql.version>
         <avro.version>1.12.0</avro.version>
         <confluent.avro.version>8.2.0</confluent.avro.version>
     </properties>
@@ -210,6 +211,11 @@
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-schema-registry-client</artifactId>
                 <version>${confluent.avro.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

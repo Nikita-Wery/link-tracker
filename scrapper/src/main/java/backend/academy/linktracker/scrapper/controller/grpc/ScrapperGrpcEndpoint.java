@@ -31,7 +31,6 @@ import org.springframework.grpc.server.service.GrpcService;
 public class ScrapperGrpcEndpoint extends ScrapperServiceGrpc.ScrapperServiceImplBase {
 
     private final ChatService chatService;
-    // TODO: заменить на interface
     private final SubscriptionServiceBase subscriptionServiceBase;
     private final DtoEntityMapper dtoEntityMapper;
     private final GrpcMapper grpcMapper;
