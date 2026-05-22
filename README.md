@@ -293,45 +293,45 @@ LinkTracker – Telegram-бот, который отслеживает изме�
   - POST /links: 1%
 - Инструмент: K6
 
-| Метрика                           | Без кэша       | С кэшем        | Изменение        |
-|-----------------------------------|----------------|----------------|------------------|
-| **THRESHOLDS**                    |                |                |                  |
-| http_req_duration p(99)           | 94.32ms ✓      | 21.78ms ✓      | **-77% ↓**       |
-| http_req_failed rate              | 0.00% ✓        | 0.00% ✓        | без изменений    |
-|                                   |                |                |                  |
-| **TOTAL RESULTS**                 |                |                |                  |
-| checks_total                      | 48,379         | 211,595        | **+337% ↑**      |
-| checks_succeeded                  | 100.00%        | 100.00%        | без изменений    |
-| checks_failed                     | 0.00%          | 0.00%          | без изменений    |
-| GET status 200                    | ✓              | ✓              | ✅                |
-| POST status 200                   | ✓              | ✓              | ✅                |
-|                                   |                |                |                  |
-| **HTTP**                          |                |                |                  |
-| http_req_duration (avg)           | 47.62ms        | 3.02ms         | **-94% ↓**       |
-| http_req_duration (min)           | 3.19ms         | 373.27µs       | **-88% ↓**       |
-| http_req_duration (med)           | 18.29ms        | 1.85ms         | **-90% ↓**       |
-| http_req_duration (max)           | 6.71s          | 647.51ms       | **-90% ↓**       |
-| http_req_duration p(90)           | 36.64ms        | 5.53ms         | **-85% ↓**       |
-| http_req_duration p(95)           | 45.41ms        | 7.64ms         | **-83% ↓**       |
-| http_req_failed                   | 0.00%          | 0.00%          | без изменений    |
-| http_reqs                         | 48,379         | 211,595        | **+337% ↑**      |
-|                                   |                |                |                  |
-| **EXECUTION**                     |                |                |                  |
-| iteration_duration (avg)          | 5.83s          | 1.32s          | **-77% ↓**       |
-| iteration_duration (min)          | 1.63s          | 1.09s          | **-33% ↓**       |
-| iteration_duration (med)          | 7.31s          | 1.31s          | **-82% ↓**       |
-| iteration_duration (max)          | 9.79s          | 2.17s          | **-78% ↓**       |
-| iteration_duration p(90)          | 8.72s          | 1.51s          | **-83% ↓**       |
-| iteration_duration p(95)          | 9.14s          | 1.6s           | **-82% ↓**       |
-| iterations                        | 479            | 2,095          | **+337% ↑**      |
-| vus (min/max)                     | 1 / 8          | 1 / 8          | без изменений    |
-| vus_max                           | 8              | 8              | без изменений    |
-|                                   |                |                |                  |
-| **NETWORK**                       |                |                |                  |
-| data_received                     | 682 MB         | 3.0 GB         | **+350% ↑**      |
-| data_sent                         | 4.5 MB         | 20 MB          | **+344% ↑**      |
-| throughput (received)             | 1.7 MB/s       | 7.7 MB/s       | **+353% ↑**      |
-| throughput (sent)                 | 11 kB/s        | 50 kB/s        | **+355% ↑**      |
+| Метрика                  | Без кэша       | С кэшем        | Изменение     |
+|--------------------------|----------------|----------------|---------------|
+| **THRESHOLDS**           |                |                |               |
+| http_req_duration p(99)  | 94.32ms ✓      | 21.78ms ✓      | **-77% ↓**    |
+| http_req_failed rate     | 0.00% ✓        | 0.00% ✓        | без изменений |
+|                          |                |                |               |
+| **TOTAL RESULTS**        |                |                |               |
+| checks_total             | 48,379         | 211,595        | **+337% ↑**   |
+| checks_succeeded         | 100.00%        | 100.00%        | без изменений |
+| checks_failed            | 0.00%          | 0.00%          | без изменений |
+| GET status 200           | ✓              | ✓              | ✅             |
+| POST status 200          | ✓              | ✓              | ✅             |
+|                          |                |                |               |
+| **HTTP**                 |                |                |               |
+| http_req_duration (avg)  | 47.62ms        | 3.02ms         | **-94% ↓**    |
+| http_req_duration (min)  | 3.19ms         | 373.27µs       | **-88% ↓**    |
+| http_req_duration (med)  | 18.29ms        | 1.85ms         | **-90% ↓**    |
+| http_req_duration (max)  | 6.71s          | 647.51ms       | **-90% ↓**    |
+| http_req_duration p(90)  | 36.64ms        | 5.53ms         | **-85% ↓**    |
+| http_req_duration p(95)  | 45.41ms        | 7.64ms         | **-83% ↓**    |
+| http_req_failed          | 0.00%          | 0.00%          | без изменений |
+| http_reqs                | 48,379         | 211,595        | **+337% ↑**   |
+|                          |                |                |               |
+| **EXECUTION**            |                |                |               |
+| iteration_duration (avg) | 5.83s          | 1.32s          | **-77% ↓**    |
+| iteration_duration (min) | 1.63s          | 1.09s          | **-33% ↓**    |
+| iteration_duration (med) | 7.31s          | 1.31s          | **-82% ↓**    |
+| iteration_duration (max) | 9.79s          | 2.17s          | **-78% ↓**    |
+| iteration_duration p(90) | 8.72s          | 1.51s          | **-83% ↓**    |
+| iteration_duration p(95) | 9.14s          | 1.6s           | **-82% ↓**    |
+| iterations               | 479            | 2,095          | **+337% ↑**   |
+| vus (min/max)            | 1 / 8          | 1 / 8          | без изменений |
+| vus_max                  | 8              | 8              | без изменений |
+|                          |                |                |               |
+| **NETWORK**              |                |                |               |
+| data_received            | 682 MB         | 3.0 GB         | **+350% ↑**   |
+| data_sent                | 4.5 MB         | 20 MB          | **+344% ↑**   |
+| throughput (received)    | 1.7 MB/s       | 7.7 MB/s       | **+353% ↑**   |
+| throughput (sent)        | 11 kB/s        | 50 kB/s        | **+355% ↑**   |
 
 <table border="1" cellpadding="8" cellspacing="0">
   <thead>
