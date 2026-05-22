@@ -1,0 +1,6 @@
+CREATE SEQUENCE outbox_event_seq
+    START WITH 1
+    INCREMENT BY 50
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;

@@ -145,7 +145,8 @@ services:
       - --password=${DB_PASSWORD}
       - update
     volumes:
-      - ../migrations/migrations-scrapper:/changesets
+      - ../migrations/migrations-k6-test:/changesets
+#      - ../migrations/migrations-scrapper:/changesets
     networks:
       - backend
 

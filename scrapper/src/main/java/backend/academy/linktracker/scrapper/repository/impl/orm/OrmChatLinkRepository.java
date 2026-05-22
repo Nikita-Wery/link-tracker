@@ -6,7 +6,9 @@ import backend.academy.linktracker.scrapper.repository.impl.orm.jpa.JpaChatLinkR
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @AllArgsConstructor
 public class OrmChatLinkRepository implements ChatLinkRepository {
 

@@ -1,6 +1,6 @@
 databaseChangeLog:
   - include:
-      file: scrapper/changelog-root.yaml
+      file: ../migrations-scrapper/changelog-root.yaml
 
   - changeSet:
       id: insert-test-outbox

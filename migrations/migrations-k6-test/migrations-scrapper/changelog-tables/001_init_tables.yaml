@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001_create_chats_table
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: 001_create_chats_table.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: 002_create_links_table
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: 002_create_links_table.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: 003_create_chat_link_table
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: 003_create_chat_link_table.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: 004_create_tags_table
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: 004_create_tags_table.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: 005_create_outbox_event_table
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: 005_create_outbox_event_table.sql
+            relativeToChangelogFile: true

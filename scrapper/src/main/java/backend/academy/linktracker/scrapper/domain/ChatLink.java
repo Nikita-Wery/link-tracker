@@ -21,7 +21,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
-import org.hibernate.annotations.Immutable;
+import org.hibernate.annotations.Formula;
 
 @Entity
 @Table(
@@ -46,8 +46,7 @@ public class ChatLink {
     @JoinColumn(name = "link_id", referencedColumnName = "link_id", updatable = false, nullable = false)
     private Link link;
 
-    @Immutable
-    @Column(name = "link_id", insertable = false, updatable = false, nullable = false)
+    @Formula("link_id")
     private Long linkId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -55,8 +54,7 @@ public class ChatLink {
     @JoinColumn(name = "chat_id", referencedColumnName = "chat_id", updatable = false, nullable = false)
     private Chat chat;
 
-    @Immutable
-    @Column(name = "chat_id", insertable = false, updatable = false, nullable = false)
+    @Formula("chat_id")
     private Long chatId;
 
     @ElementCollection
