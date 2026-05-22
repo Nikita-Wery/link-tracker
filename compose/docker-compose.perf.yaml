@@ -1,0 +1,145 @@
+version: '3.9'
+
+networks:
+  backend:
+    driver: bridge
+
+services:
+
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+
+    networks:
+      - backend
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  liquibase:
+    container_name: liquibase-migrations
+
+    image: liquibase/liquibase:4.29
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    command:
+      - --searchPath=/changesets
+      - --changelog-file=changelog-root.yaml
+      - --url=jdbc:postgresql://postgres:5432/${DB_NAME}
+      - --username=${DB_USERNAME}
+      - --password=${DB_PASSWORD}
+      - update
+
+    volumes:
+      - ../migrations/migrations-k6-test:/changesets
+
+    networks:
+      - backend
+
+  valkey-0:
+    image: bitnamilegacy/valkey-cluster:8.1.3
+
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      VALKEY_CLUSTER_REPLICAS: 1
+      VALKEY_NODES: "valkey-0 valkey-1 valkey-2"
+      VALKEY_CLUSTER_CREATOR: "yes"
+
+    networks:
+      - backend
+
+    depends_on:
+      - valkey-1
+      - valkey-2
+
+  valkey-1:
+    image: bitnamilegacy/valkey-cluster:8.1.3
+
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      VALKEY_NODES: "valkey-0 valkey-1 valkey-2"
+
+    networks:
+      - backend
+
+  valkey-2:
+    image: bitnamilegacy/valkey-cluster:8.1.3
+
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      VALKEY_NODES: "valkey-0 valkey-1 valkey-2"
+
+    networks:
+      - backend
+
+  scrapper:
+    build:
+      context: ../scrapper
+
+    container_name: scrapper
+
+    env_file:
+      - ../.env
+
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8081/actuator/health/readiness"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 20s
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+      liquibase:
+        condition: service_completed_successfully
+
+      valkey-0:
+        condition: service_started
+
+    environment:
+      SPRING_PROFILES_ACTIVE: valkey-cluster-config
+
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+      APP_CACHE_ENABLED: true
+
+      SPRING_DATA_REDIS_CLUSTER_NODES: valkey-0:6379,valkey-1:6379,valkey-2:6379
+
+    ports:
+      - "8081:8081"
+
+    networks:
+      - backend
+
+  k6:
+    image: grafana/k6:latest
+    container_name: k6
+
+    volumes:
+      - ../perf-tests/scripts:/scripts
+
+    command:
+      - run
+      - --summary-export=/scripts/result.json
+      - /scripts/test.js
+
+    depends_on:
+      scrapper:
+        condition: service_healthy
+
+    networks:
+      - backend

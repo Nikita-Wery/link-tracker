@@ -20,4 +20,8 @@ public interface SubscriptionService {
     LinkResponse trackLinkReturnLinkResponse(ChatLink chatLink);
 
     LinkResponse untrackLinkReturnLinkResponse(ChatLink chatLink);
+
+    backend.academy.linktracker.proto.LinkResponse trackLinkReturnProtoLinkResponse(ChatLink chatLink);
+
+    backend.academy.linktracker.proto.LinkResponse untrackLinkReturnProtoLinkResponse(ChatLink chatLink);
 }

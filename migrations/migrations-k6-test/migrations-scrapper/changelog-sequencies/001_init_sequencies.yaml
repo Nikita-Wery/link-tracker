@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001_create_chat_link_sequence
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: 001_create_chat_link_sequence.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: 002_create_link_sequence
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: 002_create_link_sequence.sql
+            relativeToChangelogFile: true
+  - changeSet:
+      id: 003_create_outbox_event_sequence
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: 003_create_outbox_event_sequence.sql
+            relativeToChangelogFile: true

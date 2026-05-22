@@ -46,6 +46,7 @@ public class SubscriptionServiceBase implements SubscriptionService {
 
             Chat savedChat = chatService.addChat(chatLink.getChat());
             chatLink.setChat(savedChat);
+            chatLink.setChatId(savedChat.getChatId());
         } catch (ChatAlreadyExistsException e) {
             log.info("When adding a chatlink, either the chat already existed");
         }
@@ -54,6 +55,7 @@ public class SubscriptionServiceBase implements SubscriptionService {
 
             Link savedLink = linkService.addLink(chatLink.getLink());
             chatLink.setLink(savedLink);
+            chatLink.setLinkId(savedLink.getLinkId());
         } catch (LinkAlreadyExistsException e) {
             log.info("When adding a chatlink, either the link already existed");
         }

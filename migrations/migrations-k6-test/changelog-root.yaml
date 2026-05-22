@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - include:
+      file: ./migrations-scrapper/changelog-root.yaml
+
+  - changeSet:
+      id: 001_fill_chats
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: ./dml/chats_table_dml/001_fill_chats.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+  - changeSet:
+      id: 001_fill_links
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: ./dml/links_table_dml/001_fill_links.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+  - changeSet:
+      id: 001_fill_chat_links
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: ./dml/chat_links_table_dml/001_fill_chat_links.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+  - changeSet:
+      id: 001_fill_tags
+      author: LuzinNikita
+      changes:
+        - sqlFile:
+            path: ./dml/tags_table_dml/001_fill_tags.sql
+            relativeToChangelogFile: true
+            splitStatements: false

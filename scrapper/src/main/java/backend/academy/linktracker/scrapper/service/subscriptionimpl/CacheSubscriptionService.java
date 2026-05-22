@@ -124,4 +124,14 @@ public class CacheSubscriptionService implements SubscriptionService {
                 removedChatLink.getLink().getUrl(),
                 removedChatLink.getTags().stream().toList());
     }
+
+    @Transactional
+    public backend.academy.linktracker.proto.LinkResponse trackLinkReturnProtoLinkResponse(ChatLink chatLink) {
+        return grpcMapper.linkToGrpcLinkResponse(trackLink(chatLink));
+    }
+
+    @Transactional
+    public backend.academy.linktracker.proto.LinkResponse untrackLinkReturnProtoLinkResponse(ChatLink chatLink) {
+        return grpcMapper.linkToGrpcLinkResponse(untrackLink(chatLink));
+    }
 }

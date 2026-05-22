@@ -45,13 +45,13 @@ app:
     access-type: orm
 
   scheduler:
-    enabled: true
+    enabled: false
     link-update:
       batch-size: 50
       interval-update-ms: 60000
 
   cache:
-    enabled: false
+    enabled: true
     local:
       ttl: 10m
       max-size: 10000
@@ -78,7 +78,7 @@ app:
 
       api:
         kafka:
-          enabled: true
+          enabled: false
         rest:
           enabled: true
         grpc:
