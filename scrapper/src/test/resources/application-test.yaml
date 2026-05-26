@@ -1,0 +1,19 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+app:
+  scheduler:
+    enabled: false
+
+  cache:
+    enabled: false
+
+  client:
+    bot:
+      api:
+        kafka:
+          enabled: false
+        grpc:
+          enabled: false

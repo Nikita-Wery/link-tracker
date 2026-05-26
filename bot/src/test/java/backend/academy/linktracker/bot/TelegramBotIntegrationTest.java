@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import backend.academy.linktracker.bot.configurations.PostgresContainerConfiguration;
 import backend.academy.linktracker.bot.properties.TelegramProperties;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
@@ -38,7 +39,7 @@ import org.wiremock.spring.EnableWireMock;
 
 @Disabled
 @SpringBootTest
-@Import(TestcontainersConfiguration.class)
+@Import(PostgresContainerConfiguration.class)
 @ActiveProfiles("test")
 @EnableWireMock
 class TelegramBotIntegrationTest implements WithAssertions {

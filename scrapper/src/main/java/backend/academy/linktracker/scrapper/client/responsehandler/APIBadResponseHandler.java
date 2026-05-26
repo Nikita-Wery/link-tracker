@@ -2,7 +2,10 @@ package backend.academy.linktracker.scrapper.client.responsehandler;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
+import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiClientException;
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiException;
+import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiRateLimitException;
+import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiServerException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +27,6 @@ public class APIBadResponseHandler {
         int statusCode = response.getStatusCode().value();
 
         String body;
-
         try (InputStream is = response.getBody()) {
             body = is != null ? new String(is.readAllBytes(), StandardCharsets.UTF_8) : "";
         }
@@ -36,6 +38,19 @@ public class APIBadResponseHandler {
                 kv("method", request.getMethod().name()),
                 kv("uri", request.getURI().toString()));
 
-        throw new ExternalApiException("External API error", body, statusCode, request.getURI());
+        if (statusCode == 429) {
+            throw new ExternalApiRateLimitException(
+                    "Too many request external api error", body, statusCode, request.getURI());
+        }
+
+        if (statusCode >= 500) {
+            throw new ExternalApiServerException("External api server error", body, statusCode, request.getURI());
+        }
+
+        if (statusCode >= 400) {
+            throw new ExternalApiClientException("External api client error", body, statusCode, request.getURI());
+        }
+
+        throw new ExternalApiException("Unknown external api error", body, statusCode, request.getURI());
     }
 }

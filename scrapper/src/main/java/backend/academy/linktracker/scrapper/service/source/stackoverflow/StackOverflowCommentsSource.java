@@ -8,8 +8,11 @@ import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowComme
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowWrapper;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
 import backend.academy.linktracker.scrapper.utils.TextMessageHandler;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import java.net.URI;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +35,8 @@ public class StackOverflowCommentsSource implements UpdateSource<LinkUpdate> {
     }
 
     @Override
+    @Retry(name = "stackCommentRetry", fallbackMethod = "fallback")
+    @RateLimiter(name = "stackCommentLimiter")
     public List<LinkUpdate> getUpdates(Link link) {
 
         Long questionId = extractQuestionId(link);
@@ -77,5 +82,12 @@ public class StackOverflowCommentsSource implements UpdateSource<LinkUpdate> {
                 link.getResourceType(),
                 Instant.ofEpochSecond(update.createdAt())
                         .atOffset(link.getLatestUpdateTime().getOffset()));
+    }
+
+    public List<LinkUpdate> fallback(Link link, Throwable exception) {
+        log.warn("Fallback link url: {}", link.getUrl(), exception);
+        log.warn("StackOverflow unavailable, source type {}", ResourceType.STACKOVERFLOW_COMMENTS);
+
+        return Collections.emptyList();
     }
 }

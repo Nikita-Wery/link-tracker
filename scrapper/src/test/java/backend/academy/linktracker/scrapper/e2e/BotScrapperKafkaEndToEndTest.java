@@ -28,6 +28,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestClient;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
@@ -40,6 +41,7 @@ import org.testcontainers.kafka.ConfluentKafkaContainer;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
+@TestPropertySource(properties = {"app.client.bot.api.kafka.enabled=true"})
 @Tag("integration")
 @Slf4j
 @Testcontainers

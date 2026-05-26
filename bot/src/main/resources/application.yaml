@@ -50,6 +50,9 @@ app:
     scrapper:
       host: ${APP_CLIENT_SCRAPPER_HOST:http://localhost:8081}
       grpc-host: ${APP_CLIENT_SCRAPPER_GRPC_HOST:localhost:9091}
+      timeout:
+        connection: 1s
+        read: 1s
 
       api:
         kafka:
@@ -58,6 +61,101 @@ app:
           enabled: true
         grpc:
           enabled: false
+
+resilience4j:
+  retry:
+    retry-aspect-order: 1
+    instances:
+      getLinksRetry:
+        max-attempts: 3
+        wait-duration: 500ms
+        retry-exceptions:
+          - backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+      addLinkRetry:
+        max-attempts: 3
+        wait-duration: 1s
+        retry-exceptions:
+          - backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+      untrackLinkRetry:
+        max-attempts: 2
+        wait-duration: 1s
+        retry-exceptions:
+          - backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+      registerChatRetry:
+        max-attempts: 3
+        wait-duration: 1s
+        retry-exceptions:
+          - backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+      deleteChatRetry:
+        max-attempts: 2
+        wait-duration: 1s
+        retry-exceptions:
+          - backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+
+  circuitbreaker:
+    circuit-breaker-aspect-order: 2
+    instances:
+      scrapperApi:
+        failure-rate-threshold: 70
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 5s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-type: count_based
+        record-exceptions:
+          - backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+
+  ratelimiter:
+    rate-limiter-aspect-order: 3
+    configs:
+      default:
+        register-health-indicator: true
+        allow-health-indicator-to-fail: true
+        subscribe-for-events: true
+        event-consumer-buffer-size: 100
+    instances:
+      registerChatLimiter:
+        base-config: default
+        limit-for-period: 10
+        limit-refresh-period: 1s
+        timeout-duration: 1s
+
+      deleteChatLimiter:
+        base-config: default
+        limit-for-period: 5
+        limit-refresh-period: 1s
+        timeout-duration: 0
+
+      getLinksLimiter:
+        base-config: default
+        limit-for-period: 50
+        limit-refresh-period: 1s
+        timeout-duration: 200ms
+
+      addLinkLimiter:
+        base-config: default
+        limit-for-period: 10
+        limit-refresh-period: 1s
+        timeout-duration: 500ms
+
+      untrackLinkLimiter:
+        base-config: default
+        limit-for-period: 5
+        limit-refresh-period: 1s
+        timeout-duration: 0
 
 logging:
   level:

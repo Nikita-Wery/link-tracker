@@ -5,9 +5,13 @@ import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.github.GithubIssueResponse;
+import backend.academy.linktracker.scrapper.dto.github.RepoInfo;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
 import backend.academy.linktracker.scrapper.utils.TextMessageHandler;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +33,10 @@ public class GithubRepositoryIssueSource implements UpdateSource<LinkUpdate> {
     }
 
     @Override
+    @Retry(name = "githubIssuesRetry", fallbackMethod = "fallback")
+    @RateLimiter(name = "githubIssuesLimiter")
     public List<LinkUpdate> getUpdates(Link link) {
+
         String[] linkData = extractLinkData(link);
 
         List<GithubIssueResponse> issuesResponse = gitHubClient.getRepositoryIssueUpdate(linkData[0], linkData[1]);
@@ -47,7 +54,8 @@ public class GithubRepositoryIssueSource implements UpdateSource<LinkUpdate> {
             throw new IllegalArgumentException("Invalid GitHub URL: " + link.getUrl());
         }
 
-        return (String[]) link.getResourceType().parser().parse(URI.create(link.getUrl()));
+        RepoInfo info = (RepoInfo) link.getResourceType().parser().parse(URI.create(link.getUrl()));
+        return new String[] {info.owner(), info.repository()};
     }
 
     private String buildDescription(GithubIssueResponse response, Link link) {
@@ -70,5 +78,12 @@ public class GithubRepositoryIssueSource implements UpdateSource<LinkUpdate> {
                         .collect(Collectors.toSet()),
                 link.getResourceType(),
                 response.updatedAt());
+    }
+
+    public List<LinkUpdate> fallback(Link link, Throwable exception) {
+        log.warn("Fallback link url: {}", link.getUrl(), exception);
+        log.warn("Github unavailable, source type {}", ResourceType.GITHUB_REPOSITORY_ISSUE);
+
+        return Collections.emptyList();
     }
 }

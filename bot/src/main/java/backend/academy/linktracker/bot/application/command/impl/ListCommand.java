@@ -6,8 +6,11 @@ import backend.academy.linktracker.bot.client.ScrapperClient;
 import backend.academy.linktracker.bot.dto.LinkResponse;
 import backend.academy.linktracker.bot.dto.ListLinksResponse;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ChatNotExistsException;
+import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException;
 import backend.academy.linktracker.bot.utils.validator.TagsValidator;
 import com.pengrad.telegrambot.model.Update;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +31,10 @@ public class ListCommand extends AbstractCommand<Update> {
     private static final String NEVER_ATTACHED_LINK_MESSAGE =
             "Чтобы получить список отслеживаемых ссылок, начните отслеживать хотя бы одну";
     private static final String NO_TRACKED_LINKS_MESSAGE = "Сейчас вы не отслеживаете ни одной ссылки";
+    private static final String SCRAPPER_SERVER_ERROR_MESSAGE = "Извините, произошла непредвиденная ошибка";
+    private static final String TOO_MANY_REQUESTS_MESSAGE = "Слишком много запросов. Попробуйте позже.";
+    private static final String SERVICE_UNAVAILABLE_MESSAGE = "Сервис временно недоступен.";
+
     private static final Pattern wordSeparators = Pattern.compile("[,\\s]+");
 
     private final ScrapperClient client;
@@ -75,6 +82,18 @@ public class ListCommand extends AbstractCommand<Update> {
         } catch (ChatNotExistsException ex) {
             log.info("The user tried to get chats, but he didn't attach any", ex);
             sender.sendMessage(update.message().chat().id(), NEVER_ATTACHED_LINK_MESSAGE);
+        } catch (RequestNotPermitted ex) {
+            log.warn("Rate limit exceeded", ex);
+
+            sender.sendMessage(update.message().chat().id(), TOO_MANY_REQUESTS_MESSAGE);
+        } catch (CallNotPermittedException ex) {
+            log.error("Circuit breaker is open", ex);
+
+            sender.sendMessage(update.message().chat().id(), SERVICE_UNAVAILABLE_MESSAGE);
+        } catch (ScrapperServerException ex) {
+            log.error("Scrapper server error", ex);
+
+            sender.sendMessage(update.message().chat().id(), SCRAPPER_SERVER_ERROR_MESSAGE);
         }
     }
 
