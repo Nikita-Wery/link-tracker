@@ -7,8 +7,11 @@ import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowQuestionUpdateTime;
 import backend.academy.linktracker.scrapper.properties.StackoverflowProperties;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,8 @@ public class StackOverflowQuestionSource implements UpdateSource<LinkUpdate> {
     }
 
     @Override
+    @Retry(name = "stackQuestionRetry", fallbackMethod = "fallback")
+    @RateLimiter(name = "stackQuestionLimiter")
     public List<LinkUpdate> getUpdates(Link link) {
 
         List<LinkUpdate> updates = new ArrayList<>();
@@ -78,5 +83,12 @@ public class StackOverflowQuestionSource implements UpdateSource<LinkUpdate> {
                         .collect(Collectors.toSet()),
                 link.getResourceType(),
                 update.lastUpdate());
+    }
+
+    public List<LinkUpdate> fallback(Link link, Throwable exception) {
+        log.warn("Fallback link url: {}", link.getUrl(), exception);
+        log.warn("StackOverflow unavailable, source type {}", ResourceType.STACKOVERFLOW_QUESTION);
+
+        return Collections.emptyList();
     }
 }

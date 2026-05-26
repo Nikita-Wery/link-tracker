@@ -9,6 +9,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
@@ -25,14 +27,26 @@ public class RestClientConfiguration {
     }
 
     @Bean
-    public ScrapperClient getScrapperClient(RestScrapperBadResponseHandler handler, ScrapperProperties properties) {
+    public ScrapperClient getScrapperClient(
+            RestScrapperBadResponseHandler handler, ScrapperProperties properties, ClientHttpRequestFactory factory) {
 
         RestClient restClient = RestClient.builder()
+                .requestFactory(factory)
                 .baseUrl(properties.getHost())
                 .defaultStatusHandler(HttpStatusCode::isError, handler::handle)
                 .build();
 
         return restClientFactoryMethod(restClient, ScrapperClient.class);
+    }
+
+    @Bean
+    public ClientHttpRequestFactory clientHttpRequestFactory(ScrapperProperties properties) {
+
+        var factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(properties.getTimeout().getConnection());
+        factory.setReadTimeout(properties.getTimeout().getRead());
+
+        return factory;
     }
 
     private <T> T restClientFactoryMethod(RestClient restClient, Class<T> clientType) {

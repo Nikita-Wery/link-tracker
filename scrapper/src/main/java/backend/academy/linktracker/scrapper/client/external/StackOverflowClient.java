@@ -4,12 +4,14 @@ import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowAnswe
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowCommentResponse;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowQuestionUpdateTime;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowWrapper;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;
 
 @HttpExchange
+@CircuitBreaker(name = "stackOverflowApi")
 public interface StackOverflowClient {
 
     @GetExchange("/questions/{id}")

@@ -1,0 +1,47 @@
+resilience4j:
+  circuitbreaker:
+    circuit-breaker-aspect-order: 1
+  ratelimiter:
+    configs:
+      default:
+        register-health-indicator: false
+        subscribe-for-events: false
+        limit-for-period: 1000000
+        limit-refresh-period: 1s
+        timeout-duration: 0s
+
+    instances:
+      registerChatLimiter:
+        base-config: default
+        limit-for-period: 1000000
+
+      deleteChatLimiter:
+        base-config: default
+        limit-for-period: 1000000
+
+      getLinksLimiter:
+        base-config: default
+        limit-for-period: 1000000
+
+      addLinkLimiter:
+        base-config: default
+        limit-for-period: 1000000
+
+      untrackLinkLimiter:
+        base-config: default
+        limit-for-period: 1000000
+    rate-limiter-aspect-order: 2
+
+  retry:
+    instances:
+      getLinksRetry:
+        max-attempts: 1
+      addLinkRetry:
+        max-attempts: 1
+      untrackLinkRetry:
+        max-attempts: 1
+      registerChatRetry:
+        max-attempts: 1
+      deleteChatRetry:
+        max-attempts: 1
+    retry-aspect-order: 3

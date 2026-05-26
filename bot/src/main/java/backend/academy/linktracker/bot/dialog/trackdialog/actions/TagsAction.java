@@ -14,6 +14,8 @@ import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import backend.academy.linktracker.bot.utils.validator.TagsValidator;
 import com.pengrad.telegrambot.model.Update;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +30,8 @@ public class TagsAction implements StateAction {
             "Ссылка, которую вы пытаетесь прикрепить, уже отслеживается";
     private static final String SCRAPPER_SERVER_ERROR_MESSAGE = "Извините, произошла непредвиденная ошибка";
     private static final int ALLOWED_NUMBER_OF_TAGS = 10;
+    private static final String TOO_MANY_REQUESTS_MESSAGE = "Слишком много запросов. Попробуйте позже.";
+    private static final String SERVICE_UNAVAILABLE_MESSAGE = "Сервис временно недоступен.";
 
     private final ScrapperClient client;
     private final DialogContextStorage storage;
@@ -59,7 +63,14 @@ public class TagsAction implements StateAction {
             AddLinkRequest addLinkRequest = new AddLinkRequest(context.getUrl().toString(), context.getTags());
 
             try {
+
                 client.addLink(update.message().chat().id(), addLinkRequest);
+
+                storage.clearDialog(update.message().chat().id());
+
+                sender.sendMessage(update.message().chat().id(), DEFAULT_SUCCESS_MESSAGE);
+
+                return true;
             } catch (InvalidLinkInRequestException ex) {
                 log.error("The link was not validated by scrapper", kv("link", context.getUrl()), ex);
                 sender.sendMessage(update.message().chat().id(), INVALID_LINK_MESSAGE);
@@ -69,13 +80,15 @@ public class TagsAction implements StateAction {
             } catch (ScrapperServerException ex) {
                 log.error("Scrapper server error", ex);
                 sender.sendMessage(update.message().chat().id(), SCRAPPER_SERVER_ERROR_MESSAGE);
+            } catch (RequestNotPermitted ex) {
+                log.warn("Rate limit exceeded", ex);
+
+                sender.sendMessage(update.message().chat().id(), TOO_MANY_REQUESTS_MESSAGE);
+            } catch (CallNotPermittedException ex) {
+                log.error("Circuit breaker is open", ex);
+
+                sender.sendMessage(update.message().chat().id(), SERVICE_UNAVAILABLE_MESSAGE);
             }
-
-            storage.clearDialog(update.message().chat().id());
-
-            sender.sendMessage(update.message().chat().id(), DEFAULT_SUCCESS_MESSAGE);
-
-            return true;
         }
 
         return false;

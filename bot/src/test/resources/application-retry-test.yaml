@@ -1,0 +1,60 @@
+resilience4j:
+  retry:
+    retry-aspect-order: 1
+
+  circuitbreaker:
+    circuit-breaker-aspect-order: 2
+    configs:
+      default:
+              minimum-number-of-calls: 999999
+              failure-rate-threshold: 100
+              sliding-window-size: 100
+              wait-duration-in-open-state: 1s
+              permitted-number-of-calls-in-half-open-state: 999999
+    instances:
+      scrapperApi:
+              base-config: default
+              minimum-number-of-calls: 999999
+              failure-rate-threshold: 100
+              record-exceptions: []
+
+  ratelimiter:
+    rate-limiter-aspect-order: 3
+    configs:
+      default:
+              limit-for-period: 1000000
+              limit-refresh-period: 1s
+              timeout-duration: 0s
+              register-health-indicator: false
+              subscribe-for-events: false
+              event-consumer-buffer-size: 100
+    instances:
+          getLinksLimiter:
+            base-config: default
+            limit-for-period: 1000000
+            limit-refresh-period: 1s
+
+          addLinkLimiter:
+            base-config: default
+            limit-for-period: 1000000
+            limit-refresh-period: 1s
+
+          untrackLinkLimiter:
+            base-config: default
+            limit-for-period: 1000000
+            limit-refresh-period: 1s
+
+          registerChatLimiter:
+            base-config: default
+            limit-for-period: 1000000
+            limit-refresh-period: 1s
+
+          deleteChatLimiter:
+            base-config: default
+            limit-for-period: 1000000
+            limit-refresh-period: 1s
+
+logging:
+  level:
+    io.github.resilience4j: DEBUG
+    org.springframework.web.client: DEBUG
