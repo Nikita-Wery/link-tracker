@@ -34,7 +34,7 @@ public class LinkUpdateMessageProcessor {
                 linkUpdate.id(),
                 linkUpdate.url());
 
-        Optional<ProcessedMessage> processed = processedMessagesService.findProcessedMessageById(linkUpdate.id());
+        Optional<ProcessedMessage> processed = processedMessagesService.findProcessedMessageById(messageKey);
 
         if (processed.isPresent()) {
 
