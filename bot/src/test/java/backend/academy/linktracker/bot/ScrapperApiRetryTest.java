@@ -16,6 +16,7 @@ import io.github.resilience4j.retry.Retry;
 import io.github.resilience4j.retry.RetryRegistry;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.wiremock.spring.EnableWireMock;
 import tools.jackson.databind.ObjectMapper;
 
+@Tag("integration")
 @SpringBootTest(
         properties = {
             "spring.autoconfigure.exclude=" + "org.springframework.boot.autoconfigure.jdbc.JdbcClientAutoConfiguration,"

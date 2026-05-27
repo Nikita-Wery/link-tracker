@@ -27,6 +27,7 @@ import io.github.resilience4j.retry.RetryRegistry;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,6 +40,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.wiremock.spring.EnableWireMock;
 import tools.jackson.databind.ObjectMapper;
 
+@Tag("integration")
 @SpringBootTest(
         classes = {
             GithubRepositorySource.class,
