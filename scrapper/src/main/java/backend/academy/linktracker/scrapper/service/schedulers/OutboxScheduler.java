@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 public class OutboxScheduler {
 
     private final OutboxEventService outboxEventService;
-    private final KafkaBotClient kafkaBotClient;
+    private final KafkaBotClient<?> kafkaBotClient;
     private final OutboxSchedulerProperties outboxSchedulerProperties;
     private final LinkUpdateTopicProperties linkUpdateTopicProperties;
 
