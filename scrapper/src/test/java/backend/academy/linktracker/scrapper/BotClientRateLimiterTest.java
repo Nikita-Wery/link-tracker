@@ -19,6 +19,7 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -31,6 +32,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.wiremock.spring.EnableWireMock;
 import tools.jackson.databind.ObjectMapper;
 
+@Tag("integration")
 @SpringBootTest(
         classes = {RestBotClientConfiguration.class, ObjectMapper.class},
         properties = {
