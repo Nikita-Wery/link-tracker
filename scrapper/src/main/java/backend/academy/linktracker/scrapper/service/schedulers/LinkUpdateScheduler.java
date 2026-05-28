@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Slice;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@ConditionalOnProperty(name = "app.scheduler.link-update.enabled", havingValue = "true", matchIfMissing = true)
 public class LinkUpdateScheduler {
 
     private final LinkUpdateService linkUpdateService;

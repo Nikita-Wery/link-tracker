@@ -1,6 +1,5 @@
 package backend.academy.linktracker.bot.configuration.kafka;
 
-import backend.academy.linktracker.contract.avro.LinkUpdateEvent;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
@@ -37,11 +36,11 @@ public class AvroKafkaConsumerConfig {
     public static final int DEFAULT_DLQ_ACKS = 1;
 
     @Bean("avroConsumerFactory")
-    public ConcurrentKafkaListenerContainerFactory<Long, LinkUpdateEvent> defaultConsumerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<Long, Object> defaultConsumerFactory() {
 
-        var factory = new ConcurrentKafkaListenerContainerFactory<Long, LinkUpdateEvent>();
+        var factory = new ConcurrentKafkaListenerContainerFactory<Long, Object>();
 
-        factory.setConsumerFactory(consumerFactory(linkUpdateAvroDeserializer(), props -> {
+        factory.setConsumerFactory(consumerFactory(new KafkaAvroDeserializer(), props -> {
             props.put(ConsumerConfig.GROUP_ID_CONFIG, DEFAULT_GROUP_ID);
             props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
         }));
@@ -54,7 +53,7 @@ public class AvroKafkaConsumerConfig {
     }
 
     @Bean
-    public KafkaTemplate<Long, LinkUpdateEvent> dlqAvroLinkUpdateKafkaTemplate() {
+    public KafkaTemplate<Long, Object> dlqAvroLinkUpdateKafkaTemplate() {
 
         var props = kafkaProperties.buildProducerProperties();
 
@@ -62,7 +61,7 @@ public class AvroKafkaConsumerConfig {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, KafkaAvroSerializer.class);
         props.put(ProducerConfig.ACKS_CONFIG, DEFAULT_DLQ_ACKS);
 
-        var factory = new DefaultKafkaProducerFactory<Long, LinkUpdateEvent>(props);
+        var factory = new DefaultKafkaProducerFactory<Long, Object>(props);
         return new KafkaTemplate<>(factory);
     }
 
@@ -76,10 +75,5 @@ public class AvroKafkaConsumerConfig {
         propsModifier.accept(props);
 
         return new DefaultKafkaConsumerFactory<>(props, new LongDeserializer(), valueDeserializer);
-    }
-
-    @SuppressWarnings("Обеспечиваем типобезопасность")
-    private Deserializer<LinkUpdateEvent> linkUpdateAvroDeserializer() {
-        return (Deserializer<LinkUpdateEvent>) (Deserializer<?>) new KafkaAvroDeserializer();
     }
 }

@@ -1,6 +1,7 @@
 package backend.academy.linktracker.scrapper.config.cache;
 
 import backend.academy.linktracker.scrapper.repository.cache.ChatLinkLocalCache;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -17,7 +18,7 @@ class ChatLinksInvalidateListener implements MessageListener {
 
         try {
 
-            String body = new String(message.getBody());
+            String body = new String(message.getBody(), StandardCharsets.UTF_8);
 
             log.info("Received invalidation for chatId: {}", body);
 

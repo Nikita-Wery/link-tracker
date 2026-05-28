@@ -1,6 +1,5 @@
 package backend.academy.linktracker.ai.configuration.kafka.consumers;
 
-import backend.academy.linktracker.contract.avro.RawLinkUpdateEvent;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import java.util.Map;
@@ -28,11 +27,11 @@ public class AvroKafkaConsumerConfig {
     public static final int DEFAULT_CONCURRENCY = 3;
 
     @Bean("avroConsumerFactory")
-    public ConcurrentKafkaListenerContainerFactory<Long, RawLinkUpdateEvent> defaultConsumerFactory() {
+    public ConcurrentKafkaListenerContainerFactory<Long, Object> defaultConsumerFactory() {
 
-        var factory = new ConcurrentKafkaListenerContainerFactory<Long, RawLinkUpdateEvent>();
+        var factory = new ConcurrentKafkaListenerContainerFactory<Long, Object>();
 
-        factory.setConsumerFactory(consumerFactory(linkUpdateAvroDeserializer(), props -> {
+        factory.setConsumerFactory(consumerFactory(new KafkaAvroDeserializer(), props -> {
             props.put(ConsumerConfig.GROUP_ID_CONFIG, DEFAULT_GROUP_ID);
             props.put(KafkaAvroDeserializerConfig.SPECIFIC_AVRO_READER_CONFIG, true);
         }));
@@ -54,10 +53,5 @@ public class AvroKafkaConsumerConfig {
         propsModifier.accept(props);
 
         return new DefaultKafkaConsumerFactory<>(props, new LongDeserializer(), valueDeserializer);
-    }
-
-    @SuppressWarnings("Обеспечиваем типобезопасность")
-    private Deserializer<RawLinkUpdateEvent> linkUpdateAvroDeserializer() {
-        return (Deserializer<RawLinkUpdateEvent>) (Deserializer<?>) new KafkaAvroDeserializer();
     }
 }

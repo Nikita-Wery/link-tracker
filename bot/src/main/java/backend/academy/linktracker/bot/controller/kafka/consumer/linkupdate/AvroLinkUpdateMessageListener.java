@@ -25,10 +25,10 @@ public class AvroLinkUpdateMessageListener {
     private final AvroMapper avroMapper;
     private final LinkUpdateMessageProcessor processor;
 
-    @KafkaListener(containerFactory = "avroConsumerFactory", topics = "${app.kafka.topics.link-processed-updates}")
+    @KafkaListener(containerFactory = "avroConsumerFactory", topics = "${app.kafka.topics.link-updates.name}")
     @RetryableTopic(
             backOff = @BackOff(delay = 1000L, multiplier = 2.0),
-            attempts = "3",
+            attempts = "${app.kafka.topics.link-update.attempts}",
             autoCreateTopics = "true",
             kafkaTemplate = "dlqAvroLinkUpdateKafkaTemplate",
             topicSuffixingStrategy = SUFFIX_WITH_INDEX_VALUE,

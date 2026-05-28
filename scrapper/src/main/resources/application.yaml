@@ -47,11 +47,12 @@ app:
   scheduler:
     enabled: false
     link-update:
+      enabled: true
       batch-size: 50
       interval-update-ms: 60000
 
   cache:
-    enabled: true
+    enabled: false
     local:
       ttl: 10m
       max-size: 10000
@@ -220,4 +221,3 @@ resilience4j:
 logging:
   level:
     org.hibernate.sql: DEBUG
-    org.springframework.data.redis: DEBUG

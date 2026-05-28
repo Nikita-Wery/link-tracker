@@ -29,6 +29,9 @@ app:
     serialization: json
 
     topics:
-      link-processed-updates: link-processed-updates
-      link-update: link-updates
-      concurrency: 3
+      link-processed-updates:
+        name: link-processed-updates
+        attempts: 3
+      link-updates:
+        name: link-updates
+        attempts: 3

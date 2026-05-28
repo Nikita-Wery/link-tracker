@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class SummarizationService {
 
-    private static final String ELLIPSIS = "...";
+    public static final String ELLIPSIS = "...";
     private final SummarizationProperties properties;
 
     public String summarizeDescription(String description) {

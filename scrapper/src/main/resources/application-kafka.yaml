@@ -23,8 +23,12 @@ spring:
         schema.registry.url: http://localhost:8087
 
 app:
+  cache:
+    enabled: false
+
   scheduler:
     outbox:
+      enabled: true
       batch-size: 50
       interval-update-ms: 60000
     old-event:
@@ -44,7 +48,11 @@ app:
     serialization: avro
 
     topics:
-      link-update:
+      link-raw-updates:
+        name: link-raw-updates
+        partitions: 3
+        replicas: 3
+      link-updates:
         name: link-updates
         partitions: 3
         replicas: 3

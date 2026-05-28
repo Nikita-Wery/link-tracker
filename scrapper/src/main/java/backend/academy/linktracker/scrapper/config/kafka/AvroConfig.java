@@ -8,6 +8,7 @@ import backend.academy.linktracker.scrapper.client.inner.kafka.impl.linkupdate.A
 import backend.academy.linktracker.scrapper.client.inner.kafka.impl.rawlinkupdate.AvroRawLinkUpdateOutboxEventSender;
 import backend.academy.linktracker.scrapper.dto.OutboxEventUpdateDto;
 import backend.academy.linktracker.scrapper.properties.topics.LinkUpdateTopicProperties;
+import backend.academy.linktracker.scrapper.properties.topics.RawLinkUpdateTopicProperties;
 import backend.academy.linktracker.scrapper.service.BatchWorker;
 import backend.academy.linktracker.scrapper.utils.JsonToEntityDeserializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -32,7 +33,7 @@ public class AvroConfig {
     public OutboxEventSender<RawLinkUpdateEvent> rawLinkUpdateEventOutboxEventSender(
             KafkaTemplate<Long, RawLinkUpdateEvent> kafkaTemplate,
             JsonToEntityDeserializer deserializer,
-            LinkUpdateTopicProperties properties) {
+            RawLinkUpdateTopicProperties properties) {
         return new AvroRawLinkUpdateOutboxEventSender(kafkaTemplate, deserializer, properties);
     }
 

@@ -22,7 +22,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 public class KafkaProducerConfig {
 
     private final KafkaProperties kafkaProperties;
-    public static final int DEFAULT_DLQ_ACKS = 1;
+    public static final String DEFAULT_DLQ_ACKS = "all";
 
     @Bean(name = "avroKafkaTemplate")
     public KafkaTemplate<Long, ProcessedLinkUpdateEvent> processedLinkUpdateEventKafkaTemplate() {

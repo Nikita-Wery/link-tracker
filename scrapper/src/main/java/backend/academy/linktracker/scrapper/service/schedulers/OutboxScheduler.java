@@ -17,10 +17,11 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "app.client.bot.api.kafka.enabled", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.scheduler.outbox.enabled", havingValue = "true", matchIfMissing = true)
 public class OutboxScheduler {
 
     private final OutboxEventService outboxEventService;
-    private final KafkaClient<?> kafkaClient;
+    //    private final KafkaClient<?> kafkaClient;
     private final KafkaClient<RawLinkUpdateEvent> kafkaAiAgentClient;
     private final OutboxSchedulerProperties outboxSchedulerProperties;
     private final LinkUpdateTopicProperties linkUpdateTopicProperties;

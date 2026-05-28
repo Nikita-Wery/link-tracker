@@ -42,8 +42,15 @@ app:
     max-length: 20
   kafka:
     topics:
-      link-raw-updates: link-raw-updates
-      link-processed-updates:
+      link-raw-updates:
         name: link-raw-updates
+        attempts: 3
+      link-processed-updates:
+        name: link-processed-updates
         partitions: 3
         replicas: 3
+
+logging:
+  level:
+    org.springframework.kafka: DEBUG
+    org.springframework.kafka.listener: DEBUG

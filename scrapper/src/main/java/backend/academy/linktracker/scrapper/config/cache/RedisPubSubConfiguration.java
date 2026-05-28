@@ -10,9 +10,6 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
-import org.springframework.data.redis.serializer.GenericJacksonJsonRedisSerializer;
-import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Configuration
@@ -20,17 +17,6 @@ import tools.jackson.databind.ObjectMapper;
 public class RedisPubSubConfiguration {
 
     private static final String INVALIDATE_CHANNEL_TOPIC_NAME = "chat_link:invalidate";
-
-    @Bean
-    public MessageListenerAdapter messageListenerAdapter(
-            ChatLinksInvalidateListener listener, ObjectMapper objectMapper) {
-
-        var adapter = new MessageListenerAdapter(listener, "handleMessage");
-
-        adapter.setSerializer(new GenericJacksonJsonRedisSerializer(objectMapper));
-
-        return adapter;
-    }
 
     @Bean
     public RedisMessageListenerContainer redisContainer(
