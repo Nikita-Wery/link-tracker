@@ -59,7 +59,7 @@ public class GithubRepositoryIssueSource implements UpdateSource<LinkUpdate> {
     }
 
     private String buildDescription(GithubIssueResponse response, Link link) {
-        return "Github issue: %s, с автором %s, по ссылке %s%nТекст issue %s%nБыл обновлён %s"
+        return "Github issue: %s%nAUTHOR=%s%nLINK=%s%nTEXT=%s%nUPDATED=%s"
                 .formatted(
                         response.title(),
                         response.user().login(),

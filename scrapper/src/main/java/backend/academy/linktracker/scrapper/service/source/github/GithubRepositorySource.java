@@ -62,7 +62,7 @@ public class GithubRepositorySource implements UpdateSource<LinkUpdate> {
     }
 
     private String buildDescription(GithubRepositoryUpdateTime updateTime, Link link) {
-        return "Репозиторий %s, по ссылке %s, обновлён в %s, последний push %s"
+        return "REPOSITORY=%s%nLINK=%s%nUPDATED_AT=%s%nLAST_PUSH=%s"
                 .formatted(updateTime.repositoryName(), link.getUrl(), updateTime.updateAt(), updateTime.pushedAt());
     }
 

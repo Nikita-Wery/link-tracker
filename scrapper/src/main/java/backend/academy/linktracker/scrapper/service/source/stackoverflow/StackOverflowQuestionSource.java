@@ -69,7 +69,7 @@ public class StackOverflowQuestionSource implements UpdateSource<LinkUpdate> {
     }
 
     private String buildDescription(StackOverflowQuestionUpdateTime updateTime, Link link) {
-        return "Вопрос с id %s, по ссылке %s, обновлён в %s, последний push %s"
+        return "QUESTION_ID=%s%nLINK=%s%nUPDATED_AT=%s%nLAST_EDIT=%s"
                 .formatted(updateTime.questionId(), link.getUrl(), updateTime.lastUpdate(), updateTime.lastEdit());
     }
 

@@ -41,7 +41,7 @@ app:
         maximum-number-of-unprocessed-elements: 10000
 
   kafka:
-    serialization: json
+    serialization: avro
 
     topics:
       link-update:

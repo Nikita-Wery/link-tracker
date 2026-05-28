@@ -1,4 +1,4 @@
-package backend.academy.linktracker.scrapper.client.inner.kafka.impl;
+package backend.academy.linktracker.scrapper.client.inner.kafka.impl.linkupdate;
 
 import backend.academy.linktracker.contract.avro.LinkUpdateEvent;
 import backend.academy.linktracker.scrapper.client.inner.kafka.OutboxEventSender;
@@ -13,7 +13,7 @@ import org.springframework.kafka.support.SendResult;
 @ConditionalOnProperty(name = "app.client.bot.api.kafka.enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnProperty(name = "app.kafka.serialization", havingValue = "avro")
 @RequiredArgsConstructor
-public class AvroOutboxEventSender implements OutboxEventSender<LinkUpdateEvent> {
+public class AvroLinkUpdateOutboxEventSender implements OutboxEventSender<LinkUpdateEvent> {
 
     private final KafkaTemplate<Long, LinkUpdateEvent> kafkaTemplate;
     private final JsonToEntityDeserializer deserializer;

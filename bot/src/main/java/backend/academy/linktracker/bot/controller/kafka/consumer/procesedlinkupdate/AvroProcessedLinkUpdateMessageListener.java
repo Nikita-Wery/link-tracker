@@ -1,10 +1,11 @@
-package backend.academy.linktracker.bot.controller.kafka.consumer;
+package backend.academy.linktracker.bot.controller.kafka.consumer.procesedlinkupdate;
 
 import static org.springframework.kafka.retrytopic.TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE;
 
+import backend.academy.linktracker.bot.controller.kafka.consumer.linkupdate.LinkUpdateMessageProcessor;
 import backend.academy.linktracker.bot.dto.LinkUpdate;
 import backend.academy.linktracker.bot.utils.mappers.AvroMapper;
-import backend.academy.linktracker.contract.avro.LinkUpdateEvent;
+import backend.academy.linktracker.contract.avro.ProcessedLinkUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -20,12 +21,12 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "app.client.scrapper.api.kafka.enabled", havingValue = "true", matchIfMissing = true)
 @ConditionalOnProperty(name = "app.kafka.serialization", havingValue = "avro")
 @RequiredArgsConstructor
-public class AvroLinkUpdateMessageListener {
+public class AvroProcessedLinkUpdateMessageListener {
 
     private final AvroMapper avroMapper;
     private final LinkUpdateMessageProcessor processor;
 
-    @KafkaListener(containerFactory = "avroConsumerFactory", topics = "${app.kafka.topics.link-update}")
+    @KafkaListener(containerFactory = "avroConsumerFactory", topics = "${app.kafka.topics.link-processed-updates}")
     @RetryableTopic(
             backOff = @BackOff(delay = 1000L, multiplier = 2.0),
             attempts = "3",
@@ -33,11 +34,11 @@ public class AvroLinkUpdateMessageListener {
             kafkaTemplate = "dlqAvroLinkUpdateKafkaTemplate",
             topicSuffixingStrategy = SUFFIX_WITH_INDEX_VALUE,
             include = RuntimeException.class)
-    public void consume(ConsumerRecord<Long, LinkUpdateEvent> record, Acknowledgment ack) {
+    public void consume(ConsumerRecord<Long, ProcessedLinkUpdateEvent> record, Acknowledgment ack) {
 
         log.info("A message with key: {} was received", record.key());
 
-        LinkUpdate linkUpdate = avroMapper.mappLinkUpdateEventToLinkUpdate(record.value());
+        LinkUpdate linkUpdate = avroMapper.mapProccessedLinkUpdateEventToLinkUpdate(record.value());
 
         processor.process(record.key(), record.topic(), linkUpdate, ack);
     }

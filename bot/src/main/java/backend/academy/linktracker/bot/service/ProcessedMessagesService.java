@@ -1,6 +1,6 @@
 package backend.academy.linktracker.bot.service;
 
-import backend.academy.linktracker.bot.domain.ProcessedMessage;
+import backend.academy.linktracker.bot.model.ProcessedMessage;
 import backend.academy.linktracker.bot.repository.ProcessedMessagesRepository;
 import java.util.Optional;
 import lombok.AllArgsConstructor;

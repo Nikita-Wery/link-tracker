@@ -15,21 +15,21 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ExcludedAuthorsFilter implements RawLinkUpdateFilter {
 
-    private FilterProperties properties;
+    private final FilterProperties properties;
 
     @Override
     @SuppressFBWarnings(
-        value = "SLF4J_PLACE_HOLDER_MISMATCH",
-        justification = "Используем StructuredArguments для JSON, placeholders не нужны")
+            value = "SLF4J_PLACE_HOLDER_MISMATCH",
+            justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public boolean filter(RawLinkUpdate rawLinkUpdate) {
 
         boolean excludedAuthorsNotFound = !properties.getExcludedAuthors().contains(rawLinkUpdate.author());
 
         if (!excludedAuthorsNotFound) {
-            log.info("RawLinkUpdate rejected, excluded author",
-                kv("updateId", rawLinkUpdate.id()),
-                kv("excluded_author", rawLinkUpdate.author())
-            );
+            log.info(
+                    "RawLinkUpdate rejected, excluded author",
+                    kv("updateId", rawLinkUpdate.id()),
+                    kv("excluded_author", rawLinkUpdate.author()));
         }
 
         return excludedAuthorsNotFound;

@@ -1,27 +1,41 @@
 package backend.academy.linktracker.ai.client;
 
 import backend.academy.linktracker.ai.model.ProcessedLinkUpdate;
-import backend.academy.linktracker.ai.properties.RawLinkUpdatesTopicProperties;
+import backend.academy.linktracker.ai.properties.ProcessedLinkUpdatesTopicProperties;
+import backend.academy.linktracker.ai.utils.mappers.AvroMapper;
+import backend.academy.linktracker.contract.avro.ProcessedLinkUpdateEvent;
+import java.util.concurrent.CompletableFuture;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 
 @Slf4j
+@RequiredArgsConstructor
 public class KafkaBotClient {
 
-    private final RawLinkUpdatesTopicProperties props;
-    // TODO: добавить LinkProcessedUpdate
-    private final KafkaTemplate<Long, ProcessedLinkUpdate> kafkaAvroTemplate;
+    private final ProcessedLinkUpdatesTopicProperties props;
+    private final KafkaTemplate<Long, ProcessedLinkUpdateEvent> kafkaAvroTemplate;
+    private final AvroMapper avroMapper;
 
-    public KafkaBotClient(RawLinkUpdatesTopicProperties props, KafkaTemplate<Long, ProcessedLinkUpdate> kafkaTemplate) {
-        this.props = props;
-        this.kafkaAvroTemplate = kafkaTemplate;
+    public CompletableFuture<SendResult<Long, ProcessedLinkUpdateEvent>> send(
+            Long key, ProcessedLinkUpdate processedLinkUpdate) {
+
+        ProcessedLinkUpdateEvent event = avroMapper.processedLinkUpdateToEvent(processedLinkUpdate);
+
+        return kafkaAvroTemplate.send(props.getName(), key, event).whenComplete((r, t) -> {
+            if (t != null) {
+                log.error(
+                        "Failed to send raw link update, eventKey {}, updateId {}",
+                        r.getProducerRecord().key(),
+                        processedLinkUpdate.id(),
+                        t);
+            } else {
+                log.info(
+                        "Send raw link update to processed event - successful, eventKey {}, updateId {}",
+                        r.getProducerRecord().key(),
+                        processedLinkUpdate.id());
+            }
+        });
     }
-
-    // TODO: подумать над результатом
-    public CompletableFuture<SendResult<Long, ProcessedLinkUpdate>> send(Long key, ProcessedLinkUpdate event) {
-
-        return kafkaAvroTemplate.send(props.getName(), key, event);
-    }
-
-
 }

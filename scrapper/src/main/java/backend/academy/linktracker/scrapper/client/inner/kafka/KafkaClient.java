@@ -7,13 +7,12 @@ import backend.academy.linktracker.scrapper.service.BatchWorker;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class KafkaBotClient<T> {
+public class KafkaClient<T> {
 
     private final OutboxEventSender<T> sender;
     private final BatchWorker<OutboxEventUpdateDto> batchWorker;
 
-    public KafkaBotClient(OutboxEventSender<T> sender, BatchWorker<OutboxEventUpdateDto> batchWorker) {
-
+    public KafkaClient(OutboxEventSender<T> sender, BatchWorker<OutboxEventUpdateDto> batchWorker) {
         this.sender = sender;
         this.batchWorker = batchWorker;
     }

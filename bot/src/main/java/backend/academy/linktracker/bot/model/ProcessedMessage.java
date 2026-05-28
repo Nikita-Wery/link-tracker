@@ -1,12 +1,12 @@
-package backend.academy.linktracker.ai.domain;
+package backend.academy.linktracker.bot.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.OffsetDateTime;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CurrentTimestamp;
-import jakarta.persistence.Id;
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "processed_messages")

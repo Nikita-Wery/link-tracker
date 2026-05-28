@@ -62,12 +62,12 @@ public class StackOverflowCommentsSource implements UpdateSource<LinkUpdate> {
     }
 
     private String buildDescription(StackOverflowCommentResponse update, Link link) {
-        return "Добавлен комментарий с id: %s, по ссылке %s, в %s%nПользователь добавивший комментарий: %s%nТекст комментария: %s"
+        return "ID=%s%nLINK=%s%nCREATED_AT=%s%nAUTHOR=%s%nTEXT=%s"
                 .formatted(
                         update.id(),
                         link.getUrl(),
-                        update.user().name(),
                         Instant.ofEpochSecond(update.createdAt()),
+                        update.user().name(),
                         TextMessageHandler.shortenMessage(update.body()));
     }
 

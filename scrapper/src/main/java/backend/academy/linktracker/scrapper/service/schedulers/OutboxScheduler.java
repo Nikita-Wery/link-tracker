@@ -1,6 +1,7 @@
 package backend.academy.linktracker.scrapper.service.schedulers;
 
-import backend.academy.linktracker.scrapper.client.inner.kafka.KafkaBotClient;
+import backend.academy.linktracker.contract.avro.RawLinkUpdateEvent;
+import backend.academy.linktracker.scrapper.client.inner.kafka.KafkaClient;
 import backend.academy.linktracker.scrapper.domain.OutboxEvent;
 import backend.academy.linktracker.scrapper.properties.OutboxSchedulerProperties;
 import backend.academy.linktracker.scrapper.properties.topics.LinkUpdateTopicProperties;
@@ -19,7 +20,8 @@ import org.springframework.stereotype.Component;
 public class OutboxScheduler {
 
     private final OutboxEventService outboxEventService;
-    private final KafkaBotClient kafkaBotClient;
+    private final KafkaClient<?> kafkaClient;
+    private final KafkaClient<RawLinkUpdateEvent> kafkaAiAgentClient;
     private final OutboxSchedulerProperties outboxSchedulerProperties;
     private final LinkUpdateTopicProperties linkUpdateTopicProperties;
 
@@ -33,7 +35,8 @@ public class OutboxScheduler {
         for (OutboxEvent event : outboxEvents) {
             log.info("Outbox event {} preparing for shipment", event.getId());
 
-            kafkaBotClient.sendOutboxEventTypeLinkUpdate(event);
+            //            kafkaClient.sendOutboxEventTypeLinkUpdate(event);
+            kafkaAiAgentClient.sendOutboxEventTypeLinkUpdate(event);
         }
     }
 }

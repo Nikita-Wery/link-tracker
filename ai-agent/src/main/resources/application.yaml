@@ -1,6 +1,49 @@
 server:
-  port: 8082
+  port: 8085
 
 spring:
   application:
     name: ai-agent
+
+  kafka:
+    bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
+    producer:
+      properties:
+        enable:
+          idempotence: true
+        acks: 1
+        batch.size: 1024
+        linger.ms: 10000
+        schema.registry.url: http://localhost:8087
+    consumer:
+      properties:
+        enable.auto.commit: false
+        auto-offset-reset: earliest
+        isolation.level: read_committed
+        fetch.min.bytes: 1024
+        fetch.max.bytes: 1048576
+        fetch.max.wait.ms: 100
+        max.poll.interval.ms: 300000
+        max.poll.records: 50
+        schema.registry.url: http://localhost:8087
+        session.timeout.ms: 15000
+        heartbeat.interval.ms: 5000
+
+app:
+  filter:
+    excluded-authors:
+      - bot
+    stop-words:
+      - casino
+      - spam
+      - advertising
+    min-text-length: 2
+  summarization:
+    max-length: 20
+  kafka:
+    topics:
+      link-raw-updates: link-raw-updates
+      link-processed-updates:
+        name: link-raw-updates
+        partitions: 3
+        replicas: 3

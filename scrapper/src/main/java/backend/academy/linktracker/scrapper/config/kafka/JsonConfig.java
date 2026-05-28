@@ -1,8 +1,8 @@
 package backend.academy.linktracker.scrapper.config.kafka;
 
-import backend.academy.linktracker.scrapper.client.inner.kafka.KafkaBotClient;
+import backend.academy.linktracker.scrapper.client.inner.kafka.KafkaClient;
 import backend.academy.linktracker.scrapper.client.inner.kafka.OutboxEventSender;
-import backend.academy.linktracker.scrapper.client.inner.kafka.impl.JsonOutboxEventSender;
+import backend.academy.linktracker.scrapper.client.inner.kafka.impl.linkupdate.JsonLinkUpdateOutboxEventSender;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.OutboxEventUpdateDto;
 import backend.academy.linktracker.scrapper.properties.topics.LinkUpdateTopicProperties;
@@ -23,12 +23,12 @@ public class JsonConfig {
             KafkaTemplate<Long, LinkUpdate> kafkaTemplate,
             JsonToEntityDeserializer deserializer,
             LinkUpdateTopicProperties properties) {
-        return new JsonOutboxEventSender(kafkaTemplate, deserializer, properties);
+        return new JsonLinkUpdateOutboxEventSender(kafkaTemplate, deserializer, properties);
     }
 
     @Bean
-    public KafkaBotClient<LinkUpdate> kafkaBotClient(
+    public KafkaClient<LinkUpdate> kafkaBotClient(
             OutboxEventSender<LinkUpdate> outboxEventSender, BatchWorker<OutboxEventUpdateDto> batchWorker) {
-        return new KafkaBotClient(outboxEventSender, batchWorker);
+        return new KafkaClient(outboxEventSender, batchWorker);
     }
 }

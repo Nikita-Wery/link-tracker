@@ -1,4 +1,4 @@
-package backend.academy.linktracker.bot.controller.kafka.consumer;
+package backend.academy.linktracker.bot.controller.kafka.consumer.linkupdate;
 
 import static org.springframework.kafka.retrytopic.TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE;
 

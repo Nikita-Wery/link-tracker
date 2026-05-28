@@ -18,5 +18,4 @@ public class SummarizationProperties {
 
     @Min(0)
     private int maxLength;
-
 }

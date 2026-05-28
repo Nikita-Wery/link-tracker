@@ -172,6 +172,22 @@ services:
     networks:
       - backend
 
+  ai-agent:
+    container_name: ai-agent
+    build:
+      context: ../ai-agent
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-0:9092,kafka-1:9092,kafka-2:9092
+      SPRING_KAFKA_CONSUMER_PROPERTIES_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      SPRING_KAFKA_PRODUCER_PROPERTIES_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+    ports:
+      - "8085:8085"
+    networks:
+      - backend
+    depends_on:
+      schema-registry:
+        condition: service_healthy
+
   bot:
     build:
       context: ../bot

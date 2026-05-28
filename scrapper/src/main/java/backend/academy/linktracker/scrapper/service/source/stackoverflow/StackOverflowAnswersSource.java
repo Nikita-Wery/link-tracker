@@ -63,7 +63,7 @@ public class StackOverflowAnswersSource implements UpdateSource<LinkUpdate> {
     }
 
     private String buildDescription(StackOverflowAnswerResponse update, Link link) {
-        return "Ответ с id %s, по ссылке %s, обновлён в %s%nПользователь изменивший ответ: %s%nТекст ответа теперь:%s"
+        return "ID=%s%nLINK=%s%nUPDATED_AT=%s%nAUTHOR=%s%nTEXT=%s"
                 .formatted(
                         update.id(),
                         link.getUrl(),

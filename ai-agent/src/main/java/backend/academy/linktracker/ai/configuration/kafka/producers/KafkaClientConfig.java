@@ -1,10 +1,11 @@
 package backend.academy.linktracker.ai.configuration.kafka.producers;
 
 import backend.academy.linktracker.ai.client.KafkaBotClient;
-import backend.academy.linktracker.ai.model.ProcessedLinkUpdate;
-import backend.academy.linktracker.ai.properties.RawLinkUpdatesTopicProperties;
+import backend.academy.linktracker.ai.properties.ProcessedLinkUpdatesTopicProperties;
+import backend.academy.linktracker.ai.utils.mappers.AvroMapper;
+import backend.academy.linktracker.contract.avro.ProcessedLinkUpdateEvent;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -13,15 +14,13 @@ import org.springframework.kafka.core.KafkaTemplate;
 @RequiredArgsConstructor
 public class KafkaClientConfig {
 
-    private final RawLinkUpdatesTopicProperties props;
+    private final ProcessedLinkUpdatesTopicProperties props;
 
     @Bean
-    //TODO: изменить в соответствии с yaml
-    @ConditionalOnProperty(name = "app.clint.transport", havingValue = "kafka")
     public KafkaBotClient kafkaBotClient(
-            KafkaTemplate<Long, ProcessedLinkUpdate> kafkaTemplate) {
+            @Qualifier("avroKafkaTemplate") KafkaTemplate<Long, ProcessedLinkUpdateEvent> kafkaTemplate,
+            AvroMapper avroMapper) {
 
-        return new KafkaBotClient(props, kafkaTemplate);
+        return new KafkaBotClient(props, kafkaTemplate, avroMapper);
     }
-
 }

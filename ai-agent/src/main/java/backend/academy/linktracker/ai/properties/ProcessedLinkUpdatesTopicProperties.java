@@ -9,13 +9,13 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "app.kafka.topics.link-raw-updates")
+@ConfigurationProperties(prefix = "app.kafka.topics.link-processed-updates")
 @Validated
 @Getter
 @Setter
 @EqualsAndHashCode
 @NoArgsConstructor
-public class RawLinkUpdatesTopicProperties {
+public class ProcessedLinkUpdatesTopicProperties {
 
     @NotBlank
     private String name;

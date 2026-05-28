@@ -3,12 +3,13 @@ package backend.academy.linktracker.ai.configuration.kafka.consumers;
 import backend.academy.linktracker.contract.avro.RawLinkUpdateEvent;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
+import java.util.Map;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.RoundRobinAssignor;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.LongDeserializer;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,19 +18,13 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.CommonLoggingErrorHandler;
 import org.springframework.kafka.listener.ContainerProperties;
-import java.util.Map;
-import java.util.function.Consumer;
 
 @Configuration
 @RequiredArgsConstructor
-// TODO:
-@ConditionalOnProperty(name = "app.client.scrapper.api.kafka.enabled", havingValue = "true", matchIfMissing = true)
-@ConditionalOnProperty(name = "app.kafka.serialization", havingValue = "avro")
 public class AvroKafkaConsumerConfig {
 
     private final KafkaProperties kafkaProperties;
-    // TODO: изменить
-    public static final String DEFAULT_GROUP_ID = "bot-notification-service";
+    public static final String DEFAULT_GROUP_ID = "ai-agent-filtering-service";
     public static final int DEFAULT_CONCURRENCY = 3;
 
     @Bean("avroConsumerFactory")
@@ -50,7 +45,7 @@ public class AvroKafkaConsumerConfig {
     }
 
     private <M> ConsumerFactory<Long, M> consumerFactory(
-        Deserializer<M> valueDeserializer, Consumer<Map<String, Object>> propsModifier) {
+            Deserializer<M> valueDeserializer, Consumer<Map<String, Object>> propsModifier) {
 
         var props = kafkaProperties.buildConsumerProperties();
 

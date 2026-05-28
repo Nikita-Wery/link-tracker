@@ -1,9 +1,9 @@
-package backend.academy.linktracker.bot.controller.kafka.consumer;
+package backend.academy.linktracker.bot.controller.kafka.consumer.linkupdate;
 
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
-import backend.academy.linktracker.bot.domain.ProcessedMessage;
 import backend.academy.linktracker.bot.dto.LinkUpdate;
+import backend.academy.linktracker.bot.model.ProcessedMessage;
 import backend.academy.linktracker.bot.service.LinkUpdateService;
 import backend.academy.linktracker.bot.service.ProcessedMessagesService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,7 +34,7 @@ public class LinkUpdateMessageProcessor {
                 linkUpdate.id(),
                 linkUpdate.url());
 
-        Optional<ProcessedMessage> processed = processedMessagesService.findProcessedMessageById(linkUpdate.id());
+        Optional<ProcessedMessage> processed = processedMessagesService.findProcessedMessageById(messageKey);
 
         if (processed.isPresent()) {
 
