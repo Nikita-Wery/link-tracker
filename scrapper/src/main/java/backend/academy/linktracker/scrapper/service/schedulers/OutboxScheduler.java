@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 public class OutboxScheduler {
 
     private final OutboxEventService outboxEventService;
-    //    private final KafkaClient<?> kafkaClient;
     private final KafkaClient<RawLinkUpdateEvent> kafkaAiAgentClient;
     private final OutboxSchedulerProperties outboxSchedulerProperties;
     private final LinkUpdateTopicProperties linkUpdateTopicProperties;
@@ -36,7 +35,6 @@ public class OutboxScheduler {
         for (OutboxEvent event : outboxEvents) {
             log.info("Outbox event {} preparing for shipment", event.getId());
 
-            //            kafkaClient.sendOutboxEventTypeLinkUpdate(event);
             kafkaAiAgentClient.sendOutboxEventTypeLinkUpdate(event);
         }
     }
