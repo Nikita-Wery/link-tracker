@@ -22,17 +22,6 @@ public class RedisPubSubConfiguration {
     private static final String INVALIDATE_CHANNEL_TOPIC_NAME = "chat_link:invalidate";
 
     @Bean
-    public MessageListenerAdapter messageListenerAdapter(
-            ChatLinksInvalidateListener listener, ObjectMapper objectMapper) {
-
-        var adapter = new MessageListenerAdapter(listener, "handleMessage");
-
-        adapter.setSerializer(new GenericJacksonJsonRedisSerializer(objectMapper));
-
-        return adapter;
-    }
-
-    @Bean
     public RedisMessageListenerContainer redisContainer(
             RedisConnectionFactory connectionFactory, ChatLinksInvalidateListener listener) {
 
