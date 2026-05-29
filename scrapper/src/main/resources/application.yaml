@@ -89,8 +89,87 @@ app:
           enabled: false
 
 resilience4j:
+
+  ratelimiter:
+    rate-limiter-aspect-order: 1
+    configs:
+      default:
+        register-health-indicator: true
+        allow-health-indicator-to-fail: true
+        subscribe-for-events: true
+        event-consumer-buffer-size: 100
+    instances:
+      sendUpdateLimiter:
+        base-config: default
+        limit-for-period: 50
+        limit-refresh-period: 1s
+        timeout-duration: 0s
+
+      githubRepositoryLimiter:
+        limit-for-period: 30
+        limit-refresh-period: 1m
+        timeout-duration: 0s
+
+      githubIssuesLimiter:
+        limit-for-period: 20
+        limit-refresh-period: 1m
+        timeout-duration: 0s
+
+      stackQuestionLimiter:
+        limit-for-period: 25
+        limit-refresh-period: 1m
+        timeout-duration: 0s
+
+      stackAnswerLimiter:
+        limit-for-period: 20
+        limit-refresh-period: 1m
+        timeout-duration: 0s
+
+      stackCommentLimiter:
+        limit-for-period: 20
+        limit-refresh-period: 1m
+        timeout-duration: 0s
+
+  circuitbreaker:
+    circuit-breaker-aspect-order: 2
+    instances:
+      botApi:
+        failure-rate-threshold: 70
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 1s
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-type: count_based
+        record-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+          - backend.academy.linktracker.scrapper.exception.botexception.responsexception.BotServerException
+
+      githubApi:
+        failure-rate-threshold: 50
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        wait-duration-in-open-state: 60s
+        permitted-number-of-calls-in-half-open-state: 3
+        record-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+          - backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiServerException
+
+      stackOverflowApi:
+        failure-rate-threshold: 50
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        wait-duration-in-open-state: 60s
+        permitted-number-of-calls-in-half-open-state: 3
+        record-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+          - org.springframework.web.client.HttpServerErrorException
+          - backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiServerException
+
   retry:
-    retry-aspect-order: 1
+    retry-aspect-order: 3
     instances:
       githubRepositoryRetry:
         max-attempts: 3
@@ -139,84 +218,6 @@ resilience4j:
           - org.springframework.web.client.ResourceAccessException
           - org.springframework.web.client.HttpServerErrorException
           - backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiServerException
-
-  circuitbreaker:
-    circuit-breaker-aspect-order: 2
-    instances:
-      botApi:
-        failure-rate-threshold: 70
-        sliding-window-size: 20
-        minimum-number-of-calls: 10
-        automatic-transition-from-open-to-half-open-enabled: true
-        wait-duration-in-open-state: 1s
-        permitted-number-of-calls-in-half-open-state: 3
-        sliding-window-type: count_based
-        record-exceptions:
-          - org.springframework.web.client.ResourceAccessException
-          - org.springframework.web.client.HttpServerErrorException
-          - backend.academy.linktracker.scrapper.exception.botexception.responsexception.BotServerException
-
-      githubApi:
-        failure-rate-threshold: 50
-        sliding-window-size: 20
-        minimum-number-of-calls: 10
-        wait-duration-in-open-state: 60s
-        permitted-number-of-calls-in-half-open-state: 3
-        record-exceptions:
-          - org.springframework.web.client.ResourceAccessException
-          - org.springframework.web.client.HttpServerErrorException
-          - backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiServerException
-
-      stackOverflowApi:
-        failure-rate-threshold: 50
-        sliding-window-size: 20
-        minimum-number-of-calls: 10
-        wait-duration-in-open-state: 60s
-        permitted-number-of-calls-in-half-open-state: 3
-        record-exceptions:
-          - org.springframework.web.client.ResourceAccessException
-          - org.springframework.web.client.HttpServerErrorException
-          - backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiServerException
-
-  ratelimiter:
-    rate-limiter-aspect-order: 3
-    configs:
-      default:
-        register-health-indicator: true
-        allow-health-indicator-to-fail: true
-        subscribe-for-events: true
-        event-consumer-buffer-size: 100
-    instances:
-      sendUpdateLimiter:
-        base-config: default
-        limit-for-period: 50
-        limit-refresh-period: 1s
-        timeout-duration: 0s
-
-      githubRepositoryLimiter:
-        limit-for-period: 30
-        limit-refresh-period: 1m
-        timeout-duration: 0s
-
-      githubIssuesLimiter:
-        limit-for-period: 20
-        limit-refresh-period: 1m
-        timeout-duration: 0s
-
-      stackQuestionLimiter:
-        limit-for-period: 25
-        limit-refresh-period: 1m
-        timeout-duration: 0s
-
-      stackAnswerLimiter:
-        limit-for-period: 20
-        limit-refresh-period: 1m
-        timeout-duration: 0s
-
-      stackCommentLimiter:
-        limit-for-period: 20
-        limit-refresh-period: 1m
-        timeout-duration: 0s
 
 logging:
   level:

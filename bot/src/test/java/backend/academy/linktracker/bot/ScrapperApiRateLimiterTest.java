@@ -91,6 +91,8 @@ class ScrapperApiRateLimiterTest {
     @DisplayName("Should reset rate limit after refresh period for getLinks")
     void shouldResetRateLimitAfterRefreshPeriodForGetLinks() {
         var rateLimiter = registry.rateLimiter("getLinksLimiter");
+        Duration refreshPeriod = rateLimiter.getRateLimiterConfig().getLimitRefreshPeriod();
+
         WireMock.reset();
 
         RateLimiterConfig config = rateLimiter.getRateLimiterConfig();
@@ -106,7 +108,7 @@ class ScrapperApiRateLimiterTest {
         assertThrows(RequestNotPermitted.class, () -> scrapperClient.getLinks(TEST_CHAT_ID));
 
         Awaitility.await()
-                .atMost(Duration.ofSeconds(2))
+                .atMost(refreshPeriod.plusSeconds(1))
                 .pollInterval(Duration.ofMillis(100))
                 .untilAsserted(() -> assertDoesNotThrow(
                         () -> scrapperClient.getLinks(TEST_CHAT_ID), "Request should be allowed after refresh period"));
