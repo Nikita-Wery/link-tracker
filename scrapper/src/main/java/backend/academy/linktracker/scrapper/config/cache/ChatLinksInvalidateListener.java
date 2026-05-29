@@ -1,11 +1,11 @@
 package backend.academy.linktracker.scrapper.config.cache;
 
 import backend.academy.linktracker.scrapper.repository.cache.ChatLinkLocalCache;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @RequiredArgsConstructor
