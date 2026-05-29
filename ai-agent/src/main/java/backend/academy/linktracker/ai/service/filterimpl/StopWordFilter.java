@@ -27,7 +27,7 @@ public class StopWordFilter implements RawLinkUpdateFilter {
 
         for (String stopWord : this.properties.getStopWords()) {
 
-            if (rawLinkUpdate.description().contains(stopWord)) {
+            if (rawLinkUpdate.description().toLowerCase().contains(stopWord.toLowerCase())) {
 
                 log.info(
                         "RawLinkUpdate rejected, stop word found",

@@ -24,6 +24,6 @@ public class AvroMapper {
                 processedLinkUpdate.url(),
                 processedLinkUpdate.description(),
                 processedLinkUpdate.tgChatIds(),
-                processedLinkUpdate.priority());
+                processedLinkUpdate.priority().name());
     }
 }

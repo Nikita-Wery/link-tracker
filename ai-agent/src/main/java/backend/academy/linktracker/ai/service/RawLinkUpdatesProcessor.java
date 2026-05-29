@@ -1,7 +1,6 @@
 package backend.academy.linktracker.ai.service;
 
-import backend.academy.linktracker.ai.client.KafkaBotClient;
-import backend.academy.linktracker.ai.model.Priority;
+import backend.academy.linktracker.ai.model.LinkUpdateContext;
 import backend.academy.linktracker.ai.model.ProcessedLinkUpdate;
 import backend.academy.linktracker.ai.model.RawLinkUpdate;
 import java.util.List;
@@ -16,8 +15,8 @@ import org.springframework.stereotype.Service;
 public class RawLinkUpdatesProcessor {
 
     private final List<RawLinkUpdateFilter> filters;
-    private final SummarizationService summarizationService;
-    private final KafkaBotClient botClient;
+    private final List<SubProcessor<LinkUpdateContext>> processors;
+    private final GropingService gropingService;
 
     public void processRawLinkUpdate(Long messageKey, String topic, RawLinkUpdate rawLinkUpdate, Acknowledgment ack) {
 
@@ -33,21 +32,22 @@ public class RawLinkUpdatesProcessor {
             return;
         }
 
-        String resultDescription = summarizationService.summarizeDescription(rawLinkUpdate.description());
+        LinkUpdateContext context =
+                LinkUpdateContext.builder().rawLinkUpdate(rawLinkUpdate).build();
 
-        botClient
-                .send(messageKey, rawLinkUpdateToProcessed(rawLinkUpdate, resultDescription))
-                .join();
+        processors.forEach(processor -> processor.process(context));
+
+        gropingService.addProcessedLinkUpdate(messageKey, rawLinkUpdateToProcessed(context));
 
         ack.acknowledge();
     }
 
-    private ProcessedLinkUpdate rawLinkUpdateToProcessed(RawLinkUpdate rawLinkUpdate, String resultDescription) {
+    private ProcessedLinkUpdate rawLinkUpdateToProcessed(LinkUpdateContext context) {
         return new ProcessedLinkUpdate(
-                rawLinkUpdate.id(),
-                rawLinkUpdate.url(),
-                resultDescription,
-                rawLinkUpdate.tgChatIds(),
-                Priority.HIGH.name());
+                context.getRawLinkUpdate().id(),
+                context.getRawLinkUpdate().url(),
+                context.getSummarizedDescription(),
+                context.getRawLinkUpdate().tgChatIds(),
+                context.getPriority());
     }
 }

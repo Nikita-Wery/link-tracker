@@ -11,14 +11,13 @@ spring:
       properties:
         enable:
           idempotence: true
-        acks: 1
+        acks: all
         batch.size: 1024
         linger.ms: 10000
         schema.registry.url: http://localhost:8087
     consumer:
       properties:
         enable.auto.commit: false
-        auto-offset-reset: earliest
         isolation.level: read_committed
         fetch.min.bytes: 1024
         fetch.max.bytes: 1048576
@@ -28,8 +27,26 @@ spring:
         schema.registry.url: http://localhost:8087
         session.timeout.ms: 15000
         heartbeat.interval.ms: 5000
+      auto-offset-reset: earliest
 
 app:
+
+  prioritization:
+    high-keywords:
+      - critical
+      - urgent
+      - breaking
+      - security
+    low-keywords:
+      - minor
+      - typo
+      - chore
+      - docs
+      -
+  grouping:
+    window-ms: 30000
+    core-pool-size: 2
+
   filter:
     excluded-authors:
       - bot
@@ -40,6 +57,7 @@ app:
     min-text-length: 2
   summarization:
     max-length: 20
+
   kafka:
     topics:
       link-raw-updates:

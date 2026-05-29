@@ -21,6 +21,8 @@ public class KafkaBotClient {
     public CompletableFuture<SendResult<Long, ProcessedLinkUpdateEvent>> send(
             Long key, ProcessedLinkUpdate processedLinkUpdate) {
 
+        log.info("Sending processedLinkUpdate with id {}", processedLinkUpdate.id());
+
         ProcessedLinkUpdateEvent event = avroMapper.processedLinkUpdateToEvent(processedLinkUpdate);
 
         return kafkaAvroTemplate.send(props.getName(), key, event).whenComplete((r, t) -> {

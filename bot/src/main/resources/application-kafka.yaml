@@ -3,9 +3,9 @@ spring:
     bootstrap-servers: localhost:29092,localhost:29093,localhost:29094
 
     consumer:
+      auto-offset-reset: earliest
       properties:
         enable.auto.commit: false
-        auto-offset-reset: earliest
         isolation.level: read_committed
         fetch.min.bytes: 1024
         fetch.max.bytes: 1048576
