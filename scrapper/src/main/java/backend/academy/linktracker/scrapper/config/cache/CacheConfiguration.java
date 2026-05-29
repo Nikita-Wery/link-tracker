@@ -30,7 +30,7 @@ public class CacheConfiguration {
     @Bean
     RedisConnectionFactory lettuceConnectionFactory(ValkeyClusterProperties valkeyClusterProperties) {
 
-        valkeyClusterProperties.getCluster().getNodes().stream().peek(node -> {
+        valkeyClusterProperties.getCluster().getNodes().forEach(node -> {
             log.info("REDIS NODE: {}", node);
         });
 
