@@ -34,7 +34,7 @@ public class AvroKafkaConsumerConfig {
     private final KafkaProperties kafkaProperties;
     public static final String DEFAULT_GROUP_ID = "bot-notification-service";
     public static final int DEFAULT_CONCURRENCY = 3;
-    public static final int DEFAULT_DLQ_ACKS = 1;
+    public static final String DEFAULT_DLQ_ACKS = "all";
 
     @Bean("avroConsumerFactory")
     public ConcurrentKafkaListenerContainerFactory<Long, LinkUpdateEvent> defaultConsumerFactory() {

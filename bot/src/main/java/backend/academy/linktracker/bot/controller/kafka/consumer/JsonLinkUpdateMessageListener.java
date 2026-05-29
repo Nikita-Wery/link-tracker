@@ -22,10 +22,10 @@ public class JsonLinkUpdateMessageListener {
 
     private final LinkUpdateMessageProcessor processor;
 
-    @KafkaListener(containerFactory = "jsonConsumerFactory", topics = "${app.kafka.topics.link-update}")
+    @KafkaListener(containerFactory = "jsonConsumerFactory", topics = "${app.kafka.topics.link-updates.name}")
     @RetryableTopic(
             backOff = @BackOff(delay = 1000L, multiplier = 2.0),
-            attempts = "3",
+            attempts = "${app.kafka.topics.link-updates.attempts}",
             autoCreateTopics = "true",
             kafkaTemplate = "dlqJsonLinkUpdateKafkaTemplate",
             topicSuffixingStrategy = SUFFIX_WITH_INDEX_VALUE,
