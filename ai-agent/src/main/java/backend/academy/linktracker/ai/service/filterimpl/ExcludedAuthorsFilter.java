@@ -23,9 +23,10 @@ public class ExcludedAuthorsFilter implements RawLinkUpdateFilter {
             justification = "Используем StructuredArguments для JSON, placeholders не нужны")
     public boolean filter(RawLinkUpdate rawLinkUpdate) {
 
-        boolean excludedAuthorsNotFound = !properties.getExcludedAuthors()
-            .stream().map(String::toLowerCase).toList()
-            .contains(rawLinkUpdate.author().toLowerCase());
+        boolean excludedAuthorsNotFound = !properties.getExcludedAuthors().stream()
+                .map(String::toLowerCase)
+                .toList()
+                .contains(rawLinkUpdate.author().toLowerCase());
 
         if (!excludedAuthorsNotFound) {
             log.info(
