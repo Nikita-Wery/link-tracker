@@ -228,8 +228,11 @@ resilience4j:
 management:
   endpoints:
     web:
+      base-path: /
       exposure:
-        include: health,prometheus,metrics
+        include: health,prometheus
+      path-mapping:
+        prometheus: metrics
 
   endpoint:
     health:

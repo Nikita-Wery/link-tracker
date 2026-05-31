@@ -209,6 +209,7 @@ services:
     ports:
       - "8080:8080"
       - "9090:9090"
+      - "8011:8011"
     networks:
       - backend
 
@@ -232,7 +233,7 @@ services:
       valkey-2:
         condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8081/actuator/health/readiness || exit 1"]
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8081/health/readiness || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 10

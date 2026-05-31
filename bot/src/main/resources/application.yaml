@@ -164,10 +164,16 @@ resilience4j:
 #    org.springframework.kafka.support.serializer: TRACE
 
 management:
+  server:
+    port: 8011
+
   endpoints:
     web:
+      base-path: /
       exposure:
-        include: health,prometheus,metrics
+        include: health,prometheus
+      path-mapping:
+        prometheus: metrics
 
   endpoint:
     health:
