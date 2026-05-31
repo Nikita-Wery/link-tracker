@@ -13,6 +13,7 @@ import backend.academy.linktracker.bot.client.ScrapperClient;
 import backend.academy.linktracker.bot.dto.RemoveLinkRequest;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ChatNotExistsException;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.LinkNotTrackedException;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import backend.academy.linktracker.bot.utils.validator.CommandValidator;
 import backend.academy.linktracker.bot.utils.validator.LinkValidationProcessor;
@@ -54,6 +55,9 @@ class UntrackCommandTest {
     @Mock
     private DialogContextStorage contextStorage;
 
+    @Mock
+    private BotMetricsService botMetricsService;
+
     private CommandValidator commandValidator;
 
     @Mock
@@ -77,7 +81,8 @@ class UntrackCommandTest {
 
         List<Command<Update>> commands = new ArrayList<>();
 
-        UntrackCommand untrackCommand = new UntrackCommand(scrapperClient, telegramMessageSender, validator);
+        UntrackCommand untrackCommand =
+                new UntrackCommand(scrapperClient, telegramMessageSender, validator, botMetricsService);
 
         commands.add(untrackCommand);
 

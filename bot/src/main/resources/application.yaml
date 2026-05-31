@@ -28,7 +28,7 @@ spring:
 
 app:
   telegram:
-    enabled: true
+    enabled: false
     url: https://api.telegram.org/bot
     token: ${TELEGRAM_TOKEN}
     update-listener-sleep: 1s
@@ -157,8 +157,27 @@ resilience4j:
         limit-refresh-period: 1s
         timeout-duration: 0
 
-logging:
-  level:
-    org.apache.kafka: TRACE
-    org.springframework.kafka: DEBUG
-    org.springframework.kafka.support.serializer: TRACE
+#logging:
+#  level:
+#    org.apache.kafka: TRACE
+#    org.springframework.kafka: DEBUG
+#    org.springframework.kafka.support.serializer: TRACE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+
+  endpoint:
+    health:
+      show-details: always
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+  metrics:
+    tags:
+      application: bot

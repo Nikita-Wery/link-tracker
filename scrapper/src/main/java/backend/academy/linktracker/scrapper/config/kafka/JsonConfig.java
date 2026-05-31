@@ -7,6 +7,7 @@ import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.OutboxEventUpdateDto;
 import backend.academy.linktracker.scrapper.properties.topics.LinkUpdateTopicProperties;
 import backend.academy.linktracker.scrapper.service.BatchWorker;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import backend.academy.linktracker.scrapper.utils.JsonToEntityDeserializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +23,9 @@ public class JsonConfig {
     public OutboxEventSender<LinkUpdate> outboxEventSender(
             KafkaTemplate<Long, LinkUpdate> kafkaTemplate,
             JsonToEntityDeserializer deserializer,
-            LinkUpdateTopicProperties properties) {
-        return new JsonLinkUpdateOutboxEventSender(kafkaTemplate, deserializer, properties);
+            LinkUpdateTopicProperties properties,
+            ScrapperMetricsService scrapperMetricsService) {
+        return new JsonLinkUpdateOutboxEventSender(kafkaTemplate, deserializer, properties, scrapperMetricsService);
     }
 
     @Bean

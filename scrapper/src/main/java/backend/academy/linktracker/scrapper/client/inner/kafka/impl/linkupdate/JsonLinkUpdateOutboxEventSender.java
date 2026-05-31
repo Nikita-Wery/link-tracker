@@ -3,6 +3,7 @@ package backend.academy.linktracker.scrapper.client.inner.kafka.impl.linkupdate;
 import backend.academy.linktracker.scrapper.client.inner.kafka.OutboxEventSender;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.properties.topics.LinkUpdateTopicProperties;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import backend.academy.linktracker.scrapper.utils.JsonToEntityDeserializer;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ public class JsonLinkUpdateOutboxEventSender implements OutboxEventSender<LinkUp
     private final KafkaTemplate<Long, LinkUpdate> kafkaTemplate;
     private final JsonToEntityDeserializer deserializer;
     private final LinkUpdateTopicProperties properties;
+    private final ScrapperMetricsService scrapperMetricsService;
 
     @Override
     public LinkUpdate deserialize(String json) {
@@ -39,8 +41,7 @@ public class JsonLinkUpdateOutboxEventSender implements OutboxEventSender<LinkUp
     @Override
     public CompletableFuture<SendResult<Long, LinkUpdate>> send(Long key, LinkUpdate event) {
 
-        log.info("SEND topic={}, key={}", properties.getName(), key);
-
-        return kafkaTemplate.send(properties.getName(), key, event);
+        return scrapperMetricsService.timeExternalCall(
+                "kafka", properties.getName(), "kafka", () -> kafkaTemplate.send(properties.getName(), key, event));
     }
 }

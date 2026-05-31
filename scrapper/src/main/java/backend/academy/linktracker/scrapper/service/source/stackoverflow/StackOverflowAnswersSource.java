@@ -6,6 +6,7 @@ import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowAnswerResponse;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowWrapper;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
 import backend.academy.linktracker.scrapper.utils.TextMessageHandler;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -24,9 +25,12 @@ import org.springframework.stereotype.Component;
 public class StackOverflowAnswersSource implements UpdateSource<LinkUpdate> {
 
     private final StackOverflowClient stackOverflowClient;
+    private final ScrapperMetricsService scrapperMetricsService;
 
-    public StackOverflowAnswersSource(StackOverflowClient stackOverflowClient) {
+    public StackOverflowAnswersSource(
+            StackOverflowClient stackOverflowClient, ScrapperMetricsService scrapperMetricsService) {
         this.stackOverflowClient = stackOverflowClient;
+        this.scrapperMetricsService = scrapperMetricsService;
     }
 
     @Override
@@ -41,8 +45,13 @@ public class StackOverflowAnswersSource implements UpdateSource<LinkUpdate> {
 
         Long questionId = extractQuestionId(link);
 
-        StackOverflowWrapper<StackOverflowAnswerResponse> response =
-                stackOverflowClient.getAnswerUpdates(questionId, "stackoverflow");
+        StackOverflowWrapper<StackOverflowAnswerResponse> response = scrapperMetricsService.timeExternalCall(
+                "external_source",
+                "stackoverflow",
+                ResourceType.STACKOVERFLOW_ANSWERS.name(),
+                () -> stackOverflowClient.getAnswerUpdates(questionId, "stackoverflow"));
+
+        scrapperMetricsService.incrementApiRequest("stackoverflow");
 
         return response.items().stream()
                 .filter(answer -> Instant.ofEpochSecond(answer.updatedAt())

@@ -12,6 +12,7 @@ import backend.academy.linktracker.bot.application.command.impl.HelpCommand;
 import backend.academy.linktracker.bot.application.command.impl.StartCommand;
 import backend.academy.linktracker.bot.application.command.impl.UnknownCommand;
 import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispatcher;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import backend.academy.linktracker.bot.utils.validator.CommandValidator;
 import com.pengrad.telegrambot.model.Chat;
@@ -37,6 +38,9 @@ class CommandWithoutArgsTest {
     private CommandValidator commandValidator;
 
     @Mock
+    private BotMetricsService botMetrics;
+
+    @Mock
     private TelegramMessageSender telegramMessageSender;
 
     private CommandDispatcher commandDispatcher;
@@ -56,13 +60,13 @@ class CommandWithoutArgsTest {
         when(update.message()).thenReturn(message);
 
         // commands
-        StartCommand startCommand = new StartCommand(telegramMessageSender);
-        UnknownCommand unknownCommand = new UnknownCommand(telegramMessageSender);
+        StartCommand startCommand = new StartCommand(telegramMessageSender, botMetrics);
+        UnknownCommand unknownCommand = new UnknownCommand(telegramMessageSender, botMetrics);
 
         List<Command<Update>> commands = new ArrayList<>();
         commands.add(startCommand);
 
-        HelpCommand helpCommand = new HelpCommand(telegramMessageSender, commands);
+        HelpCommand helpCommand = new HelpCommand(telegramMessageSender, commands, botMetrics);
 
         commands.add(helpCommand);
         commands.add(unknownCommand);

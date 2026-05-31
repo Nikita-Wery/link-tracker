@@ -13,6 +13,7 @@ import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispat
 import backend.academy.linktracker.bot.client.ScrapperClient;
 import backend.academy.linktracker.bot.dto.ListLinksResponse;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ChatNotExistsException;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import backend.academy.linktracker.bot.utils.validator.CommandValidator;
 import backend.academy.linktracker.bot.utils.validator.TagsValidator;
@@ -56,6 +57,9 @@ class ListCommandTest {
     @Mock
     private TelegramMessageSender telegramMessageSender;
 
+    @Mock
+    private BotMetricsService botMetrics;
+
     private CommandDispatcher commandDispatcher;
 
     private Update update;
@@ -74,7 +78,7 @@ class ListCommandTest {
 
         List<Command<Update>> commands = new ArrayList<>();
 
-        ListCommand listCommand = new ListCommand(scrapperClient, telegramMessageSender, tagsValidator);
+        ListCommand listCommand = new ListCommand(scrapperClient, telegramMessageSender, tagsValidator, botMetrics);
 
         commands.add(listCommand);
 

@@ -1,0 +1,92 @@
+Parameterized dashboard:
+Panels:
+
+1)Request Rate: sum(rate(api_requests_total{application="scrapper"}[30m]))
+
+2)Error Rate: sum(rate(api_requests_total{application="scrapper",status="error"}[30m]))
+
+3)Request Duration p95:
+
+	histogram_quantile(
+	  0.95,
+	  sum(
+	    rate(request_duration_seconds_bucket{
+	      application="scrapper"
+	    }[30m])
+	  ) by (le)
+	)
+
+4)Heap Memory Usage: jvm_memory_used_bytes{area="heap",application="$app"}
+
+5)Non Heap Memory Usage:
+
+	jvm_memory_used_bytes{
+	  area="nonheap",
+	  application="$app"
+	}
+
+Business metrics:
+Panels:
+
+1)User Messages per Second: sum(rate(bot_requests_total[30m]))
+
+2)Links on track: links_on_track
+
+3)Scrapper p50:
+
+	histogram_quantile(
+	  0.50,
+	  sum(
+	    rate(request_duration_seconds_bucket[30m])
+	  ) by (le, scope_type)
+	)
+
+4)Scrapper p95:
+
+	histogram_quantile(
+	  0.95,
+	  sum(
+	    rate(request_duration_seconds_bucket[5m])
+	  ) by (le, scope_type)
+	)
+
+5)Scrapper p99:
+
+	histogram_quantile(
+	  0.99,
+	  sum(
+	    rate(request_duration_seconds_bucket[5m])
+	  ) by (le, scope_type)
+	)
+
+6)Bot p50:
+
+	histogram_quantile(
+	  0.50,
+	  sum(
+	    rate(command_duration_seconds_bucket[30m])
+	  ) by (le, scope_type)
+	)
+
+7)Bot p95:
+
+	histogram_quantile(
+	  0.95,
+	  sum(
+	    rate(command_duration_seconds_bucket[30m])
+	  ) by (le, scope_type)
+	)
+
+8)Bot p99:
+
+	histogram_quantile(
+	  0.99,
+	  sum(
+	    rate(command_duration_seconds_bucket[30m])
+	  ) by (le, scope_type)
+	)
+
+9)Total count of telegram requests: sum(rate(bot_requests_total[30m]))
+
+10)Number of notifications send: sum(rate(sent_notification_total[30m]))
+

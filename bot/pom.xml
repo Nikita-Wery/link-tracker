@@ -130,6 +130,16 @@
             <artifactId>kafka-avro-serializer</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-api</artifactId>
+        </dependency>
+
         <!-- Opentelemetry support: -->
         <!-- <dependency> -->
         <!--     <groupId>org.springframework.boot</groupId> -->

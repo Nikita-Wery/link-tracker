@@ -1,6 +1,7 @@
 package backend.academy.linktracker.bot.application.client.impl;
 
 import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,17 @@ import org.springframework.stereotype.Component;
 public class PengradTelegramMessageSender implements TelegramMessageSender {
 
     private final TelegramBot telegramBot;
+    private final BotMetricsService botMetrics;
 
     @Autowired
-    public PengradTelegramMessageSender(TelegramBot telegramBot) {
+    public PengradTelegramMessageSender(TelegramBot telegramBot, BotMetricsService botMetrics) {
         this.telegramBot = telegramBot;
+        this.botMetrics = botMetrics;
     }
 
     @Override
     public void sendMessage(Long chatId, String message) {
         telegramBot.execute(new SendMessage(chatId, message));
+        botMetrics.incrementSentNotifications();
     }
 }

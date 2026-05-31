@@ -6,6 +6,7 @@ import backend.academy.linktracker.scrapper.dto.bot.ApiErrorResponse;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.exception.botexception.responsexception.BotServerException;
 import backend.academy.linktracker.scrapper.exception.botexception.responsexception.UnknownBotException;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.List;
@@ -22,13 +23,18 @@ public class BotBadResponseHandler {
 
     private final Map<String, BotApiException> clientExceptionMap;
     private final ObjectMapper objectMapper;
+    private final ScrapperMetricsService scrapperMetricsService;
 
-    public BotBadResponseHandler(ObjectMapper objectMapper, List<BotApiException> responseExceptions) {
+    public BotBadResponseHandler(
+            ObjectMapper objectMapper,
+            List<BotApiException> responseExceptions,
+            ScrapperMetricsService scrapperMetricsService) {
 
         this.clientExceptionMap = responseExceptions.stream()
                 .collect(Collectors.toMap(ex -> ex.getClass().getSimpleName(), Function.identity()));
 
         this.objectMapper = objectMapper;
+        this.scrapperMetricsService = scrapperMetricsService;
     }
 
     @SuppressFBWarnings(
@@ -57,6 +63,8 @@ public class BotBadResponseHandler {
                         kv("status_code", status),
                         kv("method", request.getMethod()),
                         kv("url", request.getURI()));
+
+                scrapperMetricsService.incrementApiError(request.getURI().getPath());
 
                 throw new BotServerException("Bot exception 5xx");
             }

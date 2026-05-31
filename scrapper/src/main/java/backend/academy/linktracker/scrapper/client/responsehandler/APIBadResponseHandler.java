@@ -6,10 +6,12 @@ import backend.academy.linktracker.scrapper.exception.externalexception.External
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiException;
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiRateLimitException;
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiServerException;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
@@ -17,7 +19,10 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class APIBadResponseHandler {
+
+    private final ScrapperMetricsService scrapperMetricsService;
 
     @SuppressFBWarnings(
             value = "SLF4J_PLACE_HOLDER_MISMATCH",
@@ -30,6 +35,8 @@ public class APIBadResponseHandler {
         try (InputStream is = response.getBody()) {
             body = is != null ? new String(is.readAllBytes(), StandardCharsets.UTF_8) : "";
         }
+
+        scrapperMetricsService.incrementApiError(request.getURI().getHost().toString());
 
         log.error(
                 "External API error",

@@ -23,9 +23,6 @@ spring:
         schema.registry.url: http://localhost:8087
 
 app:
-  cache:
-    enabled: false
-
   scheduler:
     outbox:
       enabled: true

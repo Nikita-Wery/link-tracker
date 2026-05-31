@@ -6,6 +6,7 @@ import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowQuestionUpdateTime;
 import backend.academy.linktracker.scrapper.properties.StackoverflowProperties;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -23,12 +24,16 @@ public class StackOverflowQuestionSource implements UpdateSource<LinkUpdate> {
 
     private final StackOverflowClient stackOverflowClient;
     private final StackoverflowProperties stackoverflowProperties;
+    private final ScrapperMetricsService scrapperMetricsService;
 
     public StackOverflowQuestionSource(
-            StackOverflowClient stackOverflowClient, StackoverflowProperties stackoverflowProperties) {
+            StackOverflowClient stackOverflowClient,
+            StackoverflowProperties stackoverflowProperties,
+            ScrapperMetricsService scrapperMetricsService) {
 
         this.stackoverflowProperties = stackoverflowProperties;
         this.stackOverflowClient = stackOverflowClient;
+        this.scrapperMetricsService = scrapperMetricsService;
     }
 
     @Override
@@ -45,11 +50,17 @@ public class StackOverflowQuestionSource implements UpdateSource<LinkUpdate> {
 
         Long questionId = extractQuestionId(link);
 
-        StackOverflowQuestionUpdateTime update = stackOverflowClient.getQuestionUpdateTime(
-                questionId,
+        StackOverflowQuestionUpdateTime update = scrapperMetricsService.timeExternalCall(
+                "external_source",
                 "stackoverflow",
-                stackoverflowProperties.getKey(),
-                stackoverflowProperties.getAccessToken());
+                ResourceType.STACKOVERFLOW_QUESTION.name(),
+                () -> stackOverflowClient.getQuestionUpdateTime(
+                        questionId,
+                        "stackoverflow",
+                        stackoverflowProperties.getKey(),
+                        stackoverflowProperties.getAccessToken()));
+
+        scrapperMetricsService.incrementApiRequest("stackoverflow");
 
         if (update.lastUpdate().isAfter(link.getLatestUpdateTime())) {
             updates.add(toLinkUpdate(update, link));

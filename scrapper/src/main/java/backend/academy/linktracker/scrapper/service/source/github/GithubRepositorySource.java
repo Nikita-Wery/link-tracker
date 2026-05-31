@@ -6,6 +6,7 @@ import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.github.GithubRepositoryUpdateTime;
 import backend.academy.linktracker.scrapper.dto.github.RepoInfo;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -22,9 +23,11 @@ import org.springframework.stereotype.Component;
 public class GithubRepositorySource implements UpdateSource<LinkUpdate> {
 
     private final GitHubClient gitHubClient;
+    private final ScrapperMetricsService metricsService;
 
-    public GithubRepositorySource(GitHubClient gitHubClient) {
+    public GithubRepositorySource(GitHubClient gitHubClient, ScrapperMetricsService metricsService) {
         this.gitHubClient = gitHubClient;
+        this.metricsService = metricsService;
     }
 
     @Override
@@ -41,7 +44,13 @@ public class GithubRepositorySource implements UpdateSource<LinkUpdate> {
 
         String[] ownerAndRepo = extractOwnerAndRepo(link);
 
-        GithubRepositoryUpdateTime update = gitHubClient.getRepositoryUpdateTime(ownerAndRepo[0], ownerAndRepo[1]);
+        GithubRepositoryUpdateTime update = metricsService.timeExternalCall(
+                "external_source",
+                "github",
+                ResourceType.GITHUB_REPOSITORY.name(),
+                () -> gitHubClient.getRepositoryUpdateTime(ownerAndRepo[0], ownerAndRepo[1]));
+
+        metricsService.incrementApiRequest("github");
 
         if (update.updateAt().isAfter(link.getLatestUpdateTime())) {
             updates.add(toLinkUpdate(update, link));

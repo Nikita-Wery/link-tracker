@@ -3,6 +3,7 @@ package backend.academy.linktracker.bot.application.dispatcher.impl;
 import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
 import backend.academy.linktracker.bot.application.command.impl.UnknownCommand;
 import backend.academy.linktracker.bot.application.dispatcher.UpdateDispatcher;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
 import com.pengrad.telegrambot.model.Update;
 import org.springframework.stereotype.Component;
 
@@ -18,9 +19,9 @@ public class DefaultDispatcher implements UpdateDispatcher {
 
     private final UnknownCommand unknownCommand;
 
-    public DefaultDispatcher(TelegramMessageSender telegramMessageSender) {
+    public DefaultDispatcher(TelegramMessageSender telegramMessageSender, BotMetricsService botMetrics) {
         this.telegramMessageSender = telegramMessageSender;
-        this.unknownCommand = new UnknownCommand(telegramMessageSender);
+        this.unknownCommand = new UnknownCommand(telegramMessageSender, botMetrics);
     }
 
     /**

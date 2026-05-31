@@ -6,6 +6,7 @@ import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.github.GithubIssueResponse;
 import backend.academy.linktracker.scrapper.dto.github.RepoInfo;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
 import backend.academy.linktracker.scrapper.utils.TextMessageHandler;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -22,8 +23,10 @@ import org.springframework.stereotype.Component;
 public class GithubRepositoryIssueSource implements UpdateSource<LinkUpdate> {
 
     private final GitHubClient gitHubClient;
+    private final ScrapperMetricsService metricsService;
 
-    public GithubRepositoryIssueSource(GitHubClient gitHubClient) {
+    public GithubRepositoryIssueSource(GitHubClient gitHubClient, ScrapperMetricsService metricsService) {
+        this.metricsService = metricsService;
         this.gitHubClient = gitHubClient;
     }
 
@@ -39,7 +42,13 @@ public class GithubRepositoryIssueSource implements UpdateSource<LinkUpdate> {
 
         String[] linkData = extractLinkData(link);
 
-        List<GithubIssueResponse> issuesResponse = gitHubClient.getRepositoryIssueUpdate(linkData[0], linkData[1]);
+        List<GithubIssueResponse> issuesResponse = metricsService.timeExternalCall(
+                "external_source",
+                "github",
+                ResourceType.GITHUB_REPOSITORY_ISSUE.name(),
+                () -> gitHubClient.getRepositoryIssueUpdate(linkData[0], linkData[1]));
+
+        metricsService.incrementApiRequest("github");
 
         return issuesResponse.stream()
                 .filter(issue -> issue.createdAt().isAfter(link.getLatestUpdateTime()))

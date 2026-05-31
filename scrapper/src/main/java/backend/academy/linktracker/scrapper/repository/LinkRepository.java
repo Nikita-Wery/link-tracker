@@ -1,5 +1,6 @@
 package backend.academy.linktracker.scrapper.repository;
 
+import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import java.time.OffsetDateTime;
@@ -20,4 +21,6 @@ public interface LinkRepository {
     Link saveAndFlush(Link link);
 
     Optional<Link> findLinkByURI(String uri);
+
+    int countByResourceType(ResourceType resourceType);
 }

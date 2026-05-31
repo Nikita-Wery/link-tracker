@@ -1,5 +1,6 @@
 package backend.academy.linktracker.scrapper.repository.impl.orm;
 
+import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
@@ -54,5 +55,10 @@ public class OrmLinkRepository implements LinkRepository {
     @Override
     public Optional<Link> findLinkByURI(String uri) {
         return jpaLinkRepository.findLinkByUrl(uri);
+    }
+
+    @Override
+    public int countByResourceType(ResourceType resourceType) {
+        return jpaLinkRepository.countByResourceType(resourceType);
     }
 }

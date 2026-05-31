@@ -45,14 +45,17 @@ app:
     access-type: orm
 
   scheduler:
-    enabled: false
+    enabled: true
+    metrics:
+      enabled: true
+      interval-ms: 10000
     link-update:
       enabled: true
       batch-size: 50
       interval-update-ms: 60000
 
   cache:
-    enabled: false
+    enabled: true
     local:
       ttl: 10m
       max-size: 10000
@@ -82,7 +85,7 @@ app:
 
       api:
         kafka:
-          enabled: false
+          enabled: true
         rest:
           enabled: true
         grpc:
@@ -218,6 +221,25 @@ resilience4j:
         limit-refresh-period: 1m
         timeout-duration: 0s
 
-logging:
-  level:
-    org.hibernate.sql: DEBUG
+#logging:
+#  level:
+#    org.hibernate.sql: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus,metrics
+
+  endpoint:
+    health:
+      show-details: always
+
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+  metrics:
+    tags:
+      application: scrapper

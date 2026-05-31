@@ -12,8 +12,10 @@ import backend.academy.linktracker.scrapper.client.responsehandler.APIBadRespons
 import backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.rest.RestExternalClientsConfiguration;
 import backend.academy.linktracker.scrapper.dto.github.GithubIssueResponse;
 import backend.academy.linktracker.scrapper.dto.github.GithubRepositoryUpdateTime;
+import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiClientException;
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiException;
 import backend.academy.linktracker.scrapper.properties.GithubProperties;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import java.time.OffsetDateTime;
@@ -21,12 +23,19 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @Tag("integration")
 @WireMockTest
+@ExtendWith(MockitoExtension.class)
 class GitHubClientIntegrationTest {
 
     private GitHubClient gitHubClient;
+
+    @Mock
+    private ScrapperMetricsService scrapperMetricsService;
 
     @BeforeEach
     void setUp(WireMockRuntimeInfo wmRuntimeInfo) {
@@ -35,7 +44,7 @@ class GitHubClientIntegrationTest {
         properties.setHost(wmRuntimeInfo.getHttpBaseUrl());
         properties.setToken("test-token");
 
-        APIBadResponseHandler handler = new APIBadResponseHandler();
+        APIBadResponseHandler handler = new APIBadResponseHandler(scrapperMetricsService);
 
         RestExternalClientsConfiguration config = new RestExternalClientsConfiguration();
 
@@ -144,8 +153,8 @@ class GitHubClientIntegrationTest {
                         }
                         """)));
 
-        ExternalApiException exception =
-                assertThrows(ExternalApiException.class, () -> gitHubClient.getRepositoryIssueUpdate("test", "repo"));
+        ExternalApiException exception = assertThrows(
+                ExternalApiClientException.class, () -> gitHubClient.getRepositoryIssueUpdate("test", "repo"));
 
         assertEquals(403, exception.getStatusCode());
 
@@ -168,8 +177,8 @@ class GitHubClientIntegrationTest {
                         }
                         """)));
 
-        ExternalApiException exception =
-                assertThrows(ExternalApiException.class, () -> gitHubClient.getRepositoryUpdateTime("test", "repo"));
+        ExternalApiException exception = assertThrows(
+                ExternalApiClientException.class, () -> gitHubClient.getRepositoryUpdateTime("test", "repo"));
 
         assertEquals(404, exception.getStatusCode());
 

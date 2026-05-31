@@ -1,0 +1,3 @@
+resilience4j:
+  ratelimiter:
+    rate-limiter-aspect-order: 1

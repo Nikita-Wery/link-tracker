@@ -7,10 +7,12 @@ import backend.academy.linktracker.bot.dto.LinkResponse;
 import backend.academy.linktracker.bot.dto.ListLinksResponse;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ChatNotExistsException;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
 import backend.academy.linktracker.bot.utils.validator.TagsValidator;
 import com.pengrad.telegrambot.model.Update;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.micrometer.core.instrument.Timer;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -40,17 +42,24 @@ public class ListCommand extends AbstractCommand<Update> {
     private final ScrapperClient client;
     private final TelegramMessageSender sender;
     private final TagsValidator tagsValidator;
+    private final BotMetricsService botMetrics;
 
-    public ListCommand(ScrapperClient client, TelegramMessageSender sender, TagsValidator tagsValidator) {
+    public ListCommand(
+            ScrapperClient client,
+            TelegramMessageSender sender,
+            TagsValidator tagsValidator,
+            BotMetricsService botMetrics) {
 
         super(COMMAND_NAME, COMMAND_DESCRIPTION);
         this.client = client;
         this.sender = sender;
         this.tagsValidator = tagsValidator;
+        this.botMetrics = botMetrics;
     }
 
     @Override
     public void handle(Update update) {
+        ListLinksResponse listLinksResponse;
         Long chatId = update.message().chat().id();
         String[] tags = Arrays.copyOfRange(
                 update.message().text().split(wordSeparators.pattern()),
@@ -59,7 +68,12 @@ public class ListCommand extends AbstractCommand<Update> {
 
         try {
 
-            ListLinksResponse listLinksResponse = client.getLinks(chatId);
+            Timer.Sample sample = botMetrics.startCommandTimer();
+            try {
+                listLinksResponse = client.getLinks(chatId);
+            } finally {
+                botMetrics.stopCommandTimer(sample, "scrapper_sync_api", "getLinks");
+            }
 
             List<LinkResponse> linkResponses = listLinksResponse.links();
 
@@ -80,20 +94,24 @@ public class ListCommand extends AbstractCommand<Update> {
             }
 
         } catch (ChatNotExistsException ex) {
+
             log.info("The user tried to get chats, but he didn't attach any", ex);
             sender.sendMessage(update.message().chat().id(), NEVER_ATTACHED_LINK_MESSAGE);
         } catch (RequestNotPermitted ex) {
-            log.warn("Rate limit exceeded", ex);
 
+            log.warn("Rate limit exceeded", ex);
             sender.sendMessage(update.message().chat().id(), TOO_MANY_REQUESTS_MESSAGE);
         } catch (CallNotPermittedException ex) {
-            log.error("Circuit breaker is open", ex);
 
+            log.error("Circuit breaker is open", ex);
             sender.sendMessage(update.message().chat().id(), SERVICE_UNAVAILABLE_MESSAGE);
         } catch (ScrapperServerException ex) {
-            log.error("Scrapper server error", ex);
 
+            log.error("Scrapper server error", ex);
             sender.sendMessage(update.message().chat().id(), SCRAPPER_SERVER_ERROR_MESSAGE);
+        } finally {
+
+            botMetrics.incrementCommand(COMMAND_NAME);
         }
     }
 

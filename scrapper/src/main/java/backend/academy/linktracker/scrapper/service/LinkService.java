@@ -8,11 +8,11 @@ import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.exception.botexception.requestexception.LinkAlreadyExistsException;
 import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
 import backend.academy.linktracker.scrapper.repository.LinkRepository;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.OffsetDateTime;
+import io.micrometer.core.instrument.Timer;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -28,20 +28,15 @@ public class LinkService {
 
     private final LinkRepository linkRepository;
     private final ChatLinkRepository chatLinkRepository;
+    private final ScrapperMetricsService scrapperMetricsService;
 
-    public LinkService(LinkRepository linkRepository, ChatLinkRepository chatLinkRepository) {
+    public LinkService(
+            LinkRepository linkRepository,
+            ChatLinkRepository chatLinkRepository,
+            ScrapperMetricsService scrapperMetricsService) {
         this.linkRepository = linkRepository;
         this.chatLinkRepository = chatLinkRepository;
-    }
-
-    @Transactional
-    public void changeLastUpdate(Link link, OffsetDateTime newLastUpdate) {
-        linkRepository.updateLastUpdate(link, newLastUpdate);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<Link> findLinkByUri(String url) {
-        return linkRepository.findLinkByURI(url);
+        this.scrapperMetricsService = scrapperMetricsService;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -52,7 +47,9 @@ public class LinkService {
 
         try {
 
-            return linkRepository.saveAndFlush(link);
+            return scrapperMetricsService.timeExternalCall(
+                    "database", "addLink", "linkservice", () -> linkRepository.saveAndFlush(link));
+
         } catch (DataIntegrityViolationException ex) {
             log.warn("Link already exists", kv("link_url", link.getUrl()));
             throw new LinkAlreadyExistsException("Link already exists in repository");
@@ -62,11 +59,19 @@ public class LinkService {
     @Transactional(readOnly = true)
     public Slice<Link> findLinkBatch(long lastLinkId, int size) {
 
-        Slice<Link> slice = linkRepository.findByLinkIdGreaterThan(lastLinkId, size);
+        Slice<Link> slice = scrapperMetricsService.timeExternalCall(
+                "database",
+                "findByLinkIdGreaterThan",
+                "linkservice",
+                () -> linkRepository.findByLinkIdGreaterThan(lastLinkId, size));
 
-        List<ChatLink> chatsThatTrackLinks = chatLinkRepository.findChatLinksThatTrackLink(slice.getContent().stream()
-                .map(chatlink -> chatlink.getLinkId())
-                .toList());
+        List<ChatLink> chatsThatTrackLinks = scrapperMetricsService.timeExternalCall(
+                "database",
+                "findChatLinksThatTrackLink",
+                "linkservice",
+                () -> chatLinkRepository.findChatLinksThatTrackLink(slice.getContent().stream()
+                        .map(chatlink -> chatlink.getLinkId())
+                        .toList()));
 
         Map<Long, Link> futureLinkUpdates = slice.getContent().stream()
                 .collect(Collectors.toMap(l -> l.getLinkId(), l -> {
@@ -89,6 +94,8 @@ public class LinkService {
 
     @Transactional
     public void updateLastUpdateBatch(List<LinkUpdate> batch, int batchSize) {
+        Timer.Sample sample = scrapperMetricsService.startRequestTimer();
         linkRepository.updateLastUpdateBatch(batch, batchSize);
+        scrapperMetricsService.stopRequestTimer(sample, "database", "updateLastUpdateBatch");
     }
 }

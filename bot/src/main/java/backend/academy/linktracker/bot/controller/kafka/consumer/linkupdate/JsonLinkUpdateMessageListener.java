@@ -3,6 +3,8 @@ package backend.academy.linktracker.bot.controller.kafka.consumer.linkupdate;
 import static org.springframework.kafka.retrytopic.TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE;
 
 import backend.academy.linktracker.bot.dto.LinkUpdate;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -21,11 +23,12 @@ import org.springframework.stereotype.Component;
 public class JsonLinkUpdateMessageListener {
 
     private final LinkUpdateMessageProcessor processor;
+    private final BotMetricsService botMetricsService;
 
     @KafkaListener(containerFactory = "jsonConsumerFactory", topics = "${app.kafka.topics.link-updates.name}")
     @RetryableTopic(
             backOff = @BackOff(delay = 1000L, multiplier = 2.0),
-            attempts = "${app.kafka.topics.link-update.attempts}",
+            attempts = "${app.kafka.topics.link-updates.attempts}",
             autoCreateTopics = "true",
             kafkaTemplate = "dlqJsonLinkUpdateKafkaTemplate",
             topicSuffixingStrategy = SUFFIX_WITH_INDEX_VALUE,
@@ -34,6 +37,8 @@ public class JsonLinkUpdateMessageListener {
 
         log.info("A message with key: {} was received", record.key());
 
+        Timer.Sample sample = botMetricsService.startCommandTimer();
         processor.process(record.key(), record.topic(), record.value(), ack);
+        botMetricsService.stopCommandTimer(sample, "scrapper_async_api", "consumeLinkUpdate");
     }
 }

@@ -3,6 +3,7 @@ package backend.academy.linktracker.bot.dialog.trackdialog.actions;
 import static net.logstash.logback.argument.StructuredArguments.kv;
 
 import backend.academy.linktracker.bot.application.client.TelegramMessageSender;
+import backend.academy.linktracker.bot.application.command.impl.TrackCommand;
 import backend.academy.linktracker.bot.client.ScrapperClient;
 import backend.academy.linktracker.bot.dialog.DialogContext;
 import backend.academy.linktracker.bot.dialog.StateAction;
@@ -10,12 +11,14 @@ import backend.academy.linktracker.bot.dto.AddLinkRequest;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.InvalidLinkInRequestException;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.LinkAlreadyTrackedException;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import backend.academy.linktracker.bot.utils.validator.TagsValidator;
 import com.pengrad.telegrambot.model.Update;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -37,17 +40,20 @@ public class TagsAction implements StateAction {
     private final DialogContextStorage storage;
     private final TelegramMessageSender sender;
     private final TagsValidator tagsValidator;
+    private final BotMetricsService botMetricsService;
 
     public TagsAction(
             ScrapperClient client,
             DialogContextStorage storage,
             TelegramMessageSender sender,
-            TagsValidator tagsValidator) {
+            TagsValidator tagsValidator,
+            BotMetricsService botMetricsService) {
 
         this.client = client;
         this.storage = storage;
         this.sender = sender;
         this.tagsValidator = tagsValidator;
+        this.botMetricsService = botMetricsService;
     }
 
     @SuppressFBWarnings(
@@ -64,7 +70,12 @@ public class TagsAction implements StateAction {
 
             try {
 
-                client.addLink(update.message().chat().id(), addLinkRequest);
+                Timer.Sample sample = botMetricsService.startCommandTimer();
+                try {
+                    client.addLink(update.message().chat().id(), addLinkRequest);
+                } finally {
+                    botMetricsService.stopCommandTimer(sample, "scrapper_sync_api", "addLink");
+                }
 
                 storage.clearDialog(update.message().chat().id());
 
@@ -88,6 +99,9 @@ public class TagsAction implements StateAction {
                 log.error("Circuit breaker is open", ex);
 
                 sender.sendMessage(update.message().chat().id(), SERVICE_UNAVAILABLE_MESSAGE);
+            } finally {
+
+                botMetricsService.incrementCommand(TrackCommand.COMMAND_NAME);
             }
         }
 

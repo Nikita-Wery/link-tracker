@@ -1,5 +1,6 @@
 package backend.academy.linktracker.scrapper.repository.impl.orm.jpa;
 
+import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.domain.Link;
 import java.time.OffsetDateTime;
 import java.util.Optional;
@@ -33,4 +34,12 @@ public interface JpaLinkRepository extends JpaRepository<Link, Long> {
             @Param("latestUpdateTime") OffsetDateTime latestUpdateTime);
 
     Slice<Link> findLinkByLinkIdGreaterThan(Long linkIdIsGreaterThan, Pageable pageable);
+
+    @Query("""
+        SELECT COUNT(cl.chatLinkId)
+        FROM Link l
+        JOIN ChatLink cl ON l.linkId = cl.link.linkId
+        WHERE l.resourceType = :resourceType
+    """)
+    int countByResourceType(@Param("resourceType") ResourceType resourceType);
 }

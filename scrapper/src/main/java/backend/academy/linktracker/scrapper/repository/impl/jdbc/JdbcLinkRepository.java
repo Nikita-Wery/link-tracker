@@ -36,6 +36,15 @@ public class JdbcLinkRepository implements LinkRepository {
     // language=sql
     private static final String SELECT_NEXT_ID = "SELECT nextval('LINK_SEQUENCE')";
 
+    // language=sql
+    private static final String SELECT_COUNT_LINKS_BY_RESOURCE_TYPE = """
+        SELECT
+        COUNT(cl.chat_link_id) AS chat_link_count
+        FROM links l
+        JOIN chat_link cl ON l.link_id = cl.link_id
+        WHERE l.resource_type = :resourceType;
+        """;
+
     private static final RowMapper<Link> rsLinkMapper = (rs, rowNum) -> {
         Link link = new Link(
                 rs.getString("url"),
@@ -109,5 +118,14 @@ public class JdbcLinkRepository implements LinkRepository {
                 .param("linkUrl", uri.toString())
                 .query(rsLinkMapper)
                 .optional();
+    }
+
+    @Override
+    public int countByResourceType(ResourceType resourceType) {
+        return jdbcClient
+                .sql(SELECT_COUNT_LINKS_BY_RESOURCE_TYPE)
+                .param("resourceType", resourceType.name())
+                .query(Integer.class)
+                .single();
     }
 }

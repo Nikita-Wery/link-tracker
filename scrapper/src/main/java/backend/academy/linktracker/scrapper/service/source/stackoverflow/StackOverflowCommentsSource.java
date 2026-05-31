@@ -6,6 +6,7 @@ import backend.academy.linktracker.scrapper.domain.Link;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowCommentResponse;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowWrapper;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import backend.academy.linktracker.scrapper.service.source.UpdateSource;
 import backend.academy.linktracker.scrapper.utils.TextMessageHandler;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
@@ -23,10 +24,13 @@ import org.springframework.stereotype.Component;
 public class StackOverflowCommentsSource implements UpdateSource<LinkUpdate> {
 
     private final StackOverflowClient stackOverflowClient;
+    private final ScrapperMetricsService scrapperMetricsService;
 
-    public StackOverflowCommentsSource(StackOverflowClient stackOverflowClient) {
+    public StackOverflowCommentsSource(
+            StackOverflowClient stackOverflowClient, ScrapperMetricsService scrapperMetricsService) {
 
         this.stackOverflowClient = stackOverflowClient;
+        this.scrapperMetricsService = scrapperMetricsService;
     }
 
     @Override
@@ -41,8 +45,13 @@ public class StackOverflowCommentsSource implements UpdateSource<LinkUpdate> {
 
         Long questionId = extractQuestionId(link);
 
-        StackOverflowWrapper<StackOverflowCommentResponse> response =
-                stackOverflowClient.getCommentUpdates(questionId, "stackoverflow");
+        StackOverflowWrapper<StackOverflowCommentResponse> response = scrapperMetricsService.timeExternalCall(
+                "external_source",
+                "stackoverflow",
+                ResourceType.STACKOVERFLOW_COMMENTS.name(),
+                () -> stackOverflowClient.getCommentUpdates(questionId, "stackoverflow"));
+
+        scrapperMetricsService.incrementApiRequest("stackoverflow");
 
         return response.items().stream()
                 .filter(comment -> Instant.ofEpochSecond(comment.createdAt())

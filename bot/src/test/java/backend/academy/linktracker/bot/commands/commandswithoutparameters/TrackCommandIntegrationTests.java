@@ -14,6 +14,7 @@ import backend.academy.linktracker.bot.application.dispatcher.impl.CommandDispat
 import backend.academy.linktracker.bot.client.ScrapperClient;
 import backend.academy.linktracker.bot.dialog.DialogContext;
 import backend.academy.linktracker.bot.dialog.trackdialog.TrackingDialogStates;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
 import backend.academy.linktracker.bot.repository.DialogContextStorage;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
@@ -43,6 +44,9 @@ class TrackCommandTest {
 
     @Mock
     private DialogContextStorage contextStorage;
+
+    @Mock
+    private BotMetricsService botMetrics;
 
     private CommandDispatcher commandDispatcher;
 

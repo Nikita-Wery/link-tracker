@@ -3,6 +3,7 @@ package backend.academy.linktracker.scrapper.client.inner.kafka.impl.rawlinkupda
 import backend.academy.linktracker.contract.avro.RawLinkUpdateEvent;
 import backend.academy.linktracker.scrapper.client.inner.kafka.OutboxEventSender;
 import backend.academy.linktracker.scrapper.properties.topics.RawLinkUpdateTopicProperties;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import backend.academy.linktracker.scrapper.utils.JsonToEntityDeserializer;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class AvroRawLinkUpdateOutboxEventSender implements OutboxEventSender<Raw
     private final KafkaTemplate<Long, RawLinkUpdateEvent> kafkaTemplate;
     private final JsonToEntityDeserializer deserializer;
     private final RawLinkUpdateTopicProperties properties;
+    private final ScrapperMetricsService scrapperMetricsService;
 
     @Override
     public RawLinkUpdateEvent deserialize(String json) {
@@ -37,6 +39,7 @@ public class AvroRawLinkUpdateOutboxEventSender implements OutboxEventSender<Raw
     @Override
     public CompletableFuture<SendResult<Long, RawLinkUpdateEvent>> send(Long key, RawLinkUpdateEvent event) {
 
-        return kafkaTemplate.send(properties.getName(), key, event);
+        return scrapperMetricsService.timeExternalCall(
+                "kafka", properties.getName(), "kafka", () -> kafkaTemplate.send(properties.getName(), key, event));
     }
 }

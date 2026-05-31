@@ -4,6 +4,7 @@ import backend.academy.linktracker.scrapper.client.inner.impl.RestBotClient;
 import backend.academy.linktracker.scrapper.client.responsehandler.BotBadResponseHandler;
 import backend.academy.linktracker.scrapper.exception.botexception.BotApiException;
 import backend.academy.linktracker.scrapper.properties.BotProperties;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +23,10 @@ public class RestBotClientConfiguration {
 
     @Bean
     public BotBadResponseHandler botBadResponseHandler(
-            ObjectMapper objectMapper, List<BotApiException> responseExceptions) {
-        return new BotBadResponseHandler(objectMapper, responseExceptions);
+            ObjectMapper objectMapper,
+            List<BotApiException> responseExceptions,
+            ScrapperMetricsService scrapperMetricsService) {
+        return new BotBadResponseHandler(objectMapper, responseExceptions, scrapperMetricsService);
     }
 
     @Bean

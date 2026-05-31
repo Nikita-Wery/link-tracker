@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import org.wiremock.spring.EnableWireMock;
 import tools.jackson.databind.ObjectMapper;
 
@@ -45,6 +46,7 @@ import tools.jackson.databind.ObjectMapper;
             "resilience4j.ratelimiter.rate-limiter-aspect-order=1"
         })
 @EnableWireMock
+@ActiveProfiles("rate-limiter-test")
 @DisplayName("Rate Limiter tests for ScrapperClient")
 class ScrapperApiRateLimiterTest {
 

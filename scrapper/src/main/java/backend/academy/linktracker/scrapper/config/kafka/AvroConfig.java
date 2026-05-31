@@ -10,6 +10,7 @@ import backend.academy.linktracker.scrapper.dto.OutboxEventUpdateDto;
 import backend.academy.linktracker.scrapper.properties.topics.LinkUpdateTopicProperties;
 import backend.academy.linktracker.scrapper.properties.topics.RawLinkUpdateTopicProperties;
 import backend.academy.linktracker.scrapper.service.BatchWorker;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import backend.academy.linktracker.scrapper.utils.JsonToEntityDeserializer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -25,16 +26,18 @@ public class AvroConfig {
     public OutboxEventSender<LinkUpdateEvent> linkUpdateEventOutboxEventSender(
             KafkaTemplate<Long, LinkUpdateEvent> kafkaTemplate,
             JsonToEntityDeserializer deserializer,
-            LinkUpdateTopicProperties properties) {
-        return new AvroLinkUpdateOutboxEventSender(kafkaTemplate, deserializer, properties);
+            LinkUpdateTopicProperties properties,
+            ScrapperMetricsService scrapperMetricsService) {
+        return new AvroLinkUpdateOutboxEventSender(kafkaTemplate, deserializer, properties, scrapperMetricsService);
     }
 
     @Bean
     public OutboxEventSender<RawLinkUpdateEvent> rawLinkUpdateEventOutboxEventSender(
             KafkaTemplate<Long, RawLinkUpdateEvent> kafkaTemplate,
             JsonToEntityDeserializer deserializer,
-            RawLinkUpdateTopicProperties properties) {
-        return new AvroRawLinkUpdateOutboxEventSender(kafkaTemplate, deserializer, properties);
+            RawLinkUpdateTopicProperties properties,
+            ScrapperMetricsService scrapperMetricsService) {
+        return new AvroRawLinkUpdateOutboxEventSender(kafkaTemplate, deserializer, properties, scrapperMetricsService);
     }
 
     @Bean

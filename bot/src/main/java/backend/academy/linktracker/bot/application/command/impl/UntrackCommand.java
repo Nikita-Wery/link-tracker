@@ -9,11 +9,13 @@ import backend.academy.linktracker.bot.dto.RemoveLinkRequest;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ChatNotExistsException;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.LinkNotTrackedException;
 import backend.academy.linktracker.bot.exception.scrapperexception.responsexception.ScrapperServerException;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
 import backend.academy.linktracker.bot.utils.validator.LinkValidationProcessor;
 import com.pengrad.telegrambot.model.Update;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
+import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -40,13 +42,19 @@ public class UntrackCommand extends AbstractCommand<Update> {
     private final ScrapperClient client;
     private final TelegramMessageSender sender;
     private final LinkValidationProcessor validator;
+    private final BotMetricsService botMetrics;
 
-    public UntrackCommand(ScrapperClient client, TelegramMessageSender sender, LinkValidationProcessor validator) {
+    public UntrackCommand(
+            ScrapperClient client,
+            TelegramMessageSender sender,
+            LinkValidationProcessor validator,
+            BotMetricsService botMetrics) {
 
         super(COMMAND_NAME, COMMAND_DESCRIPTION);
         this.sender = sender;
         this.client = client;
         this.validator = validator;
+        this.botMetrics = botMetrics;
     }
 
     @Override
@@ -70,7 +78,14 @@ public class UntrackCommand extends AbstractCommand<Update> {
             RemoveLinkRequest removeLinkRequest = new RemoveLinkRequest(link);
 
             try {
-                client.untrackLink(chatId, removeLinkRequest);
+
+                Timer.Sample sample = botMetrics.startCommandTimer();
+                try {
+                    client.untrackLink(chatId, removeLinkRequest);
+                } finally {
+                    botMetrics.stopCommandTimer(sample, "scrapper_sync_api", "untrackLink");
+                }
+
                 sender.sendMessage(chatId, SUCCESSFUL_LINK_UNPINNING_MESSAGE);
             } catch (ChatNotExistsException ex) {
                 log.warn("The user has never interacted with the bot before");
@@ -89,6 +104,9 @@ public class UntrackCommand extends AbstractCommand<Update> {
                 log.error("Circuit breaker is open", ex);
 
                 sender.sendMessage(update.message().chat().id(), SERVICE_UNAVAILABLE_MESSAGE);
+            } finally {
+
+                botMetrics.incrementCommand(COMMAND_NAME);
             }
 
         } else {

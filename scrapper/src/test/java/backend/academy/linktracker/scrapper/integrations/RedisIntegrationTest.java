@@ -98,8 +98,9 @@ public class RedisIntegrationTest {
         assertEquals(1, chatLinkRedisCache.getAll(888L).size());
         assertEquals(chatLinkRedisCache.getAll(888L).getFirst().id(), 888L);
 
-        assertEquals(1, chatLinkLocalCache.get(888L).get().links().size());
-        assertEquals(chatLinkLocalCache.get(888L).get().links().getFirst().id(), 888L);
+        assertEquals(1, chatLinkLocalCache.get(888L).orElseThrow().links().size());
+        assertEquals(
+                chatLinkLocalCache.get(888L).orElseThrow().links().getFirst().id(), 888L);
     }
 
     @Test

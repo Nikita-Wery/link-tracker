@@ -3,8 +3,10 @@ package backend.academy.linktracker.bot.controller.kafka.consumer.linkupdate;
 import static org.springframework.kafka.retrytopic.TopicSuffixingStrategy.SUFFIX_WITH_INDEX_VALUE;
 
 import backend.academy.linktracker.bot.dto.LinkUpdate;
+import backend.academy.linktracker.bot.logging.aspect.BotMetricsService;
 import backend.academy.linktracker.bot.utils.mappers.AvroMapper;
 import backend.academy.linktracker.contract.avro.LinkUpdateEvent;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -24,11 +26,12 @@ public class AvroLinkUpdateMessageListener {
 
     private final AvroMapper avroMapper;
     private final LinkUpdateMessageProcessor processor;
+    private final BotMetricsService botMetricsService;
 
     @KafkaListener(containerFactory = "avroConsumerFactory", topics = "${app.kafka.topics.link-updates.name}")
     @RetryableTopic(
             backOff = @BackOff(delay = 1000L, multiplier = 2.0),
-            attempts = "${app.kafka.topics.link-update.attempts}",
+            attempts = "${app.kafka.topics.link-updates.attempts}",
             autoCreateTopics = "true",
             kafkaTemplate = "dlqAvroLinkUpdateKafkaTemplate",
             topicSuffixingStrategy = SUFFIX_WITH_INDEX_VALUE,
@@ -39,6 +42,8 @@ public class AvroLinkUpdateMessageListener {
 
         LinkUpdate linkUpdate = avroMapper.mappLinkUpdateEventToLinkUpdate(record.value());
 
+        Timer.Sample sample = Timer.start();
         processor.process(record.key(), record.topic(), linkUpdate, ack);
+        botMetricsService.stopCommandTimer(sample, "scrapper_async_api", "consumeLinkUpdate");
     }
 }

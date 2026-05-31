@@ -15,6 +15,7 @@ import backend.academy.linktracker.scrapper.repository.ChatLinkRepository;
 import backend.academy.linktracker.scrapper.service.ChatService;
 import backend.academy.linktracker.scrapper.service.LinkService;
 import backend.academy.linktracker.scrapper.service.SubscriptionService;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import backend.academy.linktracker.scrapper.utils.DtoEntityMapper;
 import backend.academy.linktracker.scrapper.utils.GrpcMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,6 +36,7 @@ public class SubscriptionServiceBase implements SubscriptionService {
     private final LinkService linkService;
     private final GrpcMapper grpcMapper;
     private final DtoEntityMapper dtoEntityMapper;
+    private final ScrapperMetricsService scrapperMetricsService;
 
     @Transactional
     @SuppressFBWarnings(
@@ -62,7 +64,9 @@ public class SubscriptionServiceBase implements SubscriptionService {
 
         try {
 
-            return chatLinkRepository.saveAndFlush(chatLink);
+            return scrapperMetricsService.timeExternalCall(
+                    "database", "trackLink", "subscriptionservice", () -> chatLinkRepository.saveAndFlush(chatLink));
+
         } catch (DataIntegrityViolationException ex) {
             log.warn(
                     "Link already tracked",
@@ -76,15 +80,20 @@ public class SubscriptionServiceBase implements SubscriptionService {
     @Transactional
     public ChatLink untrackLink(ChatLink chatLink) {
 
-        return chatLinkRepository
-                .deleteChatLinkReturningChatLink(chatLink)
-                .orElseThrow(() -> new LinkNotTrackedException("The link was not tracked from the chat side"));
+        return scrapperMetricsService.timeExternalCall(
+                "database", "untrackLink", "subscriptionservice", () -> chatLinkRepository
+                        .deleteChatLinkReturningChatLink(chatLink)
+                        .orElseThrow(() -> new LinkNotTrackedException("The link was not tracked from the chat side")));
     }
 
     @Transactional(readOnly = true)
     public List<ChatLink> getTrackedLinksByChatId(Long chatId) {
 
-        return chatLinkRepository.findChatLinksByChatId(chatId);
+        return scrapperMetricsService.timeExternalCall(
+                "database",
+                "getTrackedLinksByChatId",
+                "database",
+                () -> chatLinkRepository.findChatLinksByChatId(chatId));
     }
 
     @Transactional(readOnly = true)

@@ -11,19 +11,28 @@ import backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.res
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowAnswerResponse;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowCommentResponse;
 import backend.academy.linktracker.scrapper.dto.stackoverflow.StackOverflowWrapper;
+import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiClientException;
 import backend.academy.linktracker.scrapper.exception.externalexception.ExternalApiException;
 import backend.academy.linktracker.scrapper.properties.StackoverflowProperties;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @Tag("integration")
 @WireMockTest
+@ExtendWith(MockitoExtension.class)
 class StackOverflowIntegrationTest {
 
     private StackOverflowClient stackOverflowClient;
+
+    @Mock
+    private ScrapperMetricsService scrapperMetricsService;
 
     @BeforeEach
     void setUp(WireMockRuntimeInfo wmRuntimeInfo) {
@@ -34,7 +43,7 @@ class StackOverflowIntegrationTest {
         properties.setKey("test-key");
         properties.setAccessToken("test-token");
 
-        APIBadResponseHandler handler = new APIBadResponseHandler();
+        APIBadResponseHandler handler = new APIBadResponseHandler(scrapperMetricsService);
 
         RestExternalClientsConfiguration config = new RestExternalClientsConfiguration();
 
@@ -51,7 +60,7 @@ class StackOverflowIntegrationTest {
                         .withBody("quota exceeded")));
 
         ExternalApiException ex = assertThrows(
-                ExternalApiException.class,
+                ExternalApiClientException.class,
                 () -> stackOverflowClient.getQuestionUpdateTime(123L, "stackoverflow", "test-key", "test-token"));
 
         assertEquals(403, ex.getStatusCode());
@@ -130,7 +139,7 @@ class StackOverflowIntegrationTest {
                         .withBody("rate limit exceeded")));
 
         ExternalApiException ex = assertThrows(
-                ExternalApiException.class, () -> stackOverflowClient.getCommentUpdates(123L, "stackoverflow"));
+                ExternalApiClientException.class, () -> stackOverflowClient.getCommentUpdates(123L, "stackoverflow"));
 
         assertEquals(403, ex.getStatusCode());
         assertEquals("rate limit exceeded", ex.getBody());
@@ -143,7 +152,7 @@ class StackOverflowIntegrationTest {
                 .willReturn(aResponse().withStatus(403).withBody("blocked")));
 
         ExternalApiException ex = assertThrows(
-                ExternalApiException.class, () -> stackOverflowClient.getAnswerUpdates(123L, "stackoverflow"));
+                ExternalApiClientException.class, () -> stackOverflowClient.getAnswerUpdates(123L, "stackoverflow"));
 
         assertEquals(403, ex.getStatusCode());
         assertEquals("blocked", ex.getBody());
