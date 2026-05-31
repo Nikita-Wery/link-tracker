@@ -12,6 +12,7 @@ import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.rest.RestBotClientConfiguration;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.properties.BotProperties;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.ratelimiter.RateLimiterRegistry;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
@@ -29,6 +30,7 @@ import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.liquibase.autoconfigure.LiquibaseAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.wiremock.spring.EnableWireMock;
 import tools.jackson.databind.ObjectMapper;
 
@@ -49,7 +51,7 @@ import tools.jackson.databind.ObjectMapper;
             "resilience4j.ratelimiter.rate-limiter-aspect-order=1"
         })
 @EnableWireMock
-@ActiveProfiles("test")
+@ActiveProfiles({"test", "rate-limiter-test"})
 @EnableConfigurationProperties(BotProperties.class)
 @EnableAutoConfiguration(
         exclude = {
@@ -66,6 +68,9 @@ class BotClientRateLimiterTest {
 
     @Autowired
     private RateLimiterRegistry registry;
+
+    @MockitoBean
+    private ScrapperMetricsService scrapperMetricsService;
 
     @Autowired
     private RestBotClient botClient;

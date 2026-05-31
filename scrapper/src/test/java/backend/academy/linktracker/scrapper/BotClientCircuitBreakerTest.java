@@ -12,6 +12,7 @@ import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.bot.ApiErrorResponse;
 import backend.academy.linktracker.scrapper.exception.botexception.responsexception.BotServerException;
 import backend.academy.linktracker.scrapper.properties.BotProperties;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
@@ -35,6 +36,7 @@ import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.liquibase.autoconfigure.LiquibaseAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.wiremock.spring.EnableWireMock;
 import tools.jackson.databind.ObjectMapper;
 
@@ -74,6 +76,9 @@ class BotClientCircuitBreakerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private ScrapperMetricsService scrapperMetricsService;
 
     @Autowired
     private RestBotClient botClient;

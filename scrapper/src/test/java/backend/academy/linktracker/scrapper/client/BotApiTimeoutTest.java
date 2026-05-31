@@ -9,6 +9,7 @@ import backend.academy.linktracker.scrapper.config.ResourceType;
 import backend.academy.linktracker.scrapper.config.scrapperconfiguration.api.rest.RestBotClientConfiguration;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.properties.BotProperties;
+import backend.academy.linktracker.scrapper.service.logs.ScrapperMetricsService;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.Set;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.ResourceAccessException;
 import org.wiremock.spring.EnableWireMock;
 import tools.jackson.databind.ObjectMapper;
@@ -34,6 +36,9 @@ public class BotApiTimeoutTest {
 
     @Autowired
     private BotClient botClient;
+
+    @MockitoBean
+    ScrapperMetricsService scrapperMetricsService;
 
     @Test
     void shouldThrowTimeoutException() {
