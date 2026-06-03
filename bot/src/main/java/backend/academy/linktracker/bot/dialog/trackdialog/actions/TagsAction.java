@@ -19,6 +19,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.micrometer.core.instrument.Timer;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -66,7 +69,13 @@ public class TagsAction implements StateAction {
 
         if (tagsValidator.validate(messageText) && messageText.split(",").length <= ALLOWED_NUMBER_OF_TAGS) {
 
-            AddLinkRequest addLinkRequest = new AddLinkRequest(context.getUrl().toString(), context.getTags());
+            String[] tagsArray = messageText.split(",", -1);
+
+            Set<String> tags = Arrays.stream(tagsArray).map(String::strip).collect(Collectors.toSet());
+
+            context.setTags(tags);
+
+            AddLinkRequest addLinkRequest = new AddLinkRequest(context.getUrl().toString(), tags);
 
             try {
 

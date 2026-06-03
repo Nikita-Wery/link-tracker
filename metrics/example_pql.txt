@@ -86,7 +86,7 @@ Panels:
 	  ) by (le, scope_type)
 	)
 
-9)Total count of telegram requests: sum(rate(bot_requests_total[30m]))
+9)Total count of telegram requests: bot_requests_total
 
 10)Number of notifications send: sum(rate(sent_notification_total[30m]))
 
