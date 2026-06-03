@@ -12,10 +12,10 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class GropingServiceTest {
+class GroupingServiceTest {
 
     @InjectMocks
-    private GropingService service;
+    private GroupingService service;
 
     @Test
     void TC21_shouldGroupMultipleUpdatesIntoSingleMessage() {
