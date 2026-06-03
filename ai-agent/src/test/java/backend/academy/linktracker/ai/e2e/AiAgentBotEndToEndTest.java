@@ -1,9 +1,11 @@
 package backend.academy.linktracker.ai.e2e;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import backend.academy.linktracker.contract.avro.ProcessedLinkUpdateEvent;
 import backend.academy.linktracker.contract.avro.RawLinkUpdateEvent;
@@ -11,6 +13,7 @@ import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.serializers.KafkaAvroSerializer;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -34,12 +37,15 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.test.context.TestPropertySource;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+import org.testcontainers.containers.startupcheck.OneShotStartupCheckStrategy;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.ConfluentKafkaContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestPropertySource(properties = {"app.client.bot.api.kafka.enabled=true"})
@@ -53,8 +59,38 @@ class AiAgentBotEndToEndTest {
     static final DockerImageName KAFKA_IMAGE = DockerImageName.parse("confluentinc/cp-kafka:7.5.2");
     static final DockerImageName SCHEMA_REGISTRY = DockerImageName.parse("confluentinc/cp-schema-registry:7.7.8");
     static final DockerImageName AI_AGENT_IMAGE = DockerImageName.parse("ai-agent:0.0.1");
+    static final DockerImageName BOT_IMAGE = DockerImageName.parse("bot:0.0.1");
+    static final DockerImageName LIQUIBASE_IMAGE = DockerImageName.parse("liquibase/liquibase:latest-alpine");
 
     static Network network = Network.newNetwork();
+
+    @Container
+    static PostgreSQLContainer botPostgres = new PostgreSQLContainer("postgres:18-alpine")
+            .withDatabaseName("bot_db")
+            .withUsername("test")
+            .withPassword("test")
+            .withNetwork(network)
+            .withNetworkAliases("bot-postgres");
+
+    @Container
+    static GenericContainer<?> botLiquibase = new GenericContainer<>(LIQUIBASE_IMAGE)
+            .withNetwork(network)
+            .withFileSystemBind(
+                    Path.of("")
+                            .toAbsolutePath()
+                            .getParent()
+                            .resolve("migrations/migrations-bot")
+                            .toString(),
+                    "/liquibase/changelog",
+                    BindMode.READ_ONLY)
+            .withCommand(
+                    "--url=jdbc:postgresql://bot-postgres:5432/bot_db",
+                    "--username=test",
+                    "--password=test",
+                    "--changeLogFile=changelog-root.yaml",
+                    "update")
+            .dependsOn(botPostgres)
+            .withStartupCheckStrategy(new OneShotStartupCheckStrategy());
 
     @Container
     static ConfluentKafkaContainer kafka = new ConfluentKafkaContainer(KAFKA_IMAGE)
@@ -88,10 +124,37 @@ class AiAgentBotEndToEndTest {
             .withEnv("SPRING_KAFKA_CONSUMER_PROPERTIES_MAX_POLL_INTERVAL_MS", "3000")
             .withEnv("APP_GROUPING_WINDOW_MS", "1000")
             .withNetwork(network)
-            .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+            //            .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
             .withNetworkAliases("ai-agent")
             .dependsOn(schemaRegistry)
             .waitingFor(Wait.forHttp("/actuator/health").forPort(8085));
+
+    @Container
+    GenericContainer<?> bot = new GenericContainer<>(BOT_IMAGE)
+            .withExposedPorts(8080, 9090, 8011)
+            .withEnv("APP_LOGGER_FILE_ENABLED", "false")
+            .withEnv("APP_TELEGRAM_ENABLED", "false")
+            .withEnv("APP_CLIENT_SCRAPPER_API_KAFKA_ENABLED", "true")
+            .withEnv("SPRING_PROFILES_ACTIVE", "kafka")
+            .withEnv("SPRING_KAFKA_CONSUMER_PROPERTIES_SCHEMA_REGISTRY_URL", "http://schema-registry:8087")
+            .withEnv("SPRING_KAFKA_BOOTSTRAP_SERVERS", "kafka:29092")
+            .withEnv("SPRING_KAFKA_CONSUMER_PROPERTIES_FETCH_MIN_BYTES", "2")
+            .withEnv("SPRING_KAFKA_CONSUMER_PROPERTIES_MAX_POLL_INTERVAL_MS", "3000")
+            .withEnv("APP_KAFKA_SERIALIZATION", "avro")
+            .withEnv("APP_CLIENT_SCRAPPER_API_GRPC_ENABLED", "true")
+            .withEnv("APP_CLIENT_SCRAPPER_API_REST_ENABLED", "true")
+            .withEnv("APP_CLIENT_SCRAPPER_HOST", "http://scrapper:8081")
+            .withEnv("APP_CLIENT_SCRAPPER_GRPC_HOST", "scrapper:9091")
+            .withEnv("DB_HOST", "bot-postgres")
+            .withEnv("DB_PORT", "5432")
+            .withEnv("DB_NAME", "bot_db")
+            .withEnv("DB_USERNAME", "test")
+            .withEnv("DB_PASSWORD", "test")
+            .withNetwork(network)
+            .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+            .withNetworkAliases("bot")
+            .dependsOn(botLiquibase, schemaRegistry)
+            .waitingFor(Wait.forHttp("/health").forPort(8011));
 
     @Test
     @SneakyThrows
@@ -114,6 +177,22 @@ class AiAgentBotEndToEndTest {
         log.info("TEST CONSUMER RECEIVED key={}, value={}", record.key(), event);
 
         assertEquals(1L, event.getId());
+    }
+
+    @Test
+    void bot_logs_shouldContainSuccessLog() {
+
+        produceMessage();
+
+        await().atMost(Duration.ofSeconds(20)).untilAsserted(() -> {
+            String logs = bot.getLogs();
+
+            assertTrue(logs.contains("A message with key: 1 was received"));
+        });
+
+        ConsumerRecord<Long, Object> record = pollMessage("link-processed-updates");
+
+        assertNotNull(record);
     }
 
     private void produceMessage() {

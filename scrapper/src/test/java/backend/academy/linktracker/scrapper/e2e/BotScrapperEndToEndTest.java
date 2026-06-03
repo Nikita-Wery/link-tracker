@@ -145,7 +145,7 @@ class BotScrapperEndToEndTest {
         botLiquibaseContainer.start();
 
         bot = new GenericContainer<>(BOT_IMAGE)
-                .withExposedPorts(8080, 9090)
+                .withExposedPorts(8080, 9090, 8011)
                 .withEnv("APP_LOGGER_FILE_ENABLED", "false")
                 .withEnv("APP_TELEGRAM_ENABLED", "false")
                 .withEnv("APP_CLIENT_SCRAPPER_API_KAFKA_ENABLED", "false")
@@ -158,11 +158,10 @@ class BotScrapperEndToEndTest {
                 .withEnv("DB_NAME", "bot_db")
                 .withEnv("DB_USERNAME", "test")
                 .withEnv("DB_PASSWORD", "test")
-                //                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
                 .withNetwork(network)
                 .withNetworkAliases("bot")
-                .waitingFor(Wait.forHttp("/actuator/health").forPort(8080).withStartupTimeout(Duration.ofMinutes(2)));
-
+                .waitingFor(Wait.forHttp("/health").forPort(8011).withStartupTimeout(Duration.ofMinutes(2)));
         bot.start();
 
         scrapper = new GenericContainer<>(SCRAPPER_IMAGE)
@@ -172,6 +171,8 @@ class BotScrapperEndToEndTest {
                 .withEnv("APP_CLIENT_BOT_API_REST_ENABLED", "true")
                 .withEnv("APP_CLIENT_BOT_API_GRPC_ENABLED", "true")
                 .withEnv("APP_CLIENT_BOT_API_KAFKA_ENABLED", "false")
+                .withEnv("APP_CACHE_ENABLED", "false")
+                .withEnv("MANAGEMENT_HEALTH_REDIS_ENABLED", "false")
                 .withEnv("APP_DB_ACCESS_TYPE", "orm")
                 .withEnv("APP_CLIENT_BOT_HOST", "http://bot:8080")
                 .withEnv("APP_CLIENT_BOT_GRPC_HOST", "bot:9090")
@@ -181,7 +182,7 @@ class BotScrapperEndToEndTest {
                 .withEnv("DB_USERNAME", "test")
                 .withEnv("DB_PASSWORD", "test")
                 .withEnv("SPRING_LIQUIBASE_ENABLED", "false")
-                //                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
+                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
                 .withNetwork(network)
                 .withNetworkAliases("test-migrations/scrapper")
                 .waitingFor(Wait.forHttp("/actuator/health").forPort(8081).withStartupTimeout(Duration.ofMinutes(2)));
@@ -217,6 +218,12 @@ class BotScrapperEndToEndTest {
                 .build();
     }
 
+    private RestClient botActuatorRestClient() {
+        return RestClient.builder()
+                .baseUrl("http://localhost:" + bot.getMappedPort(8011))
+                .build();
+    }
+
     private RestClient scrapperRestClient() {
         return RestClient.builder()
                 .baseUrl("http://localhost:" + scrapper.getMappedPort(8081))
@@ -242,11 +249,8 @@ class BotScrapperEndToEndTest {
 
     @Test
     void restBotHealthTest() {
-        var response = botRestClient()
-                .get()
-                .uri("/actuator/health/liveness")
-                .retrieve()
-                .toEntity(String.class);
+        var response =
+                botActuatorRestClient().get().uri("/health/liveness").retrieve().toEntity(String.class);
 
         assertEquals(200, response.getStatusCode().value());
     }

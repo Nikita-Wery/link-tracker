@@ -139,7 +139,7 @@ public class BotScrapperKafkaEndToEndTest {
 
     @Container
     GenericContainer<?> bot = new GenericContainer<>(BOT_IMAGE)
-            .withExposedPorts(8080, 9090)
+            .withExposedPorts(8080, 9090, 8011)
             .withEnv("APP_LOGGER_FILE_ENABLED", "false")
             .withEnv("APP_TELEGRAM_ENABLED", "false")
             .withEnv("APP_CLIENT_SCRAPPER_API_KAFKA_ENABLED", "true")
@@ -162,7 +162,7 @@ public class BotScrapperKafkaEndToEndTest {
             .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
             .withNetworkAliases("bot")
             .dependsOn(botLiquibase, schemaRegistry)
-            .waitingFor(Wait.forHttp("/actuator/health").forPort(8080));
+            .waitingFor(Wait.forHttp("/health").forPort(8011).withStartupTimeout(Duration.ofMinutes(2)));
 
     @Container
     GenericContainer<?> scrapper = new GenericContainer<>(SCRAPPER_IMAGE)

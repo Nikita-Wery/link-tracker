@@ -16,7 +16,7 @@ public class RawLinkUpdatesProcessor {
 
     private final List<RawLinkUpdateFilter> filters;
     private final List<SubProcessor<LinkUpdateContext>> processors;
-    private final GropingService gropingService;
+    private final GroupingService groupingService;
 
     public void processRawLinkUpdate(Long messageKey, String topic, RawLinkUpdate rawLinkUpdate, Acknowledgment ack) {
 
@@ -37,7 +37,7 @@ public class RawLinkUpdatesProcessor {
 
         processors.forEach(processor -> processor.process(context));
 
-        gropingService.addProcessedLinkUpdate(messageKey, rawLinkUpdateToProcessed(context));
+        groupingService.addProcessedLinkUpdate(messageKey, rawLinkUpdateToProcessed(context));
 
         ack.acknowledge();
     }

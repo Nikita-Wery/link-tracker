@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class GropingService {
+public class GroupingService {
 
     @Qualifier("linkUpdateGrouperScheduler")
     private final TaskScheduler scheduler;
@@ -36,13 +36,16 @@ public class GropingService {
 
     public void addProcessedLinkUpdate(long eventKey, ProcessedLinkUpdate processedLinkUpdate) {
 
-        buffers.computeIfAbsent(processedLinkUpdate.id(), id -> {
-                    scheduleFlush(id);
+        for (Long chatId : processedLinkUpdate.tgChatIds()) {
 
-                    return new LinkUpdatesGroup(eventKey, new ConcurrentLinkedQueue<>());
-                })
-                .processedLinkUpdates()
-                .add(processedLinkUpdate);
+            buffers.computeIfAbsent(chatId, id -> {
+                        scheduleFlush(id);
+
+                        return new LinkUpdatesGroup(eventKey, new ConcurrentLinkedQueue<>());
+                    })
+                    .processedLinkUpdates()
+                    .add(processedLinkUpdate);
+        }
     }
 
     private void scheduleFlush(long id) {
