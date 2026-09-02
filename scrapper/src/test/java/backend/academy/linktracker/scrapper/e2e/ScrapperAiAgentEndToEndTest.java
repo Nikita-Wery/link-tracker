@@ -108,9 +108,6 @@ class ScrapperAiAgentEndToEndTest {
     GenericContainer<?> scrapper = new GenericContainer<>(SCRAPPER_IMAGE)
             .withExposedPorts(8081, 9091)
             .withEnv("MANAGEMENT_HEALTH_REDIS_ENABLED", "false")
-            //        .withEnv("SPRING_AUTOCONFIGURE_EXCLUDE",
-            //            "org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration," +
-            //            "org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration")
             .withEnv("SPRING_TASK_SCHEDULING_ENABLED", "true")
             .withEnv("APP_SCHEDULER_ENABLED", "true")
             .withEnv("APP_SCHEDULER_LINK_UPDATE_ENABLED", "false")

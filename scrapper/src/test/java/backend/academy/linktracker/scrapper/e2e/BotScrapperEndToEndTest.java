@@ -13,6 +13,8 @@ import backend.academy.linktracker.proto.RegisterChatRequest;
 import backend.academy.linktracker.proto.RemoveChatRequest;
 import backend.academy.linktracker.proto.ScrapperServiceGrpc;
 import backend.academy.linktracker.scrapper.config.ResourceType;
+import backend.academy.linktracker.scrapper.containers.liquibase.LiquibaseContainerFactory;
+import backend.academy.linktracker.scrapper.containers.postgres.PostgresContainerFactory;
 import backend.academy.linktracker.scrapper.dto.LinkUpdate;
 import backend.academy.linktracker.scrapper.dto.bot.AddLinkRequest;
 import backend.academy.linktracker.scrapper.dto.bot.RemoveLinkRequest;
@@ -44,7 +46,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
-import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.startupcheck.OneShotStartupCheckStrategy;
@@ -96,68 +97,36 @@ class BotScrapperEndToEndTest {
     @BeforeAll
     void upContainers() {
 
-        scrapperPostgreSQLContainer = new PostgreSQLContainer("postgres:18-alpine")
-                .withDatabaseName("linktracker_db")
-                .withUsername("test")
-                .withPassword("test")
-                .withNetwork(network)
-                .withNetworkAliases("scrapper-postgres")
-                .waitingFor(Wait.forListeningPort());
+        scrapperPostgreSQLContainer = PostgresContainerFactory.create("linktracker_db", network, "scrapper-postgres");
+        scrapperPostgreSQLContainer.waitingFor(Wait.forListeningPort());
 
-        botPostgreSQLContainer = new PostgreSQLContainer("postgres:18-alpine")
-                .withDatabaseName("bot_db")
-                .withUsername("test")
-                .withPassword("test")
-                .withNetwork(network)
-                .withNetworkAliases("bot-postgres")
-                .waitingFor(Wait.forListeningPort());
+        botPostgreSQLContainer = PostgresContainerFactory.create("bot_db", network, "bot-postgres");
+        botPostgreSQLContainer.waitingFor(Wait.forListeningPort());
 
         scrapperPostgreSQLContainer.start();
-
         botPostgreSQLContainer.start();
 
-        scrapperLiquibaseContainer = new GenericContainer<>(LIQUIBASE_IMAGE)
-                .withNetwork(network)
-                .withFileSystemBind(SCRAPPER_MIGRATIONS_PATH, "/liquibase/changelog", BindMode.READ_ONLY)
-                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
-                .withCommand(
-                        "--url=jdbc:postgresql://scrapper-postgres:5432/linktracker_db",
-                        "--username=test",
-                        "--password=test",
-                        "--changeLogFile=changelog-root.yaml",
-                        "update")
-                .withStartupCheckStrategy(new OneShotStartupCheckStrategy());
-
+        scrapperLiquibaseContainer = LiquibaseContainerFactory.create(scrapperPostgreSQLContainer, "scrapper-postgres", SCRAPPER_MIGRATIONS_PATH, network);
+        scrapperLiquibaseContainer.withStartupCheckStrategy(new OneShotStartupCheckStrategy());
         scrapperLiquibaseContainer.start();
 
-        botLiquibaseContainer = new GenericContainer<>(LIQUIBASE_IMAGE)
-                .withNetwork(network)
-                .withFileSystemBind(BOT_MIGRATIONS_PATH, "/liquibase/changelog", BindMode.READ_ONLY)
-                .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
-                .withCommand(
-                        "--url=jdbc:postgresql://bot-postgres:5432/bot_db",
-                        "--username=test",
-                        "--password=test",
-                        "--changeLogFile=changelog-root.yaml",
-                        "update")
-                .withStartupCheckStrategy(new OneShotStartupCheckStrategy());
-
+        botLiquibaseContainer = LiquibaseContainerFactory.create(botPostgreSQLContainer, "bot-postgres", BOT_MIGRATIONS_PATH, network);
+        botLiquibaseContainer.withStartupCheckStrategy(new OneShotStartupCheckStrategy());
         botLiquibaseContainer.start();
 
         bot = new GenericContainer<>(BOT_IMAGE)
                 .withExposedPorts(8080, 9090, 8011)
-                .withEnv("APP_LOGGER_FILE_ENABLED", "false")
-                .withEnv("APP_TELEGRAM_ENABLED", "false")
-                .withEnv("APP_CLIENT_SCRAPPER_API_KAFKA_ENABLED", "false")
+                .withEnv("SPRING_PROFILES_ACTIVE", "integration")
+//                .withEnv("APP_LOGGER_FILE_ENABLED", "false")
+//                .withEnv("APP_TELEGRAM_ENABLED", "false")
+//                .withEnv("APP_CLIENT_SCRAPPER_API_KAFKA_ENABLED", "false")
                 .withEnv("APP_CLIENT_SCRAPPER_API_GRPC_ENABLED", "true")
-                .withEnv("APP_CLIENT_SCRAPPER_API_REST_ENABLED", "true")
+//                .withEnv("APP_CLIENT_SCRAPPER_API_REST_ENABLED", "true")
                 .withEnv("APP_CLIENT_SCRAPPER_HOST", "http://scrapper:8081")
                 .withEnv("APP_CLIENT_SCRAPPER_GRPC_HOST", "scrapper:9091")
                 .withEnv("DB_HOST", "bot-postgres")
                 .withEnv("DB_PORT", "5432")
                 .withEnv("DB_NAME", "bot_db")
-                .withEnv("DB_USERNAME", "test")
-                .withEnv("DB_PASSWORD", "test")
                 .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
                 .withNetwork(network)
                 .withNetworkAliases("bot")
@@ -166,25 +135,26 @@ class BotScrapperEndToEndTest {
 
         scrapper = new GenericContainer<>(SCRAPPER_IMAGE)
                 .withExposedPorts(8081, 9091)
-                .withEnv("SPRING_TASK_SCHEDULING_ENABLED", "false")
-                .withEnv("APP_CACHE_ENABLED", "false")
-                .withEnv("APP_CLIENT_BOT_API_REST_ENABLED", "true")
+                .withEnv("SPRING_PROFILES_ACTIVE", "integration")
+//                .withEnv("SPRING_TASK_SCHEDULING_ENABLED", "false")
+//                .withEnv("APP_CACHE_ENABLED", "false")
+//                .withEnv("APP_CLIENT_BOT_API_REST_ENABLED", "true")
                 .withEnv("APP_CLIENT_BOT_API_GRPC_ENABLED", "true")
-                .withEnv("APP_CLIENT_BOT_API_KAFKA_ENABLED", "false")
-                .withEnv("APP_CACHE_ENABLED", "false")
-                .withEnv("MANAGEMENT_HEALTH_REDIS_ENABLED", "false")
-                .withEnv("APP_DB_ACCESS_TYPE", "orm")
+//                .withEnv("APP_CLIENT_BOT_API_KAFKA_ENABLED", "false")
+//                .withEnv("APP_CACHE_ENABLED", "false")
+//                .withEnv("MANAGEMENT_HEALTH_REDIS_ENABLED", "false")
+//                .withEnv("APP_DB_ACCESS_TYPE", "orm")
                 .withEnv("APP_CLIENT_BOT_HOST", "http://bot:8080")
                 .withEnv("APP_CLIENT_BOT_GRPC_HOST", "bot:9090")
                 .withEnv("DB_HOST", "scrapper-postgres")
                 .withEnv("DB_PORT", "5432")
                 .withEnv("DB_NAME", "linktracker_db")
-                .withEnv("DB_USERNAME", "test")
-                .withEnv("DB_PASSWORD", "test")
-                .withEnv("SPRING_LIQUIBASE_ENABLED", "false")
+//                .withEnv("DB_USERNAME", "test")
+//                .withEnv("DB_PASSWORD", "test")
+//                .withEnv("SPRING_LIQUIBASE_ENABLED", "false")
                 .withLogConsumer(frame -> System.out.print(frame.getUtf8String()))
                 .withNetwork(network)
-                .withNetworkAliases("test-migrations/scrapper")
+//                .withNetworkAliases("test-migrations/scrapper")
                 .waitingFor(Wait.forHttp("/actuator/health").forPort(8081).withStartupTimeout(Duration.ofMinutes(2)));
 
         scrapper.start();

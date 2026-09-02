@@ -1,4 +1,5 @@
 spring:
+
   liquibase:
     enabled: true
     change-log: classpath:test-migrations/scrapper/changelog-root.yaml
@@ -23,6 +24,7 @@ app:
           enabled: true
         grpc:
           enabled: false
+
 logging:
   level:
     root: INFO

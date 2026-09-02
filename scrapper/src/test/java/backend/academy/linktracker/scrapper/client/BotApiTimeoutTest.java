@@ -24,7 +24,10 @@ import org.wiremock.spring.EnableWireMock;
 import tools.jackson.databind.ObjectMapper;
 
 @SpringBootTest(
-        classes = {RestBotClientConfiguration.class, ObjectMapper.class},
+        classes = {
+            RestBotClientConfiguration.class,
+            ObjectMapper.class
+        },
         properties = {"app.client.scrapper.base-url=${wiremock.server.baseUrl}"})
 @EnableWireMock
 @ActiveProfiles("test")
@@ -47,7 +50,10 @@ public class BotApiTimeoutTest {
 
         stubFor(post(urlEqualTo("/updates"))
                 .willReturn(
-                        aResponse().withStatus(200).withFixedDelay(fixedDelay).withBody("OK")));
+                        aResponse()
+                            .withStatus(200)
+                            .withFixedDelay(fixedDelay)
+                            .withBody("OK")));
 
         LinkUpdate linkUpdateDto = new LinkUpdate(
                 1L,

@@ -1,0 +1,22 @@
+app:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/bot_db
+    username: test
+    password: test
+    driver-class-name: org.postgresql.Driver
+
+  telegram:
+    enabled: false
+
+  db:
+    access-type: orm
+
+  client:
+
+    api:
+      kafka:
+        enabled: false
+      rest:
+        enabled: true
+      grpc:
+        enabled: false

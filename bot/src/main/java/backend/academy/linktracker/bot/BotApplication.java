@@ -7,7 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class BotApplication {
-
     static void main(String[] args) {
         SpringApplication.run(BotApplication.class, args);
     }
