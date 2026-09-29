@@ -23,9 +23,9 @@ public class ProxyProperties {
     @NotNull
     private String host;
 
-    @NotNull
-    private String pass;
-
-    @NotNull
-    private String userName;
+//    @NotNull
+//    private String pass;
+//
+//    @NotNull
+//    private String userName;
 }
